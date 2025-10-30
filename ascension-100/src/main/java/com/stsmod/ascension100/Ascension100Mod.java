@@ -58,6 +58,11 @@ public class Ascension100Mod implements
 
         // Subscribe to BaseMod events
         BaseMod.subscribe(this);
+
+        // TODO: Implement ascension level extension
+        // Need to patch game code to extend max ascension from 20 to 100
+        // Requires finding the actual methods/fields that control ascension limits
+        logger.info("Ascension 100 mod loaded (functionality not yet implemented)");
     }
 
     /**
