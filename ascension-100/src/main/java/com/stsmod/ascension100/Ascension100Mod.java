@@ -70,27 +70,33 @@ public class Ascension100Mod implements
         // Create mod settings panel
         ModPanel settingsPanel = new ModPanel();
 
-        // Load badge image (use null if not found)
+        // Try to load badge image
         Texture badgeTexture = null;
         try {
             String badgePath = getModPath(BADGE_IMAGE);
             if (Gdx.files.internal(badgePath).exists()) {
                 badgeTexture = ImageMaster.loadImage(badgePath);
+                logger.info("Badge image loaded successfully");
             } else {
-                logger.warn("Badge image not found at: " + badgePath);
+                logger.warn("Badge image not found at: " + badgePath + " - skipping badge registration");
             }
         } catch (Exception e) {
-            logger.error("Failed to load badge image", e);
+            logger.error("Failed to load badge image - skipping badge registration", e);
         }
 
-        // Register the settings panel with BaseMod
-        BaseMod.registerModBadge(
-                badgeTexture,
-                MOD_NAME,
-                AUTHOR,
-                DESCRIPTION,
-                settingsPanel
-        );
+        // Only register badge if image was loaded successfully
+        if (badgeTexture != null) {
+            BaseMod.registerModBadge(
+                    badgeTexture,
+                    MOD_NAME,
+                    AUTHOR,
+                    DESCRIPTION,
+                    settingsPanel
+            );
+            logger.info("Mod badge registered");
+        } else {
+            logger.info("Mod loaded without badge image");
+        }
 
         logger.info("Mod panel setup complete");
     }
