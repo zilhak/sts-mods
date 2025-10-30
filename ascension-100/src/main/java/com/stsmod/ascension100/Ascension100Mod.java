@@ -4,6 +4,7 @@ import basemod.BaseMod;
 import basemod.ModPanel;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
@@ -69,9 +70,22 @@ public class Ascension100Mod implements
         // Create mod settings panel
         ModPanel settingsPanel = new ModPanel();
 
+        // Load badge image (use null if not found)
+        Texture badgeTexture = null;
+        try {
+            String badgePath = getModPath(BADGE_IMAGE);
+            if (Gdx.files.internal(badgePath).exists()) {
+                badgeTexture = ImageMaster.loadImage(badgePath);
+            } else {
+                logger.warn("Badge image not found at: " + badgePath);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load badge image", e);
+        }
+
         // Register the settings panel with BaseMod
         BaseMod.registerModBadge(
-                ImageMaster.loadImage(BADGE_IMAGE),
+                badgeTexture,
                 MOD_NAME,
                 AUTHOR,
                 DESCRIPTION,
