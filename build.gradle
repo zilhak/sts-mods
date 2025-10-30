@@ -4,6 +4,11 @@ plugins {
     id 'java'
 }
 
+// Disable JAR creation for root project (no source code)
+jar {
+    enabled = false
+}
+
 // Define common properties for all projects
 ext {
     stsVersion = '01-23-2019'
@@ -66,6 +71,28 @@ subprojects {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
+
+// Copy all module JARs to root build/libs directory
+tasks.register('collectJars', Copy) {
+    dependsOn subprojects.collect { it.tasks.named('jar') }
+
+    from subprojects.collect { it.tasks.jar.outputs.files }
+    into "${buildDir}/libs"
+
+    doLast {
+        println ""
+        println "========================================="
+        println "  Collected JARs in ${buildDir}/libs:"
+        println "========================================="
+        fileTree("${buildDir}/libs").include('*.jar').each { file ->
+            println "  - ${file.name} (${String.format('%.1f', file.size() / 1024)}KB)"
+        }
+        println "========================================="
+    }
+}
+
+// Make build task collect JARs automatically
+build.finalizedBy collectJars
 
 // Print build info (custom task)
 tasks.register('info') {
