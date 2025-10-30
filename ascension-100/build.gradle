@@ -1,0 +1,35 @@
+// Build configuration for Ascension 100 mod
+
+description = 'Extends Slay the Spire ascension mode to level 100'
+
+// Dependencies (inherited from root build.gradle)
+dependencies {
+    // Common dependencies (STS, ModTheSpire, BaseMod) are already included via root project
+    // No additional dependencies needed for this module
+}
+
+// JAR configuration
+jar {
+    archiveBaseName = 'Ascension100'
+    archiveVersion = ''  // Empty version to get just "Ascension100.jar"
+
+    // Add manifest entries for ModTheSpire
+    manifest {
+        attributes(
+            'MTS-Version': rootProject.ext.modthespireVersion
+        )
+    }
+
+    // Ensure all resources are included
+    from(sourceSets.main.output)
+}
+
+// Print build info
+tasks.register('modInfo') {
+    doLast {
+        println "Building: ${project.name}"
+        println "Output: ${jar.archiveFile.get()}"
+    }
+}
+
+build.finalizedBy modInfo

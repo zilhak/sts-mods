@@ -1,0 +1,18 @@
+{
+  "ascension100:ModName": {
+    "TEXT": [
+      "Ascension 100"
+    ]
+  },
+  "ascension100:ModDescription": {
+    "TEXT": [
+      "Extends Ascension mode to level 100 with progressively harder challenges.",
+      "Each level beyond 20 adds unique modifiers that increase difficulty."
+    ]
+  },
+  "ascension100:AscensionLevel": {
+    "TEXT": [
+      "Ascension "
+    ]
+  }
+}

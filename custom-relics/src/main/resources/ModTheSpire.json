@@ -1,0 +1,12 @@
+{
+  "modid": "customrelics",
+  "name": "Custom Relics",
+  "author_list": ["YourName"],
+  "description": "Adds unique and powerful custom relics to expand your strategic options.",
+  "version": "1.0.0",
+  "sts_version": "01-23-2019",
+  "mts_version": "3.29.3",
+  "dependencies": ["basemod"],
+  "update_json": "",
+  "credits": ""
+}

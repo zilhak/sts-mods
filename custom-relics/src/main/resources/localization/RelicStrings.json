@@ -1,0 +1,9 @@
+{
+  "customrelics:LuckyCoin": {
+    "NAME": "Lucky Coin",
+    "FLAVOR": "A mysterious coin that seems to bring fortune in battle.",
+    "DESCRIPTIONS": [
+      "At the start of each combat, gain [E] and draw #b1 card."
+    ]
+  }
+}

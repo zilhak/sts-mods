@@ -1,0 +1,15 @@
+// Multi-module project settings for Slay the Spire Mods
+
+rootProject.name = 'sts-mods-parent'
+
+// Include subprojects
+include 'ascension-100'
+include 'custom-relics'
+
+// Print greeting message
+gradle.buildFinished {
+    println ""
+    println "========================================="
+    println "  Gradle Build Complete!"
+    println "========================================="
+}

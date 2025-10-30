@@ -1,0 +1,37 @@
+// Build configuration for Custom Relics mod
+
+description = 'Adds custom relics to Slay the Spire'
+
+// Dependencies
+dependencies {
+    // Common dependencies (STS, ModTheSpire, BaseMod) are already included via root project
+
+    // StSLib - Optional but recommended for advanced relic features
+    implementation files("${rootProject.ext.stsLibPath}")
+}
+
+// JAR configuration
+jar {
+    archiveBaseName = 'CustomRelics'
+    archiveVersion = ''  // Empty version to get just "CustomRelics.jar"
+
+    // Add manifest entries for ModTheSpire
+    manifest {
+        attributes(
+            'MTS-Version': rootProject.ext.modthespireVersion
+        )
+    }
+
+    // Ensure all resources are included
+    from(sourceSets.main.output)
+}
+
+// Print build info
+tasks.register('modInfo') {
+    doLast {
+        println "Building: ${project.name}"
+        println "Output: ${jar.archiveFile.get()}"
+    }
+}
+
+build.finalizedBy modInfo

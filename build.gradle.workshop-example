@@ -1,0 +1,29 @@
+// Example build.gradle configuration for Steam Workshop mods
+
+ext {
+    stsVersion = '01-23-2019'
+    modthespireVersion = '3.29.3'
+    basemodVersion = '5.48.0'
+    stslibVersion = '2.3.0'
+
+    // STS installation directory
+    stsInstallDir = System.getenv('STS_INSTALL_DIR') ?: 'C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire'
+
+    // Steam Workshop directory
+    workshopDir = 'C:/Program Files (x86)/Steam/steamapps/workshop/content/646570'
+
+    // OPTION 1: Direct paths (if mods are in STS/mods folder)
+    // modTheSpirePath = "${stsInstallDir}/mods/ModTheSpire.jar"
+    // baseModPath = "${stsInstallDir}/mods/BaseMod.jar"
+    // stsLibPath = "${stsInstallDir}/mods/StSLib.jar"
+
+    // OPTION 2: Workshop paths (UPDATE the folder IDs with your actual ones!)
+    modTheSpirePath = "${workshopDir}/1605833019/ModTheSpire.jar"
+    baseModPath = "${workshopDir}/1605060445/BaseMod.jar"
+    stsLibPath = "${workshopDir}/1609158507/StSLib.jar"
+}
+
+// Common Workshop mod IDs (for reference):
+// ModTheSpire: 1605833019
+// BaseMod:     1605060445
+// StSLib:      1609158507

@@ -1,0 +1,83 @@
+// Root build.gradle for Slay the Spire Mods Collection
+
+plugins {
+    id 'java'
+}
+
+// Define common properties for all projects
+ext {
+    stsVersion = '01-23-2019'
+    modthespireVersion = '3.29.3'
+    basemodVersion = '5.48.0'
+    stslibVersion = '2.3.0'
+
+    // STS installation directory - can be overridden via environment variable
+    stsInstallDir = System.getenv('STS_INSTALL_DIR') ?: 'D:/Steam/steamapps/common/SlayTheSpire'
+
+    // Steam Workshop directory for mods (using Workshop installation)
+    workshopDir = 'D:/Steam/steamapps/workshop/content/646570'
+
+    // Workshop mod paths (automatically detected)
+    modTheSpirePath = "${workshopDir}/1605060445/ModTheSpire.jar"
+    baseModPath = "${workshopDir}/1605833019/BaseMod.jar"
+    stsLibPath = "${workshopDir}/1609158507/StSLib.jar"
+}
+
+// Apply common configuration to all subprojects
+subprojects {
+    apply plugin: 'java'
+
+    group = 'com.stsmod'
+    version = '1.0.0'
+
+    // Use current JDK (25) but compile to Java 8 bytecode
+    // No need to specify toolchain - will use JAVA_HOME automatically
+
+    // Java compilation settings - Compile with JDK 25, target Java 8
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.encoding = 'UTF-8'
+        options.release = 8  // Generate Java 8 compatible bytecode
+        options.fork = true
+        options.compilerArgs += [
+            '-Xlint:all',
+            '-Xlint:-options',
+            '-Xlint:-path'
+        ]
+        options.warnings = true
+        options.deprecation = true
+    }
+
+    // Common dependencies for all modules
+    dependencies {
+        // Slay the Spire
+        implementation files("${rootProject.ext.stsInstallDir}/desktop-1.0.jar")
+
+        // ModTheSpire
+        implementation files("${rootProject.ext.modTheSpirePath}")
+
+        // BaseMod
+        implementation files("${rootProject.ext.baseModPath}")
+    }
+
+    // Ensure resources are processed correctly
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+}
+
+// Print build info (custom task)
+tasks.register('info') {
+    doLast {
+        println "========================================="
+        println "  Slay the Spire Mods - Gradle Build"
+        println "========================================="
+        println "STS Version: ${rootProject.ext.stsVersion}"
+        println "ModTheSpire: ${rootProject.ext.modthespireVersion}"
+        println "BaseMod: ${rootProject.ext.basemodVersion}"
+        println "STS Install: ${rootProject.ext.stsInstallDir}"
+        println "Java Version: ${JavaVersion.current()}"
+        println "========================================="
+    }
+}

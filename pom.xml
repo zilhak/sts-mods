@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.stsmod</groupId>
+    <artifactId>sts-mods-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Slay the Spire Mods Collection</name>
+    <description>Parent project for multiple Slay the Spire mods</description>
+
+    <modules>
+        <module>ascension-100</module>
+        <module>custom-relics</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.release>8</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- JDK 25 compatibility settings -->
+        <maven.compiler.fork>true</maven.compiler.fork>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+
+        <!-- Slay the Spire version -->
+        <sts.version>01-23-2019</sts.version>
+        <modthespire.version>3.29.3</modthespire.version>
+        <basemod.version>5.48.0</basemod.version>
+        <stslib.version>2.3.0</stslib.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Slay the Spire -->
+            <dependency>
+                <groupId>com.megacrit.cardcrawl</groupId>
+                <artifactId>slaythespire</artifactId>
+                <version>${sts.version}</version>
+                <scope>system</scope>
+                <systemPath>${sts.install.dir}/desktop-1.0.jar</systemPath>
+            </dependency>
+
+            <!-- ModTheSpire -->
+            <dependency>
+                <groupId>com.evacipated.cardcrawl</groupId>
+                <artifactId>modthespire</artifactId>
+                <version>${modthespire.version}</version>
+                <scope>system</scope>
+                <systemPath>${sts.install.dir}/mods/ModTheSpire.jar</systemPath>
+            </dependency>
+
+            <!-- BaseMod -->
+            <dependency>
+                <groupId>basemod</groupId>
+                <artifactId>basemod</artifactId>
+                <version>${basemod.version}</version>
+                <scope>system</scope>
+                <systemPath>${sts.install.dir}/mods/BaseMod.jar</systemPath>
+            </dependency>
+
+            <!-- StSLib (Optional but recommended) -->
+            <dependency>
+                <groupId>com.evacipated.cardcrawl.mod</groupId>
+                <artifactId>stslib</artifactId>
+                <version>${stslib.version}</version>
+                <scope>system</scope>
+                <systemPath>${sts.install.dir}/mods/StSLib.jar</systemPath>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Maven Compiler Plugin - Updated for JDK 25 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>8</release>
+                        <fork>true</fork>
+                        <compilerArgs>
+                            <arg>-Xlint:all</arg>
+                            <arg>-Xlint:-options</arg>
+                            <arg>-Xlint:-path</arg>
+                        </compilerArgs>
+                        <showWarnings>true</showWarnings>
+                        <showDeprecation>true</showDeprecation>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.7.1</version>
+                </plugin>
+
+                <!-- Maven Resources Plugin - For proper resource handling -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

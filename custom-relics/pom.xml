@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.stsmod</groupId>
+        <artifactId>sts-mods-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>custom-relics</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Custom Relics</name>
+    <description>Adds custom relics to Slay the Spire</description>
+
+    <dependencies>
+        <!-- Slay the Spire -->
+        <dependency>
+            <groupId>com.megacrit.cardcrawl</groupId>
+            <artifactId>slaythespire</artifactId>
+        </dependency>
+
+        <!-- ModTheSpire -->
+        <dependency>
+            <groupId>com.evacipated.cardcrawl</groupId>
+            <artifactId>modthespire</artifactId>
+        </dependency>
+
+        <!-- BaseMod -->
+        <dependency>
+            <groupId>basemod</groupId>
+            <artifactId>basemod</artifactId>
+        </dependency>
+
+        <!-- StSLib (Optional) -->
+        <dependency>
+            <groupId>com.evacipated.cardcrawl.mod</groupId>
+            <artifactId>stslib</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>CustomRelics</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <MTS-Version>${modthespire.version}</MTS-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
