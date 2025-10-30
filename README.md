@@ -1,40 +1,49 @@
 # Slay the Spire Mods Collection
 
-Multi-module Maven project for developing Slay the Spire mods. Each module builds independently into its own JAR file.
+Gradle 기반 멀티모듈 프로젝트로 Slay the Spire 모드를 개발합니다. 각 모듈은 독립적으로 빌드되어 개별 JAR 파일로 생성됩니다.
 
-## 📦 Modules
+## 📦 모듈
 
 ### 1. **Ascension 100** (`ascension-100/`)
-Extends Slay the Spire's Ascension mode from level 20 to level 100 with progressively harder challenges.
+Slay the Spire의 승천 모드를 20레벨에서 100레벨까지 확장합니다.
 
-**Build Output**: `Ascension100.jar`
+**현재 구현 상태**:
+- ✅ UI 확장: 캐릭터 선택 화면에서 승천 1~100 선택 가능
+- ✅ 로컬라이제이션: 한국어/영어 전체 번역 (100레벨)
+- ✅ 승천 21+ 효과: 모든 적 체력 20% 증가 (테스트용)
+- 🚧 승천 22~100 효과: 향후 구현 예정
+
+**빌드 결과**: `Ascension100.jar` (14.0KB)
 
 ### 2. **Custom Relics** (`custom-relics/`)
-Adds unique and powerful custom relics to expand strategic options.
+고유하고 강력한 커스텀 유물을 추가하여 전략적 선택지를 확장합니다.
 
-**Build Output**: `CustomRelics.jar`
+**현재 구현 상태**:
+- ✅ 기본 구조 및 예제 유물
+- 🚧 추가 유물: 향후 구현 예정
 
-## 🛠️ Prerequisites
+**빌드 결과**: `CustomRelics.jar` (6.1KB)
 
-### Required Software
-- **Java JDK 8+** (Project supports JDK 8 through JDK 25)
-  - **Using JDK 25?** See [`JDK25-SETUP.md`](JDK25-SETUP.md) for configuration details
-  - Recommended: JDK 17 (LTS) or JDK 21 (LTS) for modern development
-  - Minimum: JDK 8 for basic compatibility
-- **Maven 3.6+** (build tool)
-- **Slay the Spire** (installed via Steam)
+## 🛠️ 필수 요구사항
 
-### Required Mods
-Install these through Steam Workshop or manually:
-1. **ModTheSpire** (v3.29.3+) - Mod loader
-2. **BaseMod** (v5.48.0+) - Essential modding API
-3. **StSLib** (v2.3.0+) - Additional utilities (optional but recommended)
+### 소프트웨어
+- **Java JDK 8+** (JDK 25까지 테스트 완료)
+  - 권장: JDK 17 (LTS) 또는 JDK 21 (LTS)
+  - 최소: JDK 8
+  - JDK 25 사용 시: [`JDK25-SETUP.md`](JDK25-SETUP.md) 참고
+- **Gradle 9.1+** (Gradle Wrapper 포함됨)
+- **Slay the Spire** (Steam 설치)
 
-## ⚙️ Setup
+### 필수 모드 (Steam Workshop 또는 수동 설치)
+1. **ModTheSpire** (v3.29.3+) - 모드 로더
+2. **BaseMod** (v5.48.0+) - 필수 모딩 API
+3. **StSLib** (v2.3.0+) - 추가 유틸리티 (선택사항)
 
-### 1. Configure Environment Variable
+## ⚙️ 설치 및 빌드
 
-Set the `sts.install.dir` environment variable to your Slay the Spire installation directory.
+### 1. 환경 변수 설정
+
+`STS_INSTALL_DIR` 환경 변수를 Slay the Spire 설치 경로로 설정합니다.
 
 **Windows**:
 ```bash
@@ -46,171 +55,289 @@ set STS_INSTALL_DIR=C:\Program Files (x86)\Steam\steamapps\common\SlayTheSpire
 export STS_INSTALL_DIR=~/.steam/steam/steamapps/common/SlayTheSpire
 ```
 
-Or edit `pom.xml` and replace `${sts.install.dir}` with your actual path:
-```xml
-<systemPath>C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/desktop-1.0.jar</systemPath>
+또는 `gradle.properties` 파일을 생성하여 설정:
+```properties
+stsInstallDir=C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire
 ```
 
-### 2. Verify Dependencies
+### 2. 의존성 확인
 
-Ensure these files exist in your STS installation:
+Slay the Spire 설치 경로에 다음 파일들이 있는지 확인:
 ```
 SlayTheSpire/
-├── desktop-1.0.jar          # Base game
+├── desktop-1.0.jar          # 기본 게임
 └── mods/
-    ├── ModTheSpire.jar      # Mod loader
-    ├── BaseMod.jar          # Modding API
-    └── StSLib.jar           # Optional utilities
+    ├── ModTheSpire.jar      # 모드 로더
+    ├── BaseMod.jar          # 모딩 API
+    └── StSLib.jar           # 선택사항
 ```
 
-### 3. Verify Setup
-
-Run the verification script to check your environment:
-
-**Linux/Mac**:
-```bash
-./verify-setup.sh
-```
+### 3. 환경 검증 (선택사항)
 
 **Windows**:
 ```cmd
 verify-setup.bat
 ```
 
-This will check:
-- ✓ Java installation and version
-- ✓ Maven installation
-- ✓ STS installation path
-- ✓ Required mod files
-- ✓ Compilation compatibility
-
-## 🔨 Building
-
-### Build All Modules
+**Linux/Mac**:
 ```bash
-mvn clean package
+./verify-setup.sh
 ```
 
-### Build Specific Module
+검증 항목:
+- ✓ Java 설치 및 버전
+- ✓ Gradle 설치
+- ✓ STS 설치 경로
+- ✓ 필수 모드 파일
+- ✓ 컴파일 호환성
+
+### 4. 빌드
+
+**모든 모듈 빌드**:
 ```bash
-# Build only Ascension 100
-mvn clean package -pl ascension-100
-
-# Build only Custom Relics
-mvn clean package -pl custom-relics
+./gradlew build
 ```
 
-### Build Output
-Compiled JARs will be in each module's `target/` directory:
-```
-ascension-100/target/Ascension100.jar
-custom-relics/target/CustomRelics.jar
+**특정 모듈만 빌드**:
+```bash
+# Ascension 100만 빌드
+./gradlew :ascension-100:build
+
+# Custom Relics만 빌드
+./gradlew :custom-relics:build
 ```
 
-## 🚀 Installation
+**빌드 결과**:
+```
+build/libs/
+├── Ascension100.jar    # 14.0KB
+└── CustomRelics.jar    # 6.1KB
+```
 
-1. **Build the mods** (see above)
-2. **Copy JAR files** to your Slay the Spire mods folder:
+## 🚀 모드 설치
+
+### 1. JAR 파일 복사
+
+빌드된 JAR 파일을 ModTheSpire mods 폴더로 복사합니다.
 
 **Windows**:
 ```bash
-copy ascension-100\target\Ascension100.jar "%LOCALAPPDATA%\ModTheSpire\mods\"
-copy custom-relics\target\CustomRelics.jar "%LOCALAPPDATA%\ModTheSpire\mods\"
+copy build\libs\*.jar "%LOCALAPPDATA%\ModTheSpire\mods\"
 ```
 
 **Linux/Mac**:
 ```bash
-cp ascension-100/target/Ascension100.jar ~/.config/ModTheSpire/mods/
-cp custom-relics/target/CustomRelics.jar ~/.config/ModTheSpire/mods/
+cp build/libs/*.jar ~/.config/ModTheSpire/mods/
 ```
 
-3. **Launch the game** through ModTheSpire
-4. **Enable mods** in the ModTheSpire launcher
+### 2. 게임 실행
 
-## 🧪 Development
+1. ModTheSpire를 통해 게임 실행
+2. 모드 목록에서 원하는 모드 활성화
+3. Play 버튼 클릭
 
-### Project Structure
+## 🎮 모드 사용법
+
+### Ascension 100
+
+1. 캐릭터 선택 화면에서 Ascension 모드 선택
+2. 좌우 화살표로 승천 레벨 조정 (1~100)
+3. 레벨 21부터는 모든 적 체력이 20% 증가
+4. 각 레벨의 효과는 화면에 표시됨 (한국어/영어)
+
+### Custom Relics
+
+- 게임 플레이 중 유물 보상에서 커스텀 유물이 등장합니다
+- 현재는 예제 유물만 포함되어 있습니다
+
+## 🧪 개발 가이드
+
+### 프로젝트 구조
+
 ```
 sts-mods/
-├── pom.xml                           # Parent POM with shared config
-├── ascension-100/                    # Ascension 100 module
-│   ├── pom.xml
+├── build.gradle                          # 루트 Gradle 설정
+├── settings.gradle                       # 멀티모듈 설정
+├── gradle/wrapper/                       # Gradle Wrapper
+├── build/libs/                           # 빌드 결과 (collectJars 태스크)
+├── ascension-100/                        # Ascension 100 모듈
+│   ├── build.gradle
 │   └── src/main/
-│       ├── java/
-│       │   └── com/stsmod/ascension100/
-│       │       └── Ascension100Mod.java
-│       └── resources/
-│           ├── ModTheSpire.json
+│       ├── java/com/stsmod/ascension100/
+│       │   ├── Ascension100Mod.java      # 메인 모드 클래스
+│       │   └── patches/
+│       │       ├── Ascension100Patches.java    # UI 확장 패치
+│       │       └── MonsterHealthPatch.java     # 체력 증가 패치
+│       └── resources/ascension100Resources/
+│           ├── ModTheSpire.json          # 모드 메타데이터
 │           └── localization/
-└── custom-relics/                    # Custom Relics module
-    ├── pom.xml
+│               ├── eng/UIStrings.json    # 영어 번역
+│               └── kor/UIStrings.json    # 한국어 번역
+└── custom-relics/                        # Custom Relics 모듈
+    ├── build.gradle
     └── src/main/
-        ├── java/
-        │   └── com/stsmod/relics/
-        │       ├── CustomRelicsMod.java
-        │       └── relics/
-        │           └── ExampleRelic.java
-        └── resources/
+        ├── java/com/stsmod/relics/
+        │   ├── CustomRelicsMod.java
+        │   └── relics/ExampleRelic.java
+        └── resources/customrelicsResources/
             ├── ModTheSpire.json
             ├── localization/
             └── images/relics/
 ```
 
-### Adding New Modules
+### 새 모듈 추가
 
-1. Create new directory: `mkdir my-new-mod`
-2. Add to parent `pom.xml`:
-```xml
-<modules>
-    <module>ascension-100</module>
-    <module>custom-relics</module>
-    <module>my-new-mod</module>  <!-- Add this -->
-</modules>
+1. **디렉토리 생성**:
+```bash
+mkdir my-new-mod
 ```
-3. Create `my-new-mod/pom.xml` following existing module structure
-4. Implement mod code
 
-### IDE Setup (IntelliJ IDEA)
+2. **`settings.gradle`에 추가**:
+```groovy
+include 'ascension-100'
+include 'custom-relics'
+include 'my-new-mod'  // 추가
+```
 
-1. **Import Project**: File → Open → Select `pom.xml`
-2. **Configure JDK**: File → Project Structure → SDK: Java 8
-3. **Build**: Maven → Lifecycle → package
-4. **Run**: Configure ModTheSpire as external tool
+3. **`my-new-mod/build.gradle` 생성** (기존 모듈 참고)
 
-## 📝 Modding Resources
+4. **모드 코드 구현**
+
+### SpirePatch 사용 시 주의사항
+
+**❌ 잘못된 예 (임의로 메서드명 지어냄)**:
+```java
+@SpirePatch(
+    cls = "com.megacrit.cardcrawl.screens.charSelect.CharacterOption",
+    method = "getMaxAscensionLevel"  // 존재하지 않는 메서드!
+)
+```
+
+**✅ 올바른 예 (실제 존재하는 메서드 사용)**:
+```java
+@SpirePatch(
+    cls = "com.megacrit.cardcrawl.screens.charSelect.CharacterOption",
+    method = "incrementAscensionLevel",  // 실제 메서드
+    paramtypes = {"int"}
+)
+```
+
+**메서드 찾는 방법**:
+1. 다른 작동하는 모드의 소스코드 참고 (예: Ascension Reborn)
+2. desktop-1.0.jar 디컴파일하여 실제 메서드 확인
+3. BaseMod/ModTheSpire 위키 문서 참고
+
+### 리소스 경로 규칙
+
+**⚠️ 중요**: 모든 모드 리소스는 `{modId}Resources/` 폴더 아래에 위치해야 합니다.
+
+**❌ 잘못된 구조**:
+```
+src/main/resources/
+└── localization/
+    └── eng/
+        └── UIStrings.json
+```
+
+**✅ 올바른 구조**:
+```
+src/main/resources/
+└── ascension100Resources/        # modId + "Resources"
+    └── localization/
+        └── eng/
+            └── UIStrings.json
+```
+
+### IDE 설정 (IntelliJ IDEA)
+
+1. **프로젝트 열기**: File → Open → `build.gradle` 선택
+2. **JDK 설정**: File → Project Structure → SDK: Java 8+
+3. **Gradle 새로고침**: View → Tool Windows → Gradle → 새로고침 아이콘
+4. **빌드**: Gradle → Tasks → build → build 더블클릭
+5. **실행**: ModTheSpire를 외부 도구로 설정
+
+## 🔧 트러블슈팅
+
+### 로컬라이제이션 파일을 찾을 수 없음
+```
+File not found: ascension100Resources\localization\kor\UIStrings.json
+```
+
+**해결방법**:
+1. 리소스 폴더 구조 확인: `{modId}Resources/localization/{lang}/`
+2. 파일이 `src/main/resources/` 아래에 있는지 확인
+3. 로컬라이제이션 코드에 폴백 로직 추가:
+```java
+if (!Gdx.files.internal(localizationPath).exists()) {
+    logger.warn("Localization file not found: " + localizationPath);
+    language = "eng";  // 영어로 폴백
+}
+```
+
+### Badge 이미지 NullPointerException
+```
+java.lang.NullPointerException at basemod.ModBadge.<init>
+```
+
+**해결방법**:
+- Badge 이미지가 없으면 등록하지 않도록 null 체크:
+```java
+Texture badgeTexture = null;
+if (Gdx.files.internal(badgePath).exists()) {
+    badgeTexture = ImageMaster.loadImage(badgePath);
+}
+
+if (badgeTexture != null) {
+    BaseMod.registerModBadge(badgeTexture, MOD_NAME, AUTHOR, DESCRIPTION, settingsPanel);
+}
+```
+
+### SpirePatch 메서드를 찾을 수 없음
+```
+NoSuchMethodException: No method named [getMaxAscensionLevel] found
+```
+
+**해결방법**:
+1. 실제 존재하는 메서드명 사용 (위 "SpirePatch 사용 시 주의사항" 참고)
+2. 작동하는 다른 모드 소스코드 참고
+3. 메서드명을 임의로 짓지 말 것
+
+### Gradle 빌드 실패
+
+**"desktop-1.0.jar을 찾을 수 없습니다"**:
+- `STS_INSTALL_DIR` 환경 변수 확인
+- `gradle.properties`에 경로 설정 확인
+- Slay the Spire 설치 경로 확인
+
+**컴파일 오류**:
+```bash
+./gradlew clean build --refresh-dependencies
+```
+
+### 게임 실행 시 ClassNotFoundException
+
+- ModTheSpire와 BaseMod이 설치되어 있는지 확인
+- JAR 파일이 올바른 mods 폴더에 있는지 확인
+- `ModTheSpire.json`의 의존성 확인
+
+## 📚 참고 자료
 
 - **ModTheSpire Wiki**: https://github.com/kiooeht/ModTheSpire/wiki
 - **BaseMod Documentation**: https://github.com/daviscook477/BaseMod/wiki
 - **Discord**: Slay the Spire Modding Community
 - **Example Mods**: https://github.com/topics/slay-the-spire-mod
+- **Ascension Reborn** (참고한 모드): https://github.com/BetaChess/Ascension-Reborn
 
-## 🔧 Troubleshooting
+## 📄 라이선스
 
-### "Cannot find desktop-1.0.jar"
-- Verify `sts.install.dir` environment variable
-- Check STS installation path
-- Ensure game files are not corrupted
+이 프로젝트는 교육 및 모딩 목적으로 제공됩니다.
 
-### "ClassNotFoundException" when running
-- Ensure ModTheSpire and BaseMod are installed
-- Check JAR is in correct mods folder
-- Verify mod dependencies in ModTheSpire.json
+## 🤝 기여
 
-### Maven build fails
-- Confirm Java 8 JDK is installed: `java -version`
-- Update Maven: `mvn -version` should be 3.6+
-- Clean build: `mvn clean install`
-
-## 📄 License
-
-This project is provided as-is for educational and modding purposes.
-
-## 🤝 Contributing
-
-Each module is independent. Feel free to:
-- Add new modules
-- Enhance existing mods
-- Share improvements
+각 모듈은 독립적입니다. 자유롭게:
+- 새 모듈 추가
+- 기존 모드 개선
+- 개선사항 공유
 
 ---
 
