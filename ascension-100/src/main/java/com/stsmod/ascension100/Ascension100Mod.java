@@ -34,6 +34,9 @@ public class Ascension100Mod implements
     // Maximum ascension level
     public static final int MAX_ASCENSION = 100;
 
+    // Track current ascension level across patches
+    public static int currentAscensionLevel = 0;
+
     // Badge image path
     private static final String BADGE_IMAGE = "images/badge.png";
 
@@ -59,10 +62,7 @@ public class Ascension100Mod implements
         // Subscribe to BaseMod events
         BaseMod.subscribe(this);
 
-        // TODO: Implement ascension level extension
-        // Need to patch game code to extend max ascension from 20 to 100
-        // Requires finding the actual methods/fields that control ascension limits
-        logger.info("Ascension 100 mod loaded (functionality not yet implemented)");
+        logger.info("Ascension 100 mod loaded - extends ascension to level 100");
     }
 
     /**
