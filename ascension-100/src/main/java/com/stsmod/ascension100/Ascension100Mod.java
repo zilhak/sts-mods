@@ -90,14 +90,23 @@ public class Ascension100Mod implements
 
         // Load UI strings based on game language
         String language = getLangString();
+        String localizationPath = getModPath(UI_STRINGS.replace("eng", language));
+
+        // Check if localization file exists, fallback to English if not
+        if (!Gdx.files.internal(localizationPath).exists()) {
+            logger.warn("Localization file not found: " + localizationPath);
+            logger.info("Falling back to English localization");
+            language = "eng";
+            localizationPath = getModPath(UI_STRINGS.replace("eng", language));
+        }
 
         // Load UI strings
         BaseMod.loadCustomStringsFile(
                 UIStrings.class,
-                getModPath(UI_STRINGS.replace("eng", language))
+                localizationPath
         );
 
-        logger.info("Localization strings loaded");
+        logger.info("Localization strings loaded for language: " + language);
     }
 
     /**

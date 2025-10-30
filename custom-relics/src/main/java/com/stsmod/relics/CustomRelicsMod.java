@@ -4,6 +4,7 @@ import basemod.BaseMod;
 import basemod.ModPanel;
 import basemod.interfaces.*;
 import basemod.helpers.RelicType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import com.megacrit.cardcrawl.core.Settings;
@@ -113,14 +114,23 @@ public class CustomRelicsMod implements
 
         // Load relic strings based on game language
         String language = getLangString();
+        String localizationPath = getModPath(RELIC_STRINGS.replace("eng", language));
+
+        // Check if localization file exists, fallback to English if not
+        if (!Gdx.files.internal(localizationPath).exists()) {
+            logger.warn("Localization file not found: " + localizationPath);
+            logger.info("Falling back to English localization");
+            language = "eng";
+            localizationPath = getModPath(RELIC_STRINGS.replace("eng", language));
+        }
 
         // Load relic strings
         BaseMod.loadCustomStringsFile(
                 RelicStrings.class,
-                getModPath(RELIC_STRINGS.replace("eng", language))
+                localizationPath
         );
 
-        logger.info("Localization strings loaded");
+        logger.info("Localization strings loaded for language: " + language);
     }
 
     /**
