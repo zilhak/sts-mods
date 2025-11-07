@@ -2,6 +2,7 @@ package com.stsmod.ascension100.patches;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -19,13 +20,14 @@ public class MonsterDamagePatch {
     private static final Logger logger = LogManager.getLogger(MonsterDamagePatch.class.getName());
 
     /**
-     * Patch monster initialization to increase damage at Ascension 23-24
+     * Patch monster pre-battle action to increase damage at Ascension 23-24
      */
     @SpirePatch(
         cls = "com.megacrit.cardcrawl.monsters.AbstractMonster",
-        method = "init"
+        method = "usePreBattleAction"
     )
     public static class DamageIncreasePatch {
+        @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode) {
                 return;
