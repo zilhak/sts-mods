@@ -26,43 +26,8 @@ public class Level31to39Patches {
 
     private static final Logger logger = LogManager.getLogger(Level31to39Patches.class.getName());
 
-    /**
-     * Level 31 & 39: Reduce starting HP
-     */
-    @SpirePatch(
-        cls = "com.megacrit.cardcrawl.characters.AbstractPlayer",
-        method = "preBattlePrep"
-    )
-    public static class StartingHPPatch {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractPlayer __instance) {
-            if (!AbstractDungeon.isAscensionMode) {
-                return;
-            }
-
-            int level = AbstractDungeon.ascensionLevel;
-            int hpReduction = 0;
-
-            // Level 31: -5 current HP
-            if (level >= 31) {
-                hpReduction += 5;
-            }
-
-            // Level 39: -5 max HP
-            if (level >= 39) {
-                __instance.maxHealth -= 5;
-                hpReduction += 5;
-            }
-
-            if (hpReduction > 0) {
-                __instance.currentHealth = Math.max(1, __instance.currentHealth - hpReduction);
-                logger.info(String.format(
-                    "Ascension %d: Starting HP reduced by %d (current: %d, max: %d)",
-                    level, hpReduction, __instance.currentHealth, __instance.maxHealth
-                ));
-            }
-        }
-    }
+    // NOTE: Level 31 & 39 (starting HP reduction) is now handled by PlayerStartingHPPatch.java
+    // to ensure it only applies once at game start, not every battle
 
     /**
      * Levels 32-36: Additional HP increases
