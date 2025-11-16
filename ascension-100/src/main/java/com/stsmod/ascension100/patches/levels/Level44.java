@@ -1,11 +1,11 @@
 package com.stsmod.ascension100.patches.levels;
 
-import com.evacipated.cardcrawl.modthespire.lib.ByRef;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
-import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
-import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.city.Mugger;
+import com.megacrit.cardcrawl.monsters.exordium.Looter;
+import com.megacrit.cardcrawl.powers.AbstractPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,52 +13,62 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 44: Thieves steal more gold
  *
  * 도둑들이 더 많은 돈을 강탈합니다.
- * 도둑들이 도둑질을 10 증가합니다.
+ * 도둑들의 도둑질 수치가 10 증가합니다.
  *
- * Both Looter and Mugger eventually call AbstractPlayer.loseGold()
- * when stealing from the player, so we patch that method to detect
- * thieves and increase the stolen amount.
+ * Both Looter and Mugger's Thievery power increases by 10.
  */
 public class Level44 {
     private static final Logger logger = LogManager.getLogger(Level44.class.getName());
 
+    /**
+     * Looter: Thievery +10
+     */
     @SpirePatch(
-        clz = AbstractPlayer.class,
-        method = "loseGold"
+        clz = Looter.class,
+        method = "usePreBattleAction"
     )
-    public static class ThiefGoldIncrease {
-        @SpirePrefixPatch
-        public static void Prefix(AbstractPlayer __instance, @ByRef int[] amount) {
+    public static class LooterThieveryIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(Looter __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 44) {
                 return;
             }
 
-            // Only modify if gold is being stolen (amount > 0) and in combat
-            if (amount[0] <= 0 || AbstractDungeon.getCurrRoom() == null ||
-                AbstractDungeon.getCurrRoom().monsters == null) {
+            // Increase Thievery power by 10
+            AbstractPower thieveryPower = __instance.getPower("Thievery");
+            if (thieveryPower != null) {
+                thieveryPower.amount += 10;
+                thieveryPower.updateDescription();
+                logger.info(String.format(
+                    "Ascension 44: Looter Thievery increased by 10 to %d",
+                    thieveryPower.amount
+                ));
+            }
+        }
+    }
+
+    /**
+     * Mugger: Thievery +10
+     */
+    @SpirePatch(
+        clz = Mugger.class,
+        method = "usePreBattleAction"
+    )
+    public static class MuggerThieveryIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(Mugger __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 44) {
                 return;
             }
 
-            // Check if currently fighting a thief (Looter or Mugger)
-            boolean hasThief = false;
-            String thiefName = "";
-
-            for (AbstractMonster m : AbstractDungeon.getCurrRoom().monsters.monsters) {
-                String className = m.getClass().getSimpleName();
-                if (className.equals("Looter") || className.equals("Mugger")) {
-                    hasThief = true;
-                    thiefName = className;
-                    break;
-                }
-            }
-
-            if (hasThief) {
-                int originalAmount = amount[0];
-                amount[0] += 10;
-
+            // Increase Thievery power by 10
+            AbstractPower thieveryPower = __instance.getPower("Thievery");
+            if (thieveryPower != null) {
+                thieveryPower.amount += 10;
+                thieveryPower.updateDescription();
                 logger.info(String.format(
-                    "Ascension 44: %s theft increased from %d to %d",
-                    thiefName, originalAmount, amount[0]
+                    "Ascension 44: Mugger Thievery increased by 10 to %d",
+                    thieveryPower.amount
                 ));
             }
         }

@@ -9,10 +9,14 @@ import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 /**
- * Ascension Level 24: Normal enemies deal 10% more damage
+ * Ascension Level 24: Normal enemies deal 5% more damage
  *
- * 일반 적들의 공격력이 10% 증가합니다.
+ * 일반 적들의 공격력이 5% 증가합니다.
  */
 public class Level24 {
     private static final Logger logger = LogManager.getLogger(Level24.class.getName());
@@ -22,6 +26,9 @@ public class Level24 {
         method = "usePreBattleAction"
     )
     public static class NormalDamageIncrease {
+        // Track which monsters have already been patched to prevent duplicate application
+        private static final Set<AbstractMonster> patchedMonsters = Collections.newSetFromMap(new WeakHashMap<>());
+
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 24) {
@@ -29,7 +36,16 @@ public class Level24 {
             }
 
             if (__instance.type == AbstractMonster.EnemyType.NORMAL) {
-                float multiplier = 1.1f;
+                // Check if already patched
+                if (patchedMonsters.contains(__instance)) {
+                    logger.warn(String.format(
+                        "Ascension 24: Skipping duplicate damage increase for %s (already patched)",
+                        __instance.name
+                    ));
+                    return;
+                }
+
+                float multiplier = 1.05f;
 
                 for (DamageInfo damageInfo : __instance.damage) {
                     if (damageInfo != null && damageInfo.base > 0) {
@@ -42,6 +58,9 @@ public class Level24 {
                         ));
                     }
                 }
+
+                // Mark as patched
+                patchedMonsters.add(__instance);
             }
         }
     }

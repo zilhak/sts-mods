@@ -5,6 +5,8 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.ending.SpireShield;
+import com.megacrit.cardcrawl.monsters.ending.SpireSpear;
 import com.megacrit.cardcrawl.powers.ArtifactPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +53,54 @@ public class Level65 {
                     __instance.name
                 ));
             }
+        }
+    }
+
+    /**
+     * Spire Spear: +1 Artifact (stacks with Level 30)
+     */
+    @SpirePatch(
+        clz = SpireSpear.class,
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class SpireSpearArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SpireSpear __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 65) {
+                return;
+            }
+
+            // Add +1 Artifact to Spire Spear (stacks with Level 30)
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 65: Spire Spear gained +1 Artifact (stacks with Level 30)");
+        }
+    }
+
+    /**
+     * Spire Shield: +1 Artifact (stacks with Level 30)
+     */
+    @SpirePatch(
+        clz = SpireShield.class,
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class SpireShieldArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SpireShield __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 65) {
+                return;
+            }
+
+            // Add +1 Artifact to Spire Shield (stacks with Level 30)
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 65: Spire Shield gained +1 Artifact (stacks with Level 30)");
         }
     }
 }

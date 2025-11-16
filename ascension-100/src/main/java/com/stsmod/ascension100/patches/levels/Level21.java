@@ -9,7 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 21: Elite enemies have 10% more HP
+ * Ascension Level 21: Elite enemies have 5% more HP
+ * 엘리트 적들의 체력이 5% 증가합니다.
  */
 public class Level21 {
     private static final Logger logger = LogManager.getLogger(Level21.class.getName());
@@ -27,11 +28,11 @@ public class Level21 {
 
             if (__instance.type == AbstractMonster.EnemyType.ELITE) {
                 int originalMaxHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.1f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.1f);
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
 
                 logger.info(String.format(
-                    "Ascension 21: Elite %s HP increased from %d to %d",
+                    "Ascension 21: Elite %s HP increased from %d to %d (+5%%)",
                     __instance.name, originalMaxHP, __instance.maxHealth
                 ));
             }

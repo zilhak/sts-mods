@@ -244,3 +244,8 @@ Or edit paths directly in root `build.gradle`.
 Check logs at:
 - Windows: `%LOCALAPPDATA%\ModTheSpire\logs\`
 - Linux/Mac: `~/.config/ModTheSpire/logs/`
+
+
+##중요 : 기획문서
+기획 문서 경로 : E:\workspace\sts-mods\.claude\ascension-detail.md
+해당 문서의 내용이 절대적인 진실의 원천이 되어야하며, 모든 소스코드는 이 문서의 내용을 따라야 합니다.

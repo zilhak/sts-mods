@@ -9,9 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 22: Normal enemies have 10% more HP
- *
- * 일반 적들의 체력이 10% 증가합니다.
+ * Ascension Level 22: Normal enemies have 5% more HP
+ * 일반 적들의 체력이 5% 증가합니다.
  */
 public class Level22 {
     private static final Logger logger = LogManager.getLogger(Level22.class.getName());
@@ -29,11 +28,11 @@ public class Level22 {
 
             if (__instance.type == AbstractMonster.EnemyType.NORMAL) {
                 int originalMaxHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.1f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.1f);
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
 
                 logger.info(String.format(
-                    "Ascension 22: Normal %s HP increased from %d to %d",
+                    "Ascension 22: Normal %s HP increased from %d to %d (+5%%)",
                     __instance.name, originalMaxHP, __instance.maxHealth
                 ));
             }

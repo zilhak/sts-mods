@@ -1,24 +1,97 @@
 package com.stsmod.ascension100.patches.levels;
 
+import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
+import com.megacrit.cardcrawl.cards.DamageInfo;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.powers.FrailPower;
+import com.megacrit.cardcrawl.powers.VulnerablePower;
+import com.megacrit.cardcrawl.powers.WeakPower;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Ascension Level 56: Debuff effects enhanced
- *
- * TODO: NOT YET IMPLEMENTED - Requires power system research
- *
  * 디버프의 효과가 더욱 강화됩니다.
  *
- * - 취약은 10%의 추가적인 데미지를 입힙니다. (50% → 60%)
- * - 약화는 10%의 추가적인 데미지 감소가 적용됩니다. (25% → 35%)
- * - 손상은 10%의 추가적인 방어도 감소가 적용됩니다. (75% → 85%)
- *
- * Implementation requires:
- * - Patch VulnerablePower to increase damage multiplier
- * - Patch WeakPower to increase damage reduction
- * - Patch FrailPower to increase block reduction
- * - These values are likely constants in power classes
- *
- * This requires research into power mechanics and testing.
+ * - 취약: 50% → 60% (10% 추가)
+ * - 약화: 25% → 35% (10% 추가)
+ * - 손상: 25% → 35% (10% 추가)
  */
 public class Level56 {
-    // Intentionally empty - requires additional research
+    private static final Logger logger = LogManager.getLogger(Level56.class.getName());
+
+    /**
+     * Patch VulnerablePower: 50% → 60% damage increase
+     */
+    @SpirePatch(
+        clz = VulnerablePower.class,
+        method = "atDamageReceive"
+    )
+    public static class EnhancedVulnerable {
+        @SpirePrefixPatch
+        public static SpireReturn<Float> Prefix(VulnerablePower __instance, float damage, DamageInfo.DamageType type) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 56) {
+                return SpireReturn.Continue();
+            }
+
+            if (type == DamageInfo.DamageType.NORMAL) {
+                // Check for relics (same logic as original)
+                if (__instance.owner.isPlayer && AbstractDungeon.player.hasRelic("Odd Mushroom")) {
+                    return SpireReturn.Return(damage * 1.25F);
+                }
+                if (__instance.owner != null && !__instance.owner.isPlayer && AbstractDungeon.player.hasRelic("Paper Frog")) {
+                    return SpireReturn.Return(damage * 1.75F);
+                }
+
+                // Enhanced: 1.5F → 1.6F (50% → 60%)
+                return SpireReturn.Return(damage * 1.6F);
+            }
+
+            return SpireReturn.Return(damage);
+        }
+    }
+
+    /**
+     * Patch WeakPower: 25% → 35% damage reduction
+     */
+    @SpirePatch(
+        clz = WeakPower.class,
+        method = "atDamageGive"
+    )
+    public static class EnhancedWeak {
+        @SpirePrefixPatch
+        public static SpireReturn<Float> Prefix(WeakPower __instance, float damage, DamageInfo.DamageType type) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 56) {
+                return SpireReturn.Continue();
+            }
+
+            if (type == DamageInfo.DamageType.NORMAL) {
+                // Enhanced: 0.75F → 0.65F (25% → 35% reduction)
+                return SpireReturn.Return(damage * 0.65F);
+            }
+
+            return SpireReturn.Return(damage);
+        }
+    }
+
+    /**
+     * Patch FrailPower: 25% → 35% block reduction
+     */
+    @SpirePatch(
+        clz = FrailPower.class,
+        method = "modifyBlock"
+    )
+    public static class EnhancedFrail {
+        @SpirePrefixPatch
+        public static SpireReturn<Float> Prefix(FrailPower __instance, float blockAmount) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 56) {
+                return SpireReturn.Continue();
+            }
+
+            // Enhanced: 0.75F → 0.65F (25% → 35% reduction)
+            return SpireReturn.Return(blockAmount * 0.65F);
+        }
+    }
 }

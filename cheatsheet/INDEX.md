@@ -10,6 +10,11 @@
 - **[ENEMY_LIST.md](ENEMY_LIST.md)** - 게임 내 모든 적 목록과 클래스명
 - **[ENEMY_MODIFY.md](ENEMY_MODIFY.md)** - 적 능력치/패턴 수정 방법
 
+### 시스템 가이드
+- **[CARD_REWARD_SYSTEM.md](CARD_REWARD_SYSTEM.md)** - 카드 보상 확률 및 시스템 완벽 가이드
+- **[RELIC_POTION_SYSTEM.md](RELIC_POTION_SYSTEM.md)** - 유물 및 포션 시스템 완벽 가이드
+- **[MONSTER_AI_SYSTEM.md](MONSTER_AI_SYSTEM.md)** - 적 AI 결정 시스템 완벽 가이드
+
 ### 고급 가이드
 - **[MONSTER_HEALTH.md](MONSTER_HEALTH.md)** - 적 체력 수정 패턴
 - **[MONSTER_DAMAGE.md](MONSTER_DAMAGE.md)** - 적 공격력 수정 패턴
@@ -118,15 +123,33 @@ public static class CultistPatch {
 
 ## 📖 상세 가이드 목차
 
+### 시스템 이해
+1. [카드 보상 확률 구조](CARD_REWARD_SYSTEM.md#기본-확률-구조)
+2. [카드 블리자드 시스템](CARD_REWARD_SYSTEM.md#카드-블리자드-시스템-card-blizzard)
+3. [카드 보상 발생 상황](CARD_REWARD_SYSTEM.md#카드-보상이-발생하는-상황)
+4. [유물 등급 및 확률](RELIC_POTION_SYSTEM.md#유물-등급-relic-tiers)
+5. [포션 드롭 시스템](RELIC_POTION_SYSTEM.md#포션-획득-확률)
+6. [유물 획득 상황](RELIC_POTION_SYSTEM.md#유물-획득-상황)
+7. [포션 블리자드 시스템](RELIC_POTION_SYSTEM.md#포션-블리자드-시스템-potion-blizzard)
+8. [몬스터 AI 기본 구조](MONSTER_AI_SYSTEM.md#-ai-시스템-기본-구조)
+9. [getMove 메서드 동작 원리](MONSTER_AI_SYSTEM.md#-getmove-메서드)
+10. [재귀적 의도 변경 메커니즘](MONSTER_AI_SYSTEM.md#-재귀적-의도-변경)
+11. [Writhing Mass AI 패턴 분석](MONSTER_AI_SYSTEM.md#-writhing-mass-완벽-분석)
+
 ### 기본 수정
 1. [적 체력 변경하기](MONSTER_HEALTH.md#기본-체력-수정)
 2. [적 공격력 변경하기](MONSTER_DAMAGE.md#기본-공격력-수정)
 3. [적 타입별 수정](ENEMY_MODIFY.md#타입별-수정)
+4. [카드 보상 확률 변경](CARD_REWARD_SYSTEM.md#확률-수정-방법)
 
 ### 고급 수정
 1. [적 행동 패턴 변경](MONSTER_BEHAVIOR.md#행동-패턴-수정)
 2. [버프/디버프 추가](MONSTER_BEHAVIOR.md#버프-추가)
 3. [보스 전용 수정](BOSS_MODIFICATIONS.md)
+4. [적 AI 의도 결정 수정](MONSTER_AI_SYSTEM.md#️-ai-수정-방법)
+5. [카드 보상 개수 조정](CARD_REWARD_SYSTEM.md#카드-보상-개수)
+6. [유물 확률 및 보상 수정](RELIC_POTION_SYSTEM.md#유물-수정-방법)
+7. [포션 드롭 확률 조정](RELIC_POTION_SYSTEM.md#포션-수정-방법)
 
 ### 막별 차등 적용
 1. [Act별 다른 효과 적용](COMMON_PATTERNS.md#act별-차등-적용)
@@ -199,7 +222,8 @@ if (level == 21) {  // >= 21이 아닌 == 21
 
 ---
 
-**작성일**: 2025-11-07
+**최초 작성**: 2025-11-07
+**최근 업데이트**: 2025-11-15 (카드 보상, 유물/포션, 몬스터 AI 시스템 추가)
 **기반 모드**: ascension-100 v1.0
 **게임 버전**: 01-23-2019
 **ModTheSpire**: 3.29.3

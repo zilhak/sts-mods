@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  *
  * 적들의 공격이 강화됩니다.
  * 1막의 적들의 공격이 1 증가합니다.
- * 2막의 적들의 공격이 2 증가합니다.
+ * 2막의 적들의 공격이 2 증가합니다. (byrd 제외)
  * 3막의 적들의 공격이 5 증가합니다.
  */
 public class Level68 {
@@ -27,6 +27,11 @@ public class Level68 {
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
+                return;
+            }
+
+            // Skip byrd in Act 2 (handled by special Level 62 logic)
+            if (AbstractDungeon.actNum == 2 && __instance.id != null && __instance.id.equals("Byrd")) {
                 return;
             }
 

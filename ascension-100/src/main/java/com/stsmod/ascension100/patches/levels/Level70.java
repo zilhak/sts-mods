@@ -15,9 +15,9 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 70: Normal elites gain special advantages
  *
  * 일반 엘리트가 특수한 이점을 얻습니다.
- * 1막의 엘리트는 금속화를 4 얻습니다.
+ * 1막의 엘리트는 금속화를 2 얻습니다.
  * 2막의 엘리트는 힘을 2 얻습니다.
- * 3막의 엘리트는 불가침을 2 얻습니다.
+ * 3막의 엘리트는 불가침을 1 얻습니다.
  */
 public class Level70 {
     private static final Logger logger = LogManager.getLogger(Level70.class.getName());
@@ -37,13 +37,13 @@ public class Level70 {
                 int actNum = AbstractDungeon.actNum;
 
                 if (actNum == 1) {
-                    // Act 1: Metallicize 4
+                    // Act 1: Metallicize 2
                     AbstractDungeon.actionManager.addToBottom(
                         new ApplyPowerAction(__instance, __instance,
-                            new MetallicizePower(__instance, 4), 4)
+                            new MetallicizePower(__instance, 2), 2)
                     );
                     logger.info(String.format(
-                        "Ascension 70: Elite %s gained Metallicize 4 (Act 1)",
+                        "Ascension 70: Elite %s gained Metallicize 2 (Act 1)",
                         __instance.name
                     ));
                 } else if (actNum == 2) {
@@ -57,13 +57,13 @@ public class Level70 {
                         __instance.name
                     ));
                 } else if (actNum >= 3) {
-                    // Act 3: Intangible 2
+                    // Act 3: Intangible 1
                     AbstractDungeon.actionManager.addToBottom(
                         new ApplyPowerAction(__instance, __instance,
-                            new IntangiblePower(__instance, 2), 2)
+                            new IntangiblePower(__instance, 1), 1)
                     );
                     logger.info(String.format(
-                        "Ascension 70: Elite %s gained Intangible 2 (Act 3)",
+                        "Ascension 70: Elite %s gained Intangible 1 (Act 3)",
                         __instance.name
                     ));
                 }

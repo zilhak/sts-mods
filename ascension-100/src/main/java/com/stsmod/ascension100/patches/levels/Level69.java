@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
  * 1막의 보스의 체력이 10% 증가하고, 공격력이 1 증가합니다.
  * 2막의 보스의 체력이 20% 증가하고, 공격력이 4 증가합니다.
  * 3막의 보스의 체력이 30% 증가하고, 공격력이 10 증가합니다.
+ * (타락한 심장 제외)
  */
 public class Level69 {
     private static final Logger logger = LogManager.getLogger(Level69.class.getName());
@@ -39,7 +40,8 @@ public class Level69 {
                     hpMultiplier = 1.1f;
                 } else if (actNum == 2) {
                     hpMultiplier = 1.2f;
-                } else if (actNum >= 3) {
+                } else if (actNum == 3) {
+                    // Only Act 3, not Act 4 (Corrupt Heart)
                     hpMultiplier = 1.3f;
                 }
 
@@ -76,7 +78,8 @@ public class Level69 {
                     damageIncrease = 1;
                 } else if (actNum == 2) {
                     damageIncrease = 4;
-                } else if (actNum >= 3) {
+                } else if (actNum == 3) {
+                    // Only Act 3, not Act 4 (Corrupt Heart)
                     damageIncrease = 10;
                 }
 

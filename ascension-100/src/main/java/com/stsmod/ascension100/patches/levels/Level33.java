@@ -9,9 +9,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 33: Normal enemies have additional 10% more HP
+ * Ascension Level 33: Strong enemies have additional 5% more HP
+ * Strong Enemies 전투에서 적들의 체력이 추가로 5% 증가합니다.
  *
- * 일반 적들의 체력이 추가로 10% 증가합니다.
+ * TODO: Currently applies to ALL normal enemies, not just "Strong Enemies" encounters
  */
 public class Level33 {
     private static final Logger logger = LogManager.getLogger(Level33.class.getName());
@@ -29,11 +30,11 @@ public class Level33 {
 
             if (__instance.type == AbstractMonster.EnemyType.NORMAL) {
                 int originalMaxHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.1f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.1f);
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
 
                 logger.info(String.format(
-                    "Ascension 33: Normal %s HP increased from %d to %d",
+                    "Ascension 33: Normal %s HP increased from %d to %d (+5%% additional)",
                     __instance.name, originalMaxHP, __instance.maxHealth
                 ));
             }
