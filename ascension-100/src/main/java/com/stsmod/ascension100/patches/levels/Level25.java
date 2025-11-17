@@ -34,37 +34,8 @@ public class Level25 {
 
     /**
      * Louse (Normal & Defensive): Curl Up +3
-     * Directly increases existing Curl Up power to ensure stacking
+     * MOVED TO: LouseCurlUpPatch.java (unified patch)
      */
-    @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "usePreBattleAction"
-    )
-    public static class LouseCurlUpPatch25 {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
-                return;
-            }
-
-            String id = __instance.id;
-            if (id == null) return;
-
-            // Louse: Increase existing Curl Up power by 3
-            if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
-                AbstractPower curlUp = __instance.getPower("Curl Up");
-                if (curlUp != null) {
-                    int originalAmount = curlUp.amount;
-                    curlUp.amount += 3;
-                    curlUp.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 25: %s Curl Up increased from %d to %d (+3)",
-                        __instance.name, originalAmount, curlUp.amount
-                    ));
-                }
-            }
-        }
-    }
 
     /**
      * Cultist: Damage -2 (rituals stronger, attacks weaker)

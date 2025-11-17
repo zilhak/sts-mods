@@ -1,0 +1,11 @@
+{
+  "ascension100:TurnLimit": {
+    "NAME": "Turn Limit",
+    "DESCRIPTIONS": [
+      "At the end of turn, if this is greater than 1, decrease by #b1. In #b",
+      "At the end of turn, take #b",
+      " damage. This effect persists until death.",
+      " turns, you will die."
+    ]
+  }
+}

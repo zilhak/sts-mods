@@ -36,37 +36,8 @@ public class Level86 {
 
     /**
      * Louse (LouseNormal, LouseDefensive): Curl Up +6
-     * Directly increases existing Curl Up power to ensure stacking
+     * MOVED TO: LouseCurlUpPatch.java (unified patch)
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.AbstractMonster.class,
-        method = "usePreBattleAction"
-    )
-    public static class LouseCurlUpBoost86 {
-        @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.AbstractMonster __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 86) {
-                return;
-            }
-
-            String id = __instance.id;
-            if (id == null) return;
-
-            // Louse: Increase existing Curl Up power by 6
-            if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
-                com.megacrit.cardcrawl.powers.AbstractPower curlUp = __instance.getPower("Curl Up");
-                if (curlUp != null) {
-                    int originalAmount = curlUp.amount;
-                    curlUp.amount += 6;
-                    curlUp.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 86: %s Curl Up increased from %d to %d (+6)",
-                        __instance.name, originalAmount, curlUp.amount
-                    ));
-                }
-            }
-        }
-    }
 
     /**
      * Looter: Thievery +10, Smoke Bomb defense +5

@@ -258,12 +258,13 @@ public class Level92 {
 
     /**
      * Increase Louse's Curl Up power by 10
+     * MOVED TO: LouseCurlUpPatch.java (unified patch)
      */
     @SpirePatch(
         clz = AbstractMonster.class,
         method = "usePreBattleAction"
     )
-    public static class LouseCurlUpIncrease {
+    public static class ShelledParasiteAndOthers {
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
@@ -272,20 +273,6 @@ public class Level92 {
 
             String id = __instance.id;
             if (id == null) return;
-
-            // Louse: Increase existing Curl Up power by 10
-            if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
-                AbstractPower curlUp = __instance.getPower("Curl Up");
-                if (curlUp != null) {
-                    int originalAmount = curlUp.amount;
-                    curlUp.amount += 10;
-                    curlUp.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 92: %s Curl Up increased from %d to %d (+10)",
-                        __instance.name, originalAmount, curlUp.amount
-                    ));
-                }
-            }
 
             // Shelled Parasite: Increase Plated Armor by 4
             if (id.equals("Shelled Parasite")) {

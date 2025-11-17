@@ -42,6 +42,7 @@ public class Ascension100Mod implements
 
     // Localization paths
     private static final String UI_STRINGS = "localization/eng/UIStrings.json";
+    private static final String POWER_STRINGS = "localization/eng/PowerStrings.json";
 
     /**
      * Required by @SpireInitializer
@@ -129,6 +130,19 @@ public class Ascension100Mod implements
         BaseMod.loadCustomStringsFile(
                 UIStrings.class,
                 localizationPath
+        );
+
+        // Load Power strings
+        String powerStringsPath = getModPath(POWER_STRINGS.replace("eng", language));
+        if (!Gdx.files.internal(powerStringsPath).exists()) {
+            logger.warn("Power strings file not found: " + powerStringsPath);
+            logger.info("Falling back to English power strings");
+            powerStringsPath = getModPath(POWER_STRINGS);
+        }
+
+        BaseMod.loadCustomStringsFile(
+                PowerStrings.class,
+                powerStringsPath
         );
 
         logger.info("Localization strings loaded for language: " + language);
