@@ -43,8 +43,7 @@ public class Level80 {
             // Make it Exhaust when played (only disappears when used)
             __instance.exhaust = true;
 
-            // Update description to reflect changes
-            __instance.rawDescription = "Exhaust.";
+            // Reinitialize description - exhaust keyword will be added automatically
             __instance.initializeDescription();
 
             logger.info("Ascension 80: Modified AscendersBane - Cost: 1, Exhaust (removed Ethereal)");

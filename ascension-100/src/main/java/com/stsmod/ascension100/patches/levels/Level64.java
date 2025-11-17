@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 64: Boss damage increased
  *
  * 보스의 공격력이 증가합니다.
- * 보스(1~3막)의 공격력이 10% 증가합니다.
+ * 보스(1~3막)의 공격력이 8% 증가합니다.
  * (타락한 심장 제외)
  */
 public class Level64 {
@@ -34,7 +34,7 @@ public class Level64 {
             // Only apply to Act 1-3 bosses, exclude Corrupt Heart
             if (__instance.type == AbstractMonster.EnemyType.BOSS &&
                 !(__instance instanceof CorruptHeart)) {
-                float multiplier = 1.1f;
+                float multiplier = 1.08f;
 
                 for (DamageInfo damageInfo : __instance.damage) {
                     if (damageInfo != null && damageInfo.base > 0) {
@@ -42,7 +42,7 @@ public class Level64 {
                         damageInfo.base = MathUtils.ceil(damageInfo.base * multiplier);
 
                         logger.info(String.format(
-                            "Ascension 64: Boss %s damage increased from %d to %d",
+                            "Ascension 64: Boss %s damage increased from %d to %d (+8%%)",
                             __instance.name, originalDamage, damageInfo.base
                         ));
                     }

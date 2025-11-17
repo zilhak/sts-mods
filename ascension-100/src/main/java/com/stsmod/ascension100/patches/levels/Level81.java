@@ -6,6 +6,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.powers.MetallicizePower;
 import com.megacrit.cardcrawl.powers.RegenerateMonsterPower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
@@ -18,9 +19,11 @@ import org.apache.logging.log4j.Logger;
  * 일부 적이 버프를 가진채로 등장합니다.
  *
  * 모든 일반 적은 15% 확률로 생성시 힘1, 금속화2, 재생1 중 하나를 무작위로 부여받습니다.
+ * (한 전투당 하나의 적만 버프를 얻을 수 있습니다.)
  */
 public class Level81 {
     private static final Logger logger = LogManager.getLogger(Level81.class.getName());
+    private static boolean buffAppliedThisCombat = false;
 
     @SpirePatch(
         clz = AbstractMonster.class,
@@ -38,8 +41,14 @@ public class Level81 {
                 return;
             }
 
+            // Only one enemy per combat can receive a buff
+            if (buffAppliedThisCombat) {
+                return;
+            }
+
             // 15% chance to get a random buff
             if (MathUtils.randomBoolean(0.15f)) {
+                buffAppliedThisCombat = true; // Mark that a buff has been applied this combat
                 int randomBuff = MathUtils.random(2); // 0, 1, or 2
 
                 switch (randomBuff) {
@@ -75,6 +84,22 @@ public class Level81 {
                         break;
                 }
             }
+        }
+    }
+
+    /**
+     * Reset the buff flag when a new combat starts
+     */
+    @SpirePatch(
+        clz = MonsterGroup.class,
+        method = "init"
+    )
+    public static class ResetBuffFlagOnNewCombat {
+        @SpirePostfixPatch
+        public static void Postfix(MonsterGroup __instance) {
+            // Reset the flag at the start of each new combat
+            buffAppliedThisCombat = false;
+            logger.debug("Ascension 81: Reset buff flag for new combat");
         }
     }
 }

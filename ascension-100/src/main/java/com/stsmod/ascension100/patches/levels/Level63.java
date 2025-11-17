@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 63: Boss HP increased
  *
  * 보스의 체력이 증가합니다.
- * 모든 보스(1~3막)의 체력이 10% 증가합니다.
+ * 모든 보스(1~3막)의 체력이 8% 증가합니다.
  * (타락한 심장 제외)
  */
 public class Level63 {
@@ -34,11 +34,11 @@ public class Level63 {
             if (__instance.type == AbstractMonster.EnemyType.BOSS &&
                 !(__instance instanceof CorruptHeart)) {
                 int originalMaxHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.1f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.1f);
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.08f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.08f);
 
                 logger.info(String.format(
-                    "Ascension 63: Boss %s HP increased from %d to %d (+10%%)",
+                    "Ascension 63: Boss %s HP increased from %d to %d (+8%%)",
                     __instance.name, originalMaxHP, __instance.maxHealth
                 ));
             }

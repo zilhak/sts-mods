@@ -13,9 +13,9 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 60: Burning Elites scale more aggressively per act
  * 강화 엘리트는 각 막당 성장률이 높아집니다.
  *
- * - 막 1: 체력 +15, 공격 +1
- * - 막 2: 체력 +40, 공격 +2
- * - 막 3: 체력 +80, 공격 +5
+ * - 막 1: 체력 +10, 공격 +1
+ * - 막 2: 체력 +20, 공격 +2
+ * - 막 3: 체력 +50, 공격 +5
  */
 public class Level60 {
     private static final Logger logger = LogManager.getLogger(Level60.class.getName());
@@ -45,15 +45,15 @@ public class Level60 {
                 // Determine bonuses based on act
                 switch (actNum) {
                     case 1:
-                        hpBonus = 15;
+                        hpBonus = 10;
                         damageBonus = 1;
                         break;
                     case 2:
-                        hpBonus = 40;
+                        hpBonus = 20;
                         damageBonus = 2;
                         break;
                     case 3:
-                        hpBonus = 80;
+                        hpBonus = 50;
                         damageBonus = 5;
                         break;
                     default:

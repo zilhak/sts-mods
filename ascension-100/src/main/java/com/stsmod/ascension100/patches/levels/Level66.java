@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
  *
  * 일부 적이 버프를 가진채로 등장합니다.
  *
- * 1막의 모든 적은 15% 확률로 생성시 힘2, 금속화2, 재생4 중 하나를 무작위로 부여받습니다.
- * 2막의 모든 적은 15% 확률로 생성시 힘3, 금속화5, 재생8 중 하나를 무작위로 부여받습니다.
- * 3막의 모든 적은 15% 확률로 생성시 힘6, 금속화8, 재생15 중 하나를 무작위로 부여받습니다.
+ * 1막의 모든 적은 5% 확률로 생성시 힘1, 금속화2 중 하나를 무작위로 부여받습니다.
+ * 2막의 모든 적은 5% 확률로 생성시 금속화4, 재생3 중 하나를 무작위로 부여받습니다.
+ * 3막의 모든 적은 5% 확률로 생성시 힘6, 금속화8, 재생6 중 하나를 무작위로 부여받습니다.
  */
 public class Level66 {
     private static final Logger logger = LogManager.getLogger(Level66.class.getName());
@@ -35,61 +35,59 @@ public class Level66 {
                 return;
             }
 
-            // 15% chance to get a random buff
-            if (MathUtils.randomBoolean(0.15f)) {
+            // 5% chance to get a random buff
+            if (MathUtils.randomBoolean(0.05f)) {
                 int actNum = AbstractDungeon.actNum;
                 int randomBuff = MathUtils.random(2); // 0, 1, or 2
 
                 if (actNum == 1) {
-                    switch (randomBuff) {
-                        case 0: // Strength 2
+                    int act1Buff = MathUtils.random(1); // 0 or 1
+                    switch (act1Buff) {
+                        case 0: // Strength 1
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
-                                    new StrengthPower(__instance, 2), 2)
+                                    new StrengthPower(__instance, 1), 1)
                             );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Strength 1 (Act 1)",
+                                __instance.name
+                            ));
                             break;
                         case 1: // Metallicize 2
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
                                     new MetallicizePower(__instance, 2), 2)
                             );
-                            break;
-                        case 2: // Regeneration 4
-                            AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(__instance, __instance,
-                                    new RegenerateMonsterPower(__instance, 4), 4)
-                            );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Metallicize 2 (Act 1)",
+                                __instance.name
+                            ));
                             break;
                     }
-                    logger.info(String.format(
-                        "Ascension 66: %s started with random buff (Act 1)",
-                        __instance.name
-                    ));
                 } else if (actNum == 2) {
-                    switch (randomBuff) {
-                        case 0: // Strength 3
+                    int act2Buff = MathUtils.random(1); // 0 or 1
+                    switch (act2Buff) {
+                        case 0: // Metallicize 4
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
-                                    new StrengthPower(__instance, 3), 3)
+                                    new MetallicizePower(__instance, 4), 4)
                             );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Metallicize 4 (Act 2)",
+                                __instance.name
+                            ));
                             break;
-                        case 1: // Metallicize 5
+                        case 1: // Regeneration 3
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
-                                    new MetallicizePower(__instance, 5), 5)
+                                    new RegenerateMonsterPower(__instance, 3), 3)
                             );
-                            break;
-                        case 2: // Regeneration 8
-                            AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(__instance, __instance,
-                                    new RegenerateMonsterPower(__instance, 8), 8)
-                            );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Regeneration 3 (Act 2)",
+                                __instance.name
+                            ));
                             break;
                     }
-                    logger.info(String.format(
-                        "Ascension 66: %s started with random buff (Act 2)",
-                        __instance.name
-                    ));
                 } else if (actNum >= 3) {
                     switch (randomBuff) {
                         case 0: // Strength 6
@@ -97,24 +95,32 @@ public class Level66 {
                                 new ApplyPowerAction(__instance, __instance,
                                     new StrengthPower(__instance, 6), 6)
                             );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Strength 6 (Act 3)",
+                                __instance.name
+                            ));
                             break;
                         case 1: // Metallicize 8
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
                                     new MetallicizePower(__instance, 8), 8)
                             );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Metallicize 8 (Act 3)",
+                                __instance.name
+                            ));
                             break;
-                        case 2: // Regeneration 15
+                        case 2: // Regeneration 6
                             AbstractDungeon.actionManager.addToBottom(
                                 new ApplyPowerAction(__instance, __instance,
-                                    new RegenerateMonsterPower(__instance, 15), 15)
+                                    new RegenerateMonsterPower(__instance, 6), 6)
                             );
+                            logger.info(String.format(
+                                "Ascension 66: %s started with Regeneration 6 (Act 3)",
+                                __instance.name
+                            ));
                             break;
                     }
-                    logger.info(String.format(
-                        "Ascension 66: %s started with random buff (Act 3)",
-                        __instance.name
-                    ));
                 }
             }
         }

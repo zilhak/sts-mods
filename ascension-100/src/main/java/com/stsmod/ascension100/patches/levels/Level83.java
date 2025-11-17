@@ -14,13 +14,13 @@ import org.apache.logging.log4j.Logger;
  *
  * 적들의 방어적인 패턴이 강화됩니다.
  *
- * 방어도를 얻는 적들의 패턴들의 방어도 수치가 25% 증가합니다.
+ * 방어도를 얻는 적들의 패턴들의 방어도 수치가 10% 증가합니다.
  */
 public class Level83 {
     private static final Logger logger = LogManager.getLogger(Level83.class.getName());
 
     /**
-     * Patch all GainBlockAction constructors to increase block amount by 25% for monsters
+     * Patch all GainBlockAction constructors to increase block amount by 10% for monsters
      */
     @SpirePatch(
         clz = GainBlockAction.class,
@@ -37,10 +37,10 @@ public class Level83 {
             // Only increase block for monsters
             if (target instanceof AbstractMonster) {
                 int originalAmount = __instance.amount;
-                __instance.amount = (int) Math.ceil(originalAmount * 1.25f);
+                __instance.amount = (int) Math.ceil(originalAmount * 1.10f);
 
                 logger.info(String.format(
-                    "Ascension 83: Increased %s's block from %d to %d (+25%%)",
+                    "Ascension 83: Increased %s's block from %d to %d (+10%%)",
                     ((AbstractMonster) target).name,
                     originalAmount,
                     __instance.amount
@@ -64,10 +64,10 @@ public class Level83 {
             // Only increase block for monsters
             if (target instanceof AbstractMonster) {
                 int originalAmount = __instance.amount;
-                __instance.amount = (int) Math.ceil(originalAmount * 1.25f);
+                __instance.amount = (int) Math.ceil(originalAmount * 1.10f);
 
                 logger.info(String.format(
-                    "Ascension 83: Increased %s's block from %d to %d (+25%%)",
+                    "Ascension 83: Increased %s's block from %d to %d (+10%%)",
                     ((AbstractMonster) target).name,
                     originalAmount,
                     __instance.amount
@@ -91,10 +91,10 @@ public class Level83 {
             // Only increase block for monsters
             if (target instanceof AbstractMonster) {
                 int originalAmount = __instance.amount;
-                __instance.amount = (int) Math.ceil(originalAmount * 1.25f);
+                __instance.amount = (int) Math.ceil(originalAmount * 1.10f);
 
                 logger.info(String.format(
-                    "Ascension 83: Increased %s's block from %d to %d (+25%%)",
+                    "Ascension 83: Increased %s's block from %d to %d (+10%%)",
                     ((AbstractMonster) target).name,
                     originalAmount,
                     __instance.amount
@@ -118,10 +118,10 @@ public class Level83 {
             // Only increase block for monsters
             if (target instanceof AbstractMonster) {
                 int originalAmount = __instance.amount;
-                __instance.amount = (int) Math.ceil(originalAmount * 1.25f);
+                __instance.amount = (int) Math.ceil(originalAmount * 1.10f);
 
                 logger.info(String.format(
-                    "Ascension 83: Increased %s's block from %d to %d (+25%%)",
+                    "Ascension 83: Increased %s's block from %d to %d (+10%%)",
                     ((AbstractMonster) target).name,
                     originalAmount,
                     __instance.amount

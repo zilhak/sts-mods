@@ -38,7 +38,7 @@ public class Level25 {
      */
 
     /**
-     * Cultist: Damage -2 (rituals stronger, attacks weaker)
+     * Cultist: Damage -4 (rituals stronger, attacks weaker)
      */
     @SpirePatch(
         clz = Cultist.class,
@@ -52,7 +52,7 @@ public class Level25 {
                 if (!__instance.damage.isEmpty()) {
                     DamageInfo damageInfo = __instance.damage.get(0);
                     int originalDamage = damageInfo.base;
-                    damageInfo.base = Math.max(1, originalDamage - 2);
+                    damageInfo.base = Math.max(1, originalDamage - 4);
                     logger.info(String.format(
                         "Ascension 25: Cultist damage reduced from %d to %d",
                         originalDamage,
@@ -107,7 +107,7 @@ public class Level25 {
     }
 
     /**
-     * Jaw Worm: Defense +12 on Strength gain
+     * Jaw Worm: Defense +3 on Strength gain
      */
     @SpirePatch(
         clz = JawWorm.class,
@@ -119,9 +119,9 @@ public class Level25 {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
                 if (__instance.nextMove == 2) { // Bellow move
                     AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.GainBlockAction(__instance, __instance, 12)
+                        new com.megacrit.cardcrawl.actions.common.GainBlockAction(__instance, __instance, 3)
                     );
-                    logger.info("Ascension 25: JawWorm gained 12 Block on Strength gain");
+                    logger.info("Ascension 25: JawWorm gained 3 Block on Strength gain");
                 }
             }
         }

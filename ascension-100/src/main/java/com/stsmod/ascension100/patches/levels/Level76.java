@@ -3,7 +3,9 @@ package com.stsmod.ascension100.patches.levels;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
+import com.megacrit.cardcrawl.actions.common.GainBlockAction;
 import com.megacrit.cardcrawl.core.AbstractCreature;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.MonsterGroup;
@@ -23,9 +25,12 @@ import org.apache.logging.log4j.Logger;
  *
  * 지도에서 적 인카운터 심볼의 Strong Enemy 전투에서, 15% 확률로 특수 전투가 발생할 수 있습니다.
  * 특수 전투는 엘리트 전투와 동일한 보상을 얻습니다.
- * 1막 : 적들은 금속화를 2, 재생을 2얻습니다.
- * 2막 : 적들은 금속화를 5, 재생을 3얻습니다.
- * 3막 : 적들은 금속화를 8, 재생을 5얻습니다.
+ * 특수 전투는 시작시 적들이 버프와 함께, 시작시 방어도를 얻은 상태에서 시작합니다.
+ * 특수 전투시에는 일반 BGM 대신 엘리트 BGM(BOSS_BOTTOM)을 재생합니다.
+ *
+ * 1막 : 적들은 금속화를 2, 재생을 2얻습니다. 시작시 방어도를 6 얻습니다.
+ * 2막 : 적들은 금속화를 5, 재생을 3얻습니다. 시작시 방어도를 10 얻습니다.
+ * 3막 : 적들은 금속화를 8, 재생을 5얻습니다. 시작시 방어도를 25 얻습니다.
  */
 public class Level76 {
     private static final Logger logger = LogManager.getLogger(Level76.class.getName());
@@ -70,6 +75,28 @@ public class Level76 {
     }
 
     /**
+     * Play elite BGM for special battles
+     */
+    @SpirePatch(
+        clz = MonsterRoom.class,
+        method = "onPlayerEntry"
+    )
+    public static class PlayEliteBGM {
+        @SpirePostfixPatch
+        public static void Postfix(MonsterRoom __instance) {
+            if (!SpecialBattleTracker.isSpecialBattle) {
+                return;
+            }
+
+            // Play elite BGM (BOSS_BOTTOM - Act 1 boss BGM)
+            CardCrawlGame.music.unsilenceBGM();
+            CardCrawlGame.music.playTempBgmInstantly("BOSS_BOTTOM", true);
+
+            logger.info("Ascension 76: Playing elite BGM (BOSS_BOTTOM) for Special Battle");
+        }
+    }
+
+    /**
      * Apply buffs to monsters at battle start
      */
     @SpirePatch(
@@ -84,28 +111,32 @@ public class Level76 {
             }
 
             int actNum = AbstractDungeon.actNum;
-            int plating, regen;
+            int plating, regen, block;
 
             // Determine buff amounts by act
             switch (actNum) {
                 case 1:
                     plating = 2;
                     regen = 2;
+                    block = 6;
                     break;
                 case 2:
                     plating = 5;
                     regen = 3;
+                    block = 10;
                     break;
                 case 3:
                 default:
                     plating = 8;
                     regen = 5;
+                    block = 25;
                     break;
             }
 
             // Apply buffs to all monsters
             for (AbstractMonster m : __instance.monsters) {
                 if (m != null && !m.isDying && !m.isDead) {
+                    // Apply Plated Armor (금속화)
                     AbstractDungeon.actionManager.addToBottom(
                         new ApplyPowerAction(
                             (AbstractCreature)m,
@@ -115,6 +146,7 @@ public class Level76 {
                         )
                     );
 
+                    // Apply Regeneration (재생)
                     AbstractDungeon.actionManager.addToBottom(
                         new ApplyPowerAction(
                             (AbstractCreature)m,
@@ -123,11 +155,16 @@ public class Level76 {
                             regen
                         )
                     );
+
+                    // Apply starting block (시작시 방어도)
+                    AbstractDungeon.actionManager.addToBottom(
+                        new GainBlockAction(m, m, block)
+                    );
                 }
             }
 
-            logger.info(String.format("Ascension 76: Applied Special Battle buffs - Plating: %d, Regen: %d (Act %d)",
-                plating, regen, actNum));
+            logger.info(String.format("Ascension 76: Applied Special Battle buffs - Plating: %d, Regen: %d, Block: %d (Act %d)",
+                plating, regen, block, actNum));
         }
     }
 

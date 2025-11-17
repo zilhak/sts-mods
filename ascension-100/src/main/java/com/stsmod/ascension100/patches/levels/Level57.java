@@ -13,9 +13,9 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 57: Enemies have more HP by act and encounter type
  *
  * 적들의 체력이 증가합니다.
- * 1막의 strong enemies 전투에서 적들의 체력이 10% 증가합니다.
- * 2막의 weak enemies 전투에서 적들의 체력이 5% 증가합니다. strong enemies 전투에서 적들의 체력이 10% 증가합니다.
- * 3막의 weak enemies 전투에서 적들의 체력이 10% 증가합니다. strong enemies 전투에서 적들의 체력이 20% 증가합니다.
+ * 1막의 strong enemies 전투에서 적들의 체력이 5% 증가합니다.
+ * 2막의 weak enemies 전투에서 적들의 체력이 5% 증가합니다. strong enemies 전투에서 적들의 체력이 8% 증가합니다.
+ * 3막의 weak enemies 전투에서 적들의 체력이 8% 증가합니다. strong enemies 전투에서 적들의 체력이 10% 증가합니다.
  */
 public class Level57 {
     private static final Logger logger = LogManager.getLogger(Level57.class.getName());
@@ -44,23 +44,23 @@ public class Level57 {
             boolean isStrong = EncounterHelper.isStrongEncounter();
 
             if (actNum == 1) {
-                // Act 1: Only strong enemies get +10%
+                // Act 1: Only strong enemies get +5%
                 if (isStrong) {
-                    multiplier = 1.10f;
+                    multiplier = 1.05f;
                 }
             } else if (actNum == 2) {
-                // Act 2: Weak +5%, Strong +10%
+                // Act 2: Weak +5%, Strong +8%
                 if (isWeak) {
                     multiplier = 1.05f;
                 } else if (isStrong) {
-                    multiplier = 1.10f;
+                    multiplier = 1.08f;
                 }
             } else if (actNum >= 3) {
-                // Act 3: Weak +10%, Strong +20%
+                // Act 3: Weak +8%, Strong +10%
                 if (isWeak) {
-                    multiplier = 1.10f;
+                    multiplier = 1.08f;
                 } else if (isStrong) {
-                    multiplier = 1.20f;
+                    multiplier = 1.10f;
                 }
             }
 

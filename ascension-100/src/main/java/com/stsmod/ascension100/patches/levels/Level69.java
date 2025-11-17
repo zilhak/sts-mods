@@ -13,9 +13,9 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 69: Bosses enhanced by act
  *
  * 보스가 강화됩니다.
- * 1막의 보스의 체력이 10% 증가하고, 공격력이 1 증가합니다.
- * 2막의 보스의 체력이 20% 증가하고, 공격력이 4 증가합니다.
- * 3막의 보스의 체력이 30% 증가하고, 공격력이 10 증가합니다.
+ * 1막의 보스의 체력이 5% 증가하고, 공격력이 1 증가합니다.
+ * 2막의 보스의 체력이 10% 증가하고, 공격력이 3 증가합니다.
+ * 3막의 보스의 체력이 15% 증가하고, 공격력이 6 증가합니다.
  * (타락한 심장 제외)
  */
 public class Level69 {
@@ -37,12 +37,12 @@ public class Level69 {
                 float hpMultiplier = 1.0f;
 
                 if (actNum == 1) {
-                    hpMultiplier = 1.1f;
+                    hpMultiplier = 1.05f;
                 } else if (actNum == 2) {
-                    hpMultiplier = 1.2f;
+                    hpMultiplier = 1.10f;
                 } else if (actNum == 3) {
                     // Only Act 3, not Act 4 (Corrupt Heart)
-                    hpMultiplier = 1.3f;
+                    hpMultiplier = 1.15f;
                 }
 
                 if (hpMultiplier > 1.0f) {
@@ -77,10 +77,10 @@ public class Level69 {
                 if (actNum == 1) {
                     damageIncrease = 1;
                 } else if (actNum == 2) {
-                    damageIncrease = 4;
+                    damageIncrease = 3;
                 } else if (actNum == 3) {
                     // Only Act 3, not Act 4 (Corrupt Heart)
-                    damageIncrease = 10;
+                    damageIncrease = 6;
                 }
 
                 if (damageIncrease > 0) {

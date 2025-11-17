@@ -902,8 +902,8 @@ public class Level53 {
     }
 
     /**
-     * JawWorm (턱벌레): First turn block +5
-     * 첫턴에서 방어도를 5 얻은상태로 시작
+     * JawWorm (턱벌레): First turn block +3
+     * 첫턴에서 방어도를 3 얻은상태로 시작
      */
     @SpirePatch(
         clz = JawWorm.class,
@@ -917,10 +917,10 @@ public class Level53 {
             }
 
             AbstractDungeon.actionManager.addToBottom(
-                new GainBlockAction(__instance, __instance, 5)
+                new GainBlockAction(__instance, __instance, 3)
             );
 
-            logger.info("Ascension 53: JawWorm gained 5 block at battle start");
+            logger.info("Ascension 53: JawWorm gained 3 block at battle start");
         }
     }
 
