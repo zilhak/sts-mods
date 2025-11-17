@@ -20,6 +20,7 @@ import com.megacrit.cardcrawl.monsters.exordium.GremlinFat;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinWarrior;
 import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
 import com.megacrit.cardcrawl.monsters.exordium.FungiBeast;
+import com.megacrit.cardcrawl.monsters.exordium.TheGuardian;
 import com.megacrit.cardcrawl.monsters.city.SnakePlant;
 import com.megacrit.cardcrawl.monsters.beyond.Repulsor;
 import com.megacrit.cardcrawl.monsters.beyond.Spiker;
@@ -272,16 +273,18 @@ public class Level92 {
             String id = __instance.id;
             if (id == null) return;
 
-            // Louse: Add +10 Curl Up using ApplyPowerAction
+            // Louse: Increase existing Curl Up power by 10
             if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
-                AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new com.megacrit.cardcrawl.powers.CurlUpPower(__instance, 10), 10)
-                );
-                logger.info(String.format(
-                    "Ascension 92: %s gained +10 Curl Up",
-                    __instance.name
-                ));
+                AbstractPower curlUp = __instance.getPower("Curl Up");
+                if (curlUp != null) {
+                    int originalAmount = curlUp.amount;
+                    curlUp.amount += 10;
+                    curlUp.updateDescription();
+                    logger.info(String.format(
+                        "Ascension 92: %s Curl Up increased from %d to %d (+10)",
+                        __instance.name, originalAmount, curlUp.amount
+                    ));
+                }
             }
 
             // Shelled Parasite: Increase Plated Armor by 4
@@ -368,6 +371,28 @@ public class Level92 {
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify Shield Gremlin stats", e);
+                }
+            }
+
+            // Sneaky Gremlin (GremlinThief): Increase thiefDamage by 7
+            if (id.equals("GremlinThief")) {
+                try {
+                    Field thiefDamageField = __instance.getClass().getDeclaredField("thiefDamage");
+                    thiefDamageField.setAccessible(true);
+                    int originalDamage = thiefDamageField.getInt(__instance);
+                    thiefDamageField.setInt(__instance, originalDamage + 7);
+
+                    // Update damage info
+                    if (!__instance.damage.isEmpty()) {
+                        __instance.damage.get(0).base += 7;
+                    }
+
+                    logger.info(String.format(
+                        "Ascension 92: Sneaky Gremlin damage increased from %d to %d (+7)",
+                        originalDamage, originalDamage + 7
+                    ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Sneaky Gremlin stats", e);
                 }
             }
 
@@ -1606,6 +1631,99 @@ public class Level92 {
                 );
 
                 logger.info("Ascension 92: Hexaghost Inferno added 2 extra Burns to discard pile");
+            }
+
+            lastMove.remove();
+        }
+    }
+
+    /**
+     * Guardian: Sharp Hide +2 in defensive mode (stacks with Level 54)
+     * 수호자: 수비모드에서 날카로운 껍질을 추가로 2 얻습니다
+     */
+    @SpirePatch(
+        clz = TheGuardian.class,
+        method = "useCloseUp"
+    )
+    public static class GuardianSharpHideIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(TheGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            // Add +2 Sharp Hide after useCloseUp applies base Sharp Hide
+            // Stacks with Level 54 (+1), so total +3 at A92+
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new SharpHidePower(__instance, 2), 2)
+            );
+
+            logger.info("Ascension 92: Guardian gained +2 additional Sharp Hide in defensive mode (stacks with Level 54)");
+        }
+    }
+
+    /**
+     * Guardian: Fierce Bash damage +8
+     * 수호자: 매서운 강타 패턴의 데미지가 8 증가합니다
+     */
+    @SpirePatch(
+        clz = TheGuardian.class,
+        method = "takeTurn"
+    )
+    public static class GuardianFierceBashDamageIncrease {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(TheGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Guardian move", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(TheGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 1) { // FIERCE_BASH move
+                // Find and increase damage for Fierce Bash attack
+                try {
+                    for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
+                        AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
+
+                        if (action instanceof DamageAction) {
+                            Field infoField = DamageAction.class.getDeclaredField("info");
+                            infoField.setAccessible(true);
+                            DamageInfo info = (DamageInfo) infoField.get(action);
+
+                            if (info != null && info.owner == __instance) {
+                                int originalDamage = info.base;
+                                info.base += 8;
+                                info.output += 8;
+
+                                logger.info(String.format(
+                                    "Ascension 92: Guardian Fierce Bash damage increased from %d to %d (+8)",
+                                    originalDamage, info.base
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to modify Guardian Fierce Bash damage", e);
+                }
             }
 
             lastMove.remove();

@@ -13,6 +13,8 @@ import com.megacrit.cardcrawl.monsters.exordium.Hexaghost;
 import com.megacrit.cardcrawl.monsters.exordium.TheGuardian;
 import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
 import com.megacrit.cardcrawl.powers.AbstractPower;
+import com.megacrit.cardcrawl.powers.SharpHidePower;
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,18 +51,13 @@ public class Level54 {
                 return;
             }
 
-            // Find and increase Sharp Hide power by 1
-            AbstractPower sharpHide = __instance.getPower("Sharp Hide");
-            if (sharpHide != null) {
-                int originalAmount = sharpHide.amount;
-                sharpHide.amount += 1;
-                sharpHide.updateDescription();
+            // Add +1 Sharp Hide after useCloseUp applies base Sharp Hide
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new SharpHidePower(__instance, 1), 1)
+            );
 
-                logger.info(String.format(
-                    "Ascension 54: Guardian Sharp Hide increased from %d to %d in defensive mode",
-                    originalAmount, sharpHide.amount
-                ));
-            }
+            logger.info("Ascension 54: Guardian gained +1 additional Sharp Hide in defensive mode");
         }
     }
 

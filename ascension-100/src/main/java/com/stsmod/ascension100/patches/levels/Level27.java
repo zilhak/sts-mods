@@ -135,18 +135,39 @@ public class Level27 {
         method = "takeTurn"
     )
     public static class SlimeBossSlimePatch {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(SlimeBoss __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
+            }
+
+            try {
+                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get SlimeBoss move", e);
+            }
+        }
+
         @SpirePostfixPatch
         public static void Postfix(SlimeBoss __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 27) {
-                // Check if Slime Boss just used the Slime attack (which adds Slimed cards)
-                // We add 1 additional Slimed card after any attack that adds Slimed
-                if (__instance.nextMove == 1) { // Slime attack move ID
-                    AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Slimed(), 1)
-                    );
-                    logger.info("Ascension 27: SlimeBoss added 1 extra Slimed card");
-                }
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
             }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 1) { // Slime attack move ID
+                AbstractDungeon.actionManager.addToBottom(
+                    new MakeTempCardInDiscardAction(new Slimed(), 1)
+                );
+                logger.info("Ascension 27: SlimeBoss added 1 extra Slimed card");
+            }
+
+            lastMove.remove();
         }
     }
 
@@ -158,22 +179,44 @@ public class Level27 {
         method = "takeTurn"
     )
     public static class GuardianVentPatch {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(TheGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
+            }
+
+            try {
+                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Guardian move", e);
+            }
+        }
+
         @SpirePostfixPatch
         public static void Postfix(TheGuardian __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 27) {
-                // Check if Guardian just used Vent attack
-                if (__instance.nextMove == 4) { // Vent move ID
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(AbstractDungeon.player, __instance,
-                            new WeakPower(AbstractDungeon.player, 1, true), 1)
-                    );
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(AbstractDungeon.player, __instance,
-                            new VulnerablePower(AbstractDungeon.player, 1, true), 1)
-                    );
-                    logger.info("Ascension 27: TheGuardian Vent added +1 Weak and +1 Vulnerable");
-                }
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
             }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 4) { // Vent move ID
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new WeakPower(AbstractDungeon.player, 1, true), 1)
+                );
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new VulnerablePower(AbstractDungeon.player, 1, true), 1)
+                );
+                logger.info("Ascension 27: TheGuardian Vent added +1 Weak and +1 Vulnerable");
+            }
+
+            lastMove.remove();
         }
     }
 
@@ -185,18 +228,40 @@ public class Level27 {
         method = "takeTurn"
     )
     public static class ChampStrengthPatch {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(Champ __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
+            }
+
+            try {
+                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Champ move", e);
+            }
+        }
+
         @SpirePostfixPatch
         public static void Postfix(Champ __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 27) {
-                // Check if Champ just used a Strength-gaining move
-                if (__instance.nextMove == 2) { // Buff move ID (gains Strength)
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(__instance, __instance,
-                            new StrengthPower(__instance, 1), 1)
-                    );
-                    logger.info("Ascension 27: Champ gained +1 additional Strength");
-                }
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
             }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 2) { // Buff move ID (gains Strength)
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(__instance, __instance,
+                        new StrengthPower(__instance, 1), 1)
+                );
+                logger.info("Ascension 27: Champ gained +1 additional Strength");
+            }
+
+            lastMove.remove();
         }
     }
 
@@ -208,27 +273,49 @@ public class Level27 {
         method = "takeTurn"
     )
     public static class CollectorDebuffPatch {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(TheCollector __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
+            }
+
+            try {
+                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get TheCollector move", e);
+            }
+        }
+
         @SpirePostfixPatch
         public static void Postfix(TheCollector __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 27) {
-                // Check if Collector just used the mega debuff move
-                if (__instance.nextMove == 2) { // Mega Debuff move ID
-                    // Apply Weak 3, Vulnerable 3, Frail 3 twice
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(AbstractDungeon.player, __instance,
-                            new WeakPower(AbstractDungeon.player, 3, true), 3)
-                    );
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(AbstractDungeon.player, __instance,
-                            new VulnerablePower(AbstractDungeon.player, 3, true), 3)
-                    );
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(AbstractDungeon.player, __instance,
-                            new FrailPower(AbstractDungeon.player, 3, true), 3)
-                    );
-                    logger.info("Ascension 27: TheCollector applied additional debuffs (Weak/Vulnerable/Frail 3 each)");
-                }
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
             }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 2) { // Mega Debuff move ID
+                // Apply Weak 3, Vulnerable 3, Frail 3 twice
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new WeakPower(AbstractDungeon.player, 3, true), 3)
+                );
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new VulnerablePower(AbstractDungeon.player, 3, true), 3)
+                );
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new FrailPower(AbstractDungeon.player, 3, true), 3)
+                );
+                logger.info("Ascension 27: TheCollector applied additional debuffs (Weak/Vulnerable/Frail 3 each)");
+            }
+
+            lastMove.remove();
         }
     }
 
@@ -240,17 +327,39 @@ public class Level27 {
         method = "takeTurn"
     )
     public static class DonuDazedPatch {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(Donu __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
+            }
+
+            try {
+                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Donu move", e);
+            }
+        }
+
         @SpirePostfixPatch
         public static void Postfix(Donu __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 27) {
-                // Check if Donu just used an attack that adds Dazed
-                if (__instance.nextMove == 2 || __instance.nextMove == 3) { // Circle of Power or attack moves
-                    AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Dazed(), 1)
-                    );
-                    logger.info("Ascension 27: Donu added 1 extra Dazed card");
-                }
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 27) {
+                return;
             }
+
+            Byte move = lastMove.get();
+            if (move != null && (move == 2 || move == 3)) { // Circle of Power or attack moves
+                AbstractDungeon.actionManager.addToBottom(
+                    new MakeTempCardInDiscardAction(new Dazed(), 1)
+                );
+                logger.info("Ascension 27: Donu added 1 extra Dazed card");
+            }
+
+            lastMove.remove();
         }
     }
 

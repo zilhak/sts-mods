@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 42: More gold, higher card removal cost
  *
  * 얻는 돈이 늘어나며, 상점의 카드 제거 비용이 증가합니다.
- * 얻는 돈이 25% 증가합니다.
+ * 전투 종료시 얻는 돈이 20% 증가합니다.
  * 상점의 카드 제거 초기 비용이 25 증가합니다.
  */
 public class Level42 {
@@ -34,10 +34,10 @@ public class Level42 {
             }
 
             int originalGold = goldAmount[0];
-            goldAmount[0] = MathUtils.ceil(goldAmount[0] * 1.25f);
+            goldAmount[0] = MathUtils.ceil(goldAmount[0] * 1.20f);
 
             logger.info(String.format(
-                "Ascension 42: Combat gold increased from %d to %d",
+                "Ascension 42: Combat gold increased from %d to %d (+20%%)",
                 originalGold, goldAmount[0]
             ));
         }

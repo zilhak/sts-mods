@@ -6,6 +6,15 @@ import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinNob;
+import com.megacrit.cardcrawl.monsters.exordium.Lagavulin;
+import com.megacrit.cardcrawl.monsters.exordium.Sentry;
+import com.megacrit.cardcrawl.monsters.city.BookOfStabbing;
+import com.megacrit.cardcrawl.monsters.city.GremlinLeader;
+import com.megacrit.cardcrawl.monsters.city.Taskmaster;
+import com.megacrit.cardcrawl.monsters.beyond.GiantHead;
+import com.megacrit.cardcrawl.monsters.beyond.Nemesis;
+import com.megacrit.cardcrawl.monsters.beyond.Reptomancer;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,69 +38,194 @@ public class Level34 {
     private static final Logger logger = LogManager.getLogger(Level34.class.getName());
 
     /**
-     * Elite damage increases by monster ID
+     * Gremlin Nob: +1 damage to all attacks
      */
     @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        clz = GremlinNob.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
     )
-    public static class EliteDamageIncrease {
+    public static class GremlinNobDamagePatch {
         @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        public static void Postfix(GremlinNob __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
                 return;
             }
 
-            if (__instance.type != AbstractMonster.EnemyType.ELITE) {
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 34: Gremlin Nob damage +1");
+        }
+    }
+
+    /**
+     * Lagavulin: +1 damage
+     */
+    @SpirePatch(
+        clz = Lagavulin.class,
+        paramtypez = {boolean.class},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class LagavulinDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Lagavulin __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
                 return;
             }
 
-            String id = __instance.id;
-            if (id == null) return;
-
-            int damageIncrease = 0;
-
-            // Determine damage increase by elite ID
-            switch (id) {
-                case "GremlinNob":      // 귀족 그렘린
-                    damageIncrease = 1;
-                    break;
-                case "Lagavulin":       // 라가불린
-                    damageIncrease = 1;
-                    break;
-                case "Sentry":          // 보초기
-                    damageIncrease = 1;
-                    break;
-                case "BookOfStabbing":  // 칼부림의 책
-                    damageIncrease = 1;
-                    break;
-                case "SlaverBoss":      // 노예 관리자 (Taskmaster)
-                    damageIncrease = 2;
-                    break;
-                case "GiantHead":       // 거인의 머리
-                    damageIncrease = 5;
-                    break;
-                case "Nemesis":         // 네메시스
-                    damageIncrease = 2;
-                    break;
-                case "Reptomancer":     // 파충류 주술사
-                    damageIncrease = 2;
-                    break;
-                default:
-                    return; // No damage increase for this elite
-            }
-
-            // Apply damage increase to all damage values
             for (DamageInfo damageInfo : __instance.damage) {
                 if (damageInfo != null && damageInfo.base > 0) {
-                    damageInfo.base += damageIncrease;
+                    damageInfo.base += 1;
                 }
             }
+            logger.info("Ascension 34: Lagavulin damage +1");
+        }
+    }
 
-            logger.info(String.format(
-                "Ascension 34: Elite %s damage increased by %d",
-                __instance.name, damageIncrease
-            ));
+    /**
+     * Sentry: +1 damage
+     */
+    @SpirePatch(
+        clz = Sentry.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class SentryDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Sentry __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 34: Sentry damage +1");
+        }
+    }
+
+    /**
+     * Book of Stabbing: +1 damage
+     */
+    @SpirePatch(
+        clz = BookOfStabbing.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class BookOfStabbingDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(BookOfStabbing __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 34: Book of Stabbing damage +1");
+        }
+    }
+
+    /**
+     * Taskmaster: +2 damage
+     */
+    @SpirePatch(
+        clz = Taskmaster.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class TaskmasterDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Taskmaster __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 34: Taskmaster damage +2");
+        }
+    }
+
+    /**
+     * Giant Head: +5 damage (It Is Time attack)
+     */
+    @SpirePatch(
+        clz = GiantHead.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class GiantHeadDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(GiantHead __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 5;
+                }
+            }
+            logger.info("Ascension 34: Giant Head damage +5");
+        }
+    }
+
+    /**
+     * Nemesis: +2 damage
+     */
+    @SpirePatch(
+        clz = Nemesis.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class NemesisDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Nemesis __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 34: Nemesis damage +2");
+        }
+    }
+
+    /**
+     * Reptomancer: +2 damage
+     */
+    @SpirePatch(
+        clz = Reptomancer.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class ReptomancerDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Reptomancer __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 34: Reptomancer damage +2");
         }
     }
 
@@ -99,12 +233,12 @@ public class Level34 {
      * Gremlin Leader: Encourage pattern grants +1 additional Strength
      */
     @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.city.GremlinLeader.class,
+        clz = GremlinLeader.class,
         method = "takeTurn"
     )
     public static class GremlinLeaderEncourageBuff {
         @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.city.GremlinLeader __instance) {
+        public static void Postfix(GremlinLeader __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 34) {
                 return;
             }
@@ -126,7 +260,7 @@ public class Level34 {
                         }
                     }
 
-                    logger.info("Ascension 34: Gremlin Leader Encourage gave +1 additional Strength to minions");
+                    logger.info("Ascension 34: Gremlin Leader Encourage +1 Strength to minions");
                 }
             } catch (Exception e) {
                 logger.error("Failed to modify Gremlin Leader Encourage pattern", e);

@@ -9,8 +9,35 @@ import com.megacrit.cardcrawl.monsters.city.Mugger;
 import com.megacrit.cardcrawl.monsters.city.SnakePlant;
 import com.megacrit.cardcrawl.monsters.exordium.SlaverBlue;
 import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
+import com.megacrit.cardcrawl.monsters.exordium.LouseNormal;
+import com.megacrit.cardcrawl.monsters.exordium.LouseDefensive;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinTsundere;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinThief;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinWizard;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinWarrior;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinFat;
+import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
+import com.megacrit.cardcrawl.monsters.exordium.FungiBeast;
+import com.megacrit.cardcrawl.monsters.city.ShelledParasite;
+import com.megacrit.cardcrawl.monsters.city.Chosen;
+import com.megacrit.cardcrawl.monsters.city.Centurion;
+import com.megacrit.cardcrawl.monsters.city.Snecko;
+import com.megacrit.cardcrawl.monsters.city.SphericGuardian;
+import com.megacrit.cardcrawl.monsters.city.BanditPointy;
+import com.megacrit.cardcrawl.monsters.city.BanditLeader;
+import com.megacrit.cardcrawl.monsters.beyond.Repulsor;
+import com.megacrit.cardcrawl.monsters.beyond.OrbWalker;
+import com.megacrit.cardcrawl.monsters.beyond.Transient;
+import com.megacrit.cardcrawl.monsters.beyond.SpireGrowth;
+import com.megacrit.cardcrawl.actions.AbstractGameAction;
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
+import com.megacrit.cardcrawl.actions.common.GainBlockAction;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.powers.ExplosivePower;
+import com.megacrit.cardcrawl.powers.StrengthPower;
+import com.megacrit.cardcrawl.powers.VulnerablePower;
+import com.megacrit.cardcrawl.powers.WeakPower;
+import com.megacrit.cardcrawl.powers.PlatedArmorPower;
 import javassist.CtBehavior;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +49,7 @@ import java.lang.reflect.Field;
  * 모든 적의 행동 패턴이 강화됩니다.
  *
  * 상세효과:
+ * - 공벌레(Louse): 힘 증가 패턴에서 추가적으로 힘을 1 증가
  * - WrithingMass의 기생충 추가 패턴(MEGA_DEBUFF)을 2회 사용 가능
  * - 폭탄기(Exploder): 폭발 패턴 데미지를 50으로 증가 (기본 30)
  * - 강도(Mugger): 도둑질 수치가 5 증가
@@ -189,7 +217,8 @@ public class Level53 {
      */
     @SpirePatch(
         clz = SlaverBlue.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
     )
     public static class SlaverBlueDamagePatch {
         @SpirePostfixPatch
@@ -215,7 +244,8 @@ public class Level53 {
      */
     @SpirePatch(
         clz = SlaverRed.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
     )
     public static class SlaverRedDamagePatch {
         @SpirePostfixPatch
@@ -590,6 +620,603 @@ public class Level53 {
             } catch (Exception e) {
                 logger.error("Failed to modify Maw Roar", e);
             }
+        }
+    }
+
+    /**
+     * Louse Normal: Grow pattern +1 additional Strength
+     * 공벌레(일반): 힘 증가 패턴에서 추가적으로 힘을 1 증가
+     */
+    @SpirePatch(
+        clz = LouseNormal.class,
+        method = "takeTurn"
+    )
+    public static class LouseNormalGrowStrengthBonus {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(LouseNormal __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            try {
+                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Louse Normal move", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(LouseNormal __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 3) { // GROW move (byte 3)
+                // Find and modify the StrengthPower in action queue
+                try {
+                    for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
+                        AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
+
+                        if (action instanceof ApplyPowerAction) {
+                            Field powerToApplyField = ApplyPowerAction.class.getDeclaredField("powerToApply");
+                            powerToApplyField.setAccessible(true);
+                            AbstractPower power = (AbstractPower) powerToApplyField.get(action);
+
+                            if (power instanceof StrengthPower && power.owner == __instance) {
+                                power.amount += 1;
+                                logger.info(String.format(
+                                    "Ascension 53: Louse Normal Grow pattern strength increased by +1 to %d",
+                                    power.amount
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to modify Louse Normal Grow strength", e);
+                }
+            }
+
+            lastMove.remove();
+        }
+    }
+
+    /**
+     * Louse Defensive: Grow pattern +1 additional Strength
+     * 공벌레(방어): 힘 증가 패턴에서 추가적으로 힘을 1 증가
+     */
+    @SpirePatch(
+        clz = LouseDefensive.class,
+        method = "takeTurn"
+    )
+    public static class LouseDefensiveGrowStrengthBonus {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @SpirePrefixPatch
+        public static void Prefix(LouseDefensive __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            try {
+                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte move = nextMoveField.getByte(__instance);
+                lastMove.set(move);
+            } catch (Exception e) {
+                logger.error("Failed to get Louse Defensive move", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(LouseDefensive __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 3) { // GROW move (byte 3)
+                // Find and modify the StrengthPower in action queue
+                try {
+                    for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
+                        AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
+
+                        if (action instanceof ApplyPowerAction) {
+                            Field powerToApplyField = ApplyPowerAction.class.getDeclaredField("powerToApply");
+                            powerToApplyField.setAccessible(true);
+                            AbstractPower power = (AbstractPower) powerToApplyField.get(action);
+
+                            if (power instanceof StrengthPower && power.owner == __instance) {
+                                power.amount += 1;
+                                logger.info(String.format(
+                                    "Ascension 53: Louse Defensive Grow pattern strength increased by +1 to %d",
+                                    power.amount
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to modify Louse Defensive Grow strength", e);
+                }
+            }
+
+            lastMove.remove();
+        }
+    }
+
+    /**
+     * GremlinTsundere (방패 그렘린): Block amount +3
+     */
+    @SpirePatch(
+        clz = GremlinTsundere.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class GremlinTsundereBlockPatch {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinTsundere __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            try {
+                // Increase blockAmt field by 3
+                Field blockAmtField = GremlinTsundere.class.getDeclaredField("blockAmt");
+                blockAmtField.setAccessible(true);
+                int currentBlockAmt = blockAmtField.getInt(__instance);
+                blockAmtField.setInt(__instance, currentBlockAmt + 3);
+
+                logger.info(String.format(
+                    "Ascension 53: GremlinTsundere blockAmt increased from %d to %d (+3)",
+                    currentBlockAmt, currentBlockAmt + 3
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify GremlinTsundere blockAmt", e);
+            }
+        }
+    }
+
+    /**
+     * GremlinThief (교활한 그렘린): Damage +2
+     */
+    @SpirePatch(
+        clz = GremlinThief.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class GremlinThiefDamagePatch53 {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinThief __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            try {
+                // Increase thiefDamage field by 2
+                Field thiefDamageField = GremlinThief.class.getDeclaredField("thiefDamage");
+                thiefDamageField.setAccessible(true);
+                int currentDamage = thiefDamageField.getInt(__instance);
+                thiefDamageField.setInt(__instance, currentDamage + 2);
+
+                // Update damage info
+                if (!__instance.damage.isEmpty()) {
+                    DamageInfo damageInfo = __instance.damage.get(0);
+                    damageInfo.base += 2;
+                }
+
+                logger.info(String.format(
+                    "Ascension 53: GremlinThief damage increased from %d to %d (+2)",
+                    currentDamage, currentDamage + 2
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify GremlinThief damage", e);
+            }
+        }
+    }
+
+    /**
+     * GremlinWizard (마법사 그렘린): Damage +5
+     */
+    @SpirePatch(
+        clz = GremlinWizard.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class GremlinWizardDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinWizard __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase damage by 5
+            if (!__instance.damage.isEmpty()) {
+                int originalDamage = __instance.damage.get(0).base;
+                __instance.damage.get(0).base += 5;
+
+                logger.info(String.format(
+                    "Ascension 53: GremlinWizard damage increased from %d to %d (+5)",
+                    originalDamage, originalDamage + 5
+                ));
+            }
+        }
+    }
+
+    /**
+     * GremlinWarrior (화난 그렘린): HP +10
+     */
+    @SpirePatch(
+        clz = GremlinWarrior.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class GremlinWarriorHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinWarrior __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 10;
+            __instance.currentHealth += 10;
+
+            logger.info(String.format(
+                "Ascension 53: GremlinWarrior HP increased from %d to %d (+10)",
+                originalHP, __instance.maxHealth
+            ));
+        }
+    }
+
+    /**
+     * GremlinFat (뚱뚱한 그렘린): HP +2
+     */
+    @SpirePatch(
+        clz = GremlinFat.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class GremlinFatHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinFat __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 2;
+            __instance.currentHealth += 2;
+
+            logger.info(String.format(
+                "Ascension 53: GremlinFat HP increased from %d to %d (+2)",
+                originalHP, __instance.maxHealth
+            ));
+        }
+    }
+
+    /**
+     * JawWorm (턱벌레): First turn block +5
+     * 첫턴에서 방어도를 5 얻은상태로 시작
+     */
+    @SpirePatch(
+        clz = JawWorm.class,
+        method = "usePreBattleAction"
+    )
+    public static class JawWormFirstTurnBlock {
+        @SpirePostfixPatch
+        public static void Postfix(JawWorm __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            AbstractDungeon.actionManager.addToBottom(
+                new GainBlockAction(__instance, __instance, 5)
+            );
+
+            logger.info("Ascension 53: JawWorm gained 5 block at battle start");
+        }
+    }
+
+    /**
+     * FungiBeast (동물하초): Death debuff +1
+     * 죽을 때 가하는 취약과 약화가 1 증가 (SporeCloud 파워를 통해)
+     */
+    @SpirePatch(
+        clz = FungiBeast.class,
+        method = "usePreBattleAction"
+    )
+    public static class FungiBeastDeathDebuffIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(FungiBeast __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase SporeCloud power by 1 (it applies Weak and Vulnerable on death)
+            AbstractPower sporeCloudPower = __instance.getPower("Spore Cloud");
+            if (sporeCloudPower != null) {
+                sporeCloudPower.amount += 1;
+                sporeCloudPower.updateDescription();
+                logger.info(String.format(
+                    "Ascension 53: FungiBeast SporeCloud increased by 1 to %d (death debuff +1)",
+                    sporeCloudPower.amount
+                ));
+            }
+        }
+    }
+
+    /**
+     * ShelledParasite (갑각기생충): Plated Armor +2
+     */
+    @SpirePatch(
+        clz = ShelledParasite.class,
+        method = "usePreBattleAction"
+    )
+    public static class ShelledParasitePlatedArmorIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(ShelledParasite __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new PlatedArmorPower(__instance, 2), 2)
+            );
+
+            logger.info("Ascension 53: ShelledParasite gained +2 Plated Armor");
+        }
+    }
+
+    /**
+     * Chosen (선택받은 자): Damage +2
+     */
+    @SpirePatch(
+        clz = Chosen.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class ChosenDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Chosen __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase all damage by 2
+            for (DamageInfo damage : __instance.damage) {
+                damage.base += 2;
+            }
+
+            logger.info("Ascension 53: Chosen damage increased by +2");
+        }
+    }
+
+    /**
+     * Centurion (백부장): HP +6
+     */
+    @SpirePatch(
+        clz = Centurion.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class CenturionHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(Centurion __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 6;
+            __instance.currentHealth += 6;
+
+            logger.info(String.format(
+                "Ascension 53: Centurion HP increased from %d to %d (+6)",
+                originalHP, __instance.maxHealth
+            ));
+        }
+    }
+
+    /**
+     * Snecko (스네코): Damage +2
+     */
+    @SpirePatch(
+        clz = Snecko.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class SneckoDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Snecko __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase all damage by 2
+            for (DamageInfo damage : __instance.damage) {
+                damage.base += 2;
+            }
+
+            logger.info("Ascension 53: Snecko damage increased by +2");
+        }
+    }
+
+    /**
+     * SphericGuardian (구체형 수호기): Block +15
+     */
+    @SpirePatch(
+        clz = SphericGuardian.class,
+        method = "usePreBattleAction"
+    )
+    public static class SphericGuardianBlockIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(SphericGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            AbstractDungeon.actionManager.addToBottom(
+                new GainBlockAction(__instance, __instance, 15)
+            );
+
+            logger.info("Ascension 53: SphericGuardian gained +15 block at battle start");
+        }
+    }
+
+    /**
+     * BanditPointy (촉새): Damage +1
+     */
+    @SpirePatch(
+        clz = BanditPointy.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class BanditPointyDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(BanditPointy __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase all damage by 1
+            for (DamageInfo damage : __instance.damage) {
+                damage.base += 1;
+            }
+
+            logger.info("Ascension 53: BanditPointy damage increased by +1");
+        }
+    }
+
+    /**
+     * BanditLeader (로미오): HP +5
+     */
+    @SpirePatch(
+        clz = BanditLeader.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class BanditLeaderHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(BanditLeader __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 5;
+            __instance.currentHealth += 5;
+
+            logger.info(String.format(
+                "Ascension 53: BanditLeader HP increased from %d to %d (+5)",
+                originalHP, __instance.maxHealth
+            ));
+        }
+    }
+
+    /**
+     * Repulsor (현혹기): Damage +2
+     */
+    @SpirePatch(
+        clz = Repulsor.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class RepulsorDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Repulsor __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase all damage by 2
+            for (DamageInfo damage : __instance.damage) {
+                damage.base += 2;
+            }
+
+            logger.info("Ascension 53: Repulsor damage increased by +2");
+        }
+    }
+
+    /**
+     * OrbWalker (구체 순찰기): HP +10
+     */
+    @SpirePatch(
+        clz = OrbWalker.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class OrbWalkerHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(OrbWalker __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 10;
+            __instance.currentHealth += 10;
+
+            logger.info(String.format(
+                "Ascension 53: OrbWalker HP increased from %d to %d (+10)",
+                originalHP, __instance.maxHealth
+            ));
+        }
+    }
+
+    /**
+     * Transient (과도자): Damage +5
+     */
+    @SpirePatch(
+        clz = Transient.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {}
+    )
+    public static class TransientDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Transient __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Increase all damage by 5
+            for (DamageInfo damage : __instance.damage) {
+                damage.base += 5;
+            }
+
+            logger.info("Ascension 53: Transient damage increased by +5");
+        }
+    }
+
+    /**
+     * SpireGrowth (첨탑 암종): HP +15
+     */
+    @SpirePatch(
+        clz = SpireGrowth.class,
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class SpireGrowthHPPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SpireGrowth __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            int originalHP = __instance.maxHealth;
+            __instance.maxHealth += 15;
+            __instance.currentHealth += 15;
+
+            logger.info(String.format(
+                "Ascension 53: SpireGrowth HP increased from %d to %d (+15)",
+                originalHP, __instance.maxHealth
+            ));
         }
     }
 }

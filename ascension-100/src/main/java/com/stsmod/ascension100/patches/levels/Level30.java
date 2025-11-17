@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.ending.SpireShield;
 import com.megacrit.cardcrawl.monsters.ending.SpireSpear;
+import com.megacrit.cardcrawl.monsters.exordium.Sentry;
 import com.megacrit.cardcrawl.powers.ArtifactPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,11 +53,36 @@ public class Level30 {
     }
 
     /**
+     * Sentry: Direct usePreBattleAction patch to ensure +1 Artifact
+     */
+    @SpirePatch(
+        clz = Sentry.class,
+        method = "usePreBattleAction"
+    )
+    public static class SentryArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(Sentry __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
+                return;
+            }
+
+            // Sentry applies Artifact 1 in its own usePreBattleAction
+            // Add 1 more to make it 2 total
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 30: Sentry gained +1 Artifact (total: 2)");
+        }
+    }
+
+    /**
      * Spire Spear: +1 Artifact (spawned by Corrupt Heart)
      */
     @SpirePatch(
         clz = SpireSpear.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = "usePreBattleAction"
     )
     public static class SpireSpearArtifactPatch {
         @SpirePostfixPatch
@@ -80,7 +106,7 @@ public class Level30 {
      */
     @SpirePatch(
         clz = SpireShield.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = "usePreBattleAction"
     )
     public static class SpireShieldArtifactPatch {
         @SpirePostfixPatch

@@ -33,41 +33,35 @@ public class Level25 {
     // ========================================
 
     /**
-     * Louse (Normal): Curl Up +3
+     * Louse (Normal & Defensive): Curl Up +3
+     * Directly increases existing Curl Up power to ensure stacking
      */
     @SpirePatch(
-        clz = LouseNormal.class,
+        clz = AbstractMonster.class,
         method = "usePreBattleAction"
     )
-    public static class LouseNormalCurlUpPatch {
+    public static class LouseCurlUpPatch25 {
         @SpirePostfixPatch
-        public static void Postfix(LouseNormal __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new CurlUpPower(__instance, 3), 3)
-                );
-                logger.info("Ascension 25: LouseNormal gained +3 Curl Up");
+        public static void Postfix(AbstractMonster __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return;
             }
-        }
-    }
 
-    /**
-     * Louse (Defensive): Curl Up +3
-     */
-    @SpirePatch(
-        clz = LouseDefensive.class,
-        method = "usePreBattleAction"
-    )
-    public static class LouseDefensiveCurlUpPatch {
-        @SpirePostfixPatch
-        public static void Postfix(LouseDefensive __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new CurlUpPower(__instance, 3), 3)
-                );
-                logger.info("Ascension 25: LouseDefensive gained +3 Curl Up");
+            String id = __instance.id;
+            if (id == null) return;
+
+            // Louse: Increase existing Curl Up power by 3
+            if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
+                AbstractPower curlUp = __instance.getPower("Curl Up");
+                if (curlUp != null) {
+                    int originalAmount = curlUp.amount;
+                    curlUp.amount += 3;
+                    curlUp.updateDescription();
+                    logger.info(String.format(
+                        "Ascension 25: %s Curl Up increased from %d to %d (+3)",
+                        __instance.name, originalAmount, curlUp.amount
+                    ));
+                }
             }
         }
     }
@@ -758,6 +752,40 @@ public class Level25 {
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify GremlinTsundere blockAmt", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * GremlinThief (교활한 그렘린): Damage +2
+     */
+    @SpirePatch(
+        clz = GremlinThief.class,
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class GremlinThiefDamagePatch25 {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinThief __instance) {
+            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
+                try {
+                    // Increase thiefDamage field by 2
+                    java.lang.reflect.Field thiefDamageField = GremlinThief.class.getDeclaredField("thiefDamage");
+                    thiefDamageField.setAccessible(true);
+                    int currentDamage = thiefDamageField.getInt(__instance);
+                    thiefDamageField.setInt(__instance, currentDamage + 2);
+
+                    // Update damage info
+                    if (!__instance.damage.isEmpty()) {
+                        __instance.damage.get(0).base += 2;
+                    }
+
+                    logger.info(String.format(
+                        "Ascension 25: GremlinThief damage increased from %d to %d",
+                        currentDamage, currentDamage + 2
+                    ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify GremlinThief damage", e);
                 }
             }
         }

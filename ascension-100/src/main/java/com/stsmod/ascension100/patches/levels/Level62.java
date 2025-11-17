@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
  *
  * 적들의 공격이 강화됩니다.
  * 일반 적들의 공격력이 1 증가합니다 (섀(byrd) 제외)
- * byrd는 대신, 급습 패턴의 공격력이 4 증가합니다.
+ * byrd는 대신, 비행 수치가 1 증가합니다.
  */
 public class Level62 {
     private static final Logger logger = LogManager.getLogger(Level62.class.getName());
@@ -58,43 +58,30 @@ public class Level62 {
     }
 
     /**
-     * Byrd special handling: Swoop damage +4
+     * Byrd special handling: Flight +1
      */
     @SpirePatch(
         clz = Byrd.class,
         method = "usePreBattleAction"
     )
-    public static class ByrdSwoopDamageIncrease {
+    public static class ByrdFlightIncrease {
         @SpirePostfixPatch
         public static void Postfix(Byrd __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 62) {
                 return;
             }
 
-            try {
-                // Access swoopDmg field via reflection
-                Field swoopDmgField = Byrd.class.getDeclaredField("swoopDmg");
-                swoopDmgField.setAccessible(true);
-                int originalSwoop = swoopDmgField.getInt(__instance);
-
-                // Increase Swoop damage by +4
-                int newSwoop = originalSwoop + 4;
-                swoopDmgField.setInt(__instance, newSwoop);
-
-                // Update damage array (damage.get(1) is Swoop)
-                if (__instance.damage.size() > 1) {
-                    DamageInfo swoopDamage = __instance.damage.get(1);
-                    if (swoopDamage != null) {
-                        swoopDamage.base = newSwoop;
-                    }
-                }
+            // Increase existing Flight power by 1
+            com.megacrit.cardcrawl.powers.AbstractPower flightPower = __instance.getPower("Flight");
+            if (flightPower != null) {
+                int originalAmount = flightPower.amount;
+                flightPower.amount += 1;
+                flightPower.updateDescription();
 
                 logger.info(String.format(
-                    "[Asc62] Byrd Swoop damage increased from %d to %d (+4)",
-                    originalSwoop, newSwoop
+                    "Ascension 62: Byrd Flight increased from %d to %d (+1)",
+                    originalAmount, flightPower.amount
                 ));
-            } catch (Exception e) {
-                logger.error("[Asc62] Failed to modify Byrd Swoop damage: " + e.getMessage());
             }
         }
     }

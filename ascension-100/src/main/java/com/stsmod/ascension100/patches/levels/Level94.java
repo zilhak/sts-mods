@@ -6,6 +6,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.Designer;
 import com.megacrit.cardcrawl.events.shrines.GoldShrine;
+import com.megacrit.cardcrawl.events.shrines.PurificationShrine;
 import com.megacrit.cardcrawl.events.shrines.WomanInBlue;
 import com.megacrit.cardcrawl.vfx.RainingGoldEffect;
 import javassist.CtBehavior;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.Logger;
  *
  * - 파란 옷의 여자: "사지 않는다" 선택시 현재 체력과 최대 체력을 50% 감소
  * - 황금 성소: 기도 선택시 50% 확률로 아무것도 얻지 못함
+ * - 신성한 샘: 저주카드가 없더라도 발생 가능
  * - 탑-클래스 디자이너: "때린다" 선택시 최대체력이 10 감소
  */
 public class Level94 {
@@ -159,6 +161,43 @@ public class Level94 {
             } catch (Exception e) {
                 logger.error("Failed to modify Designer event", e);
             }
+        }
+    }
+
+    /**
+     * Fountain of Cleansing: Can appear even without curse cards
+     * (신성한 샘: 저주카드가 없더라도 발생 가능)
+     *
+     * Patches AbstractDungeon.getShrine() to bypass the isCursed() check
+     * for "Fountain of Cleansing" event at Ascension 94+
+     */
+    @SpirePatch(
+        clz = AbstractDungeon.class,
+        method = "getShrine"
+    )
+    public static class FountainOfCleansingAlwaysSpawn {
+        @SpirePrefixPatch
+        public static void Prefix(com.megacrit.cardcrawl.random.Random rng) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 94) {
+                return;
+            }
+
+            // At Ascension 94+, temporarily add "Fountain of Cleansing" to shrineList
+            // if it's in specialOneTimeEventList and player doesn't have curses
+            if (AbstractDungeon.specialOneTimeEventList.contains("Fountain of Cleansing") &&
+                !AbstractDungeon.player.isCursed() &&
+                !AbstractDungeon.shrineList.contains("Fountain of Cleansing")) {
+
+                // Temporarily move it to shrineList so it bypasses the isCursed check
+                AbstractDungeon.shrineList.add("Fountain of Cleansing");
+                logger.info("Ascension 94: Fountain of Cleansing added to shrine pool without curse cards");
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(com.megacrit.cardcrawl.random.Random rng) {
+            // Clean up: if we added it temporarily, move it back
+            // The getShrine method already handles removal from lists
         }
     }
 }

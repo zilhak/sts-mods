@@ -36,48 +36,35 @@ public class Level86 {
 
     /**
      * Louse (LouseNormal, LouseDefensive): Curl Up +6
+     * Directly increases existing Curl Up power to ensure stacking
      */
     @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.exordium.LouseNormal.class,
+        clz = com.megacrit.cardcrawl.monsters.AbstractMonster.class,
         method = "usePreBattleAction"
     )
-    public static class LouseNormalCurlUpBoost {
+    public static class LouseCurlUpBoost86 {
         @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.exordium.LouseNormal __instance) {
+        public static void Postfix(com.megacrit.cardcrawl.monsters.AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 86) {
                 return;
             }
 
-            // Add +6 to Curl Up power using ApplyPowerAction
-            AbstractDungeon.actionManager.addToBottom(
-                new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                    __instance, __instance,
-                    new com.megacrit.cardcrawl.powers.CurlUpPower(__instance, 6), 6
-                )
-            );
-            logger.info("Ascension 86: LouseNormal gained +6 Curl Up");
-        }
-    }
+            String id = __instance.id;
+            if (id == null) return;
 
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.exordium.LouseDefensive.class,
-        method = "usePreBattleAction"
-    )
-    public static class LouseDefensiveCurlUpBoost {
-        @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.exordium.LouseDefensive __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 86) {
-                return;
+            // Louse: Increase existing Curl Up power by 6
+            if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
+                com.megacrit.cardcrawl.powers.AbstractPower curlUp = __instance.getPower("Curl Up");
+                if (curlUp != null) {
+                    int originalAmount = curlUp.amount;
+                    curlUp.amount += 6;
+                    curlUp.updateDescription();
+                    logger.info(String.format(
+                        "Ascension 86: %s Curl Up increased from %d to %d (+6)",
+                        __instance.name, originalAmount, curlUp.amount
+                    ));
+                }
             }
-
-            // Add +6 to Curl Up power using ApplyPowerAction
-            AbstractDungeon.actionManager.addToBottom(
-                new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                    __instance, __instance,
-                    new com.megacrit.cardcrawl.powers.CurlUpPower(__instance, 6), 6
-                )
-            );
-            logger.info("Ascension 86: LouseDefensive gained +6 Curl Up");
         }
     }
 

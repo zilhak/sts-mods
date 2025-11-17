@@ -1,9 +1,9 @@
 {
   "modid": "ascension100",
   "name": "Ascension 100",
-  "author_list": ["YourName"],
+  "author_list": ["zilhak"],
   "description": "Extends Slay the Spire's Ascension mode from 20 to 100 levels with progressively harder challenges.",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "sts_version": "01-23-2019",
   "mts_version": "3.29.3",
   "dependencies": ["basemod"],

@@ -61,7 +61,7 @@ public class Level65 {
      */
     @SpirePatch(
         clz = SpireSpear.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = "usePreBattleAction"
     )
     public static class SpireSpearArtifactPatch {
         @SpirePostfixPatch
@@ -85,7 +85,7 @@ public class Level65 {
      */
     @SpirePatch(
         clz = SpireShield.class,
-        method = SpirePatch.CONSTRUCTOR
+        method = "usePreBattleAction"
     )
     public static class SpireShieldArtifactPatch {
         @SpirePostfixPatch
