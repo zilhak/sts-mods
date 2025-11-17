@@ -12,9 +12,11 @@ import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.powers.PlatedArmorPower;
 import com.megacrit.cardcrawl.powers.RegenerateMonsterPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.rooms.MonsterRoom;
 import com.megacrit.cardcrawl.rooms.MonsterRoomElite;
+import com.stsmod.ascension100.util.EncounterHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,6 +62,11 @@ public class Level76 {
             // Only trigger in Strong Enemy battles (floor 3+)
             // Exclude elite rooms
             if (__instance instanceof MonsterRoomElite) {
+                return;
+            }
+
+            // Check if this is a Strong Enemy encounter
+            if (!EncounterHelper.isStrongEncounter()) {
                 return;
             }
 
@@ -172,21 +179,40 @@ public class Level76 {
      * Add elite-tier relic reward to special battles
      */
     @SpirePatch(
-        clz = MonsterRoom.class,
-        method = "dropReward"
+        clz = AbstractRoom.class,
+        method = "update"
     )
     public static class AddEliteRelicReward {
         @SpirePostfixPatch
-        public static void Postfix(MonsterRoom __instance) {
+        public static void Postfix(AbstractRoom __instance) {
             if (!SpecialBattleTracker.isSpecialBattle) {
                 return;
             }
 
-            // Add relic reward like elite battles
-            AbstractRelic.RelicTier tier = AbstractDungeon.returnRandomRelicTier();
-            __instance.addRelicToRewards(tier);
+            // Only add reward once when phase becomes COMPLETE
+            if (__instance.phase == AbstractRoom.RoomPhase.COMPLETE &&
+                __instance instanceof MonsterRoom &&
+                !(__instance instanceof MonsterRoomElite)) {
 
-            logger.info(String.format("Ascension 76: Added relic reward (%s tier) to Special Battle", tier));
+                // Check if we haven't already added the relic
+                boolean hasRelicReward = false;
+                for (RewardItem reward : __instance.rewards) {
+                    if (reward.type == RewardItem.RewardType.RELIC) {
+                        hasRelicReward = true;
+                        break;
+                    }
+                }
+
+                if (!hasRelicReward) {
+                    // Add relic reward like elite battles
+                    AbstractRelic.RelicTier tier = AbstractDungeon.returnRandomRelicTier();
+                    AbstractRelic relic = AbstractDungeon.returnRandomRelic(tier);
+                    __instance.addRelicToRewards(relic);
+
+                    logger.info(String.format("Ascension 76: Added relic reward (%s - %s tier) to Special Battle",
+                        relic.name, tier));
+                }
+            }
         }
     }
 

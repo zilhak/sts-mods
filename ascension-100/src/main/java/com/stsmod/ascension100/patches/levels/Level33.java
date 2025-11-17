@@ -5,14 +5,13 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.stsmod.ascension100.util.EncounterHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Ascension Level 33: Strong enemies have additional 5% more HP
  * Strong Enemies 전투에서 적들의 체력이 추가로 5% 증가합니다.
- *
- * TODO: Currently applies to ALL normal enemies, not just "Strong Enemies" encounters
  */
 public class Level33 {
     private static final Logger logger = LogManager.getLogger(Level33.class.getName());
@@ -28,16 +27,25 @@ public class Level33 {
                 return;
             }
 
-            if (__instance.type == AbstractMonster.EnemyType.NORMAL) {
-                int originalMaxHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
-
-                logger.info(String.format(
-                    "Ascension 33: Normal %s HP increased from %d to %d (+5%% additional)",
-                    __instance.name, originalMaxHP, __instance.maxHealth
-                ));
+            // Skip bosses and elites
+            if (__instance.type == AbstractMonster.EnemyType.BOSS ||
+                __instance.type == AbstractMonster.EnemyType.ELITE) {
+                return;
             }
+
+            // Check if this is a Strong Enemy encounter
+            if (!EncounterHelper.isStrongEncounter()) {
+                return;
+            }
+
+            int originalMaxHP = __instance.maxHealth;
+            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
+
+            logger.info(String.format(
+                "Ascension 33: Strong Enemy %s HP increased from %d to %d (+5%%)",
+                __instance.name, originalMaxHP, __instance.maxHealth
+            ));
         }
     }
 }

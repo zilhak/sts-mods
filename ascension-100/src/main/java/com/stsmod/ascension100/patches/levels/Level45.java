@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.monsters.exordium.*;
 import com.megacrit.cardcrawl.monsters.city.*;
 import com.megacrit.cardcrawl.monsters.beyond.*;
+import com.stsmod.ascension100.util.EncounterHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,8 +41,16 @@ public class Level45 {
                 return;
             }
 
-            // Check if this is a "strong" encounter (has 2+ monsters)
-            if (__instance.monsters.size() < 2) {
+            // Skip elite and boss encounters
+            for (AbstractMonster m : __instance.monsters) {
+                if (m != null && (m.type == AbstractMonster.EnemyType.ELITE ||
+                                  m.type == AbstractMonster.EnemyType.BOSS)) {
+                    return;
+                }
+            }
+
+            // Check if this is a Strong Enemy encounter
+            if (!EncounterHelper.isStrongEncounter()) {
                 return;
             }
 
