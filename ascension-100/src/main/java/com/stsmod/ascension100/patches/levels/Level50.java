@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.rooms.MonsterRoomBoss;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,23 +27,30 @@ import org.apache.logging.log4j.Logger;
 public class Level50 {
     private static final Logger logger = LogManager.getLogger(Level50.class.getName());
 
+    private static boolean punishmentApplied = false;
+
     /**
-     * Patch Act 3 boss room to punish players who don't have all keys
+     * Apply punishment during pre-battle phase when action manager is ready
      */
     @SpirePatch(
-        clz = MonsterRoomBoss.class,
-        method = "onPlayerEntry"
+        clz = MonsterGroup.class,
+        method = "usePreBattleAction"
     )
-    public static class ForceAct4Punishment {
+    public static class ApplyPreBattlePunishment {
         @SpirePostfixPatch
-        public static void Postfix(MonsterRoomBoss __instance) {
+        public static void Postfix(MonsterGroup __instance) {
             // Only apply on ascension 50+
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 50) {
                 return;
             }
 
-            // Only apply in Act 3
-            if (AbstractDungeon.actNum != 3) {
+            // Only apply in Act 3 boss room
+            if (AbstractDungeon.actNum != 3 || !(AbstractDungeon.getCurrRoom() instanceof MonsterRoomBoss)) {
+                return;
+            }
+
+            // Only apply once per boss fight
+            if (punishmentApplied) {
                 return;
             }
 
@@ -61,10 +69,27 @@ public class Level50 {
                     hasRubyKey, hasEmeraldKey, hasSapphireKey
                 ));
 
+                // Punishment 0: Remove revival items first
+                // Remove all Fairy Potions
+                for (int i = player.potions.size() - 1; i >= 0; i--) {
+                    com.megacrit.cardcrawl.potions.AbstractPotion potion = player.potions.get(i);
+                    if (potion.ID != null && potion.ID.equals("FairyPotion")) {
+                        player.removePotion(potion);
+                        logger.info("[Asc50] Removed Fairy Potion from slot " + i);
+                    }
+                }
+
+                // Remove Lizard Tail if present
+                if (player.hasRelic("Lizard Tail")) {
+                    player.loseRelic("Lizard Tail");
+                    logger.info("[Asc50] Removed Lizard Tail relic");
+                }
+
                 // Punishment 1: Set HP to 1
                 int hpLoss = player.currentHealth - 1;
                 if (hpLoss > 0) {
                     player.currentHealth = 1;
+                    player.healthBarUpdatedEvent();
                     logger.info(String.format(
                         "[Asc50] Set player HP to 1 (lost %d HP)",
                         hpLoss
@@ -75,26 +100,41 @@ public class Level50 {
                 player.energy.energy = 0;
                 logger.info("[Asc50] Set player energy to 0");
 
-                // Punishment 3: Deal 100 damage 5 times (500 total)
-                // This will kill the player immediately since HP is 1
-                for (int i = 0; i < 5; i++) {
-                    AbstractDungeon.actionManager.addToBottom(
-                        new DamageAction(
+                // Punishment 3: Deal massive damage to guarantee death
+                // Use 9999 damage to ensure death even with any protection
+                AbstractDungeon.actionManager.addToBottom(
+                    new DamageAction(
+                        (AbstractCreature) player,
+                        new DamageInfo(
                             (AbstractCreature) player,
-                            new DamageInfo(
-                                (AbstractCreature) player,
-                                100,
-                                DamageInfo.DamageType.HP_LOSS
-                            ),
-                            AbstractGameAction.AttackEffect.FIRE,
-                            true
-                        )
-                    );
-                }
+                            9999,
+                            DamageInfo.DamageType.HP_LOSS
+                        ),
+                        AbstractGameAction.AttackEffect.FIRE,
+                        true
+                    )
+                );
 
-                logger.warn("[Asc50] Applied 500 HP LOSS damage (100 x 5) - Player will die");
+                logger.warn("[Asc50] Applied 9999 HP LOSS damage - Player will die");
+                punishmentApplied = true;
             } else {
                 logger.info("[Asc50] Player has all 3 keys - no punishment");
+            }
+        }
+    }
+
+    /**
+     * Reset punishment flag when combat ends
+     */
+    @SpirePatch(
+        clz = MonsterRoomBoss.class,
+        method = "onPlayerEntry"
+    )
+    public static class ResetPunishmentFlag {
+        @SpirePostfixPatch
+        public static void Postfix(MonsterRoomBoss __instance) {
+            if (AbstractDungeon.actNum == 3) {
+                punishmentApplied = false;
             }
         }
     }

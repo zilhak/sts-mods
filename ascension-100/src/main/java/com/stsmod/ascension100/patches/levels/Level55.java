@@ -5,7 +5,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
 import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
-// import com.megacrit.cardcrawl.actions.common.IncreaseMaxHpAction; // TODO: This class doesn't exist
+import com.megacrit.cardcrawl.actions.unique.IncreaseMaxHpAction;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -73,14 +73,12 @@ public class Level55 {
 
                         case 1:
                             // Max HP: 25% → 40% (15% additional)
-                            // TODO: IncreaseMaxHpAction doesn't exist in base game
-                            // Need to find proper way to increase max HP
-                            int hpIncrease = (int)(m.maxHealth * 0.40F);
-                            m.maxHealth += hpIncrease;
-                            m.currentHealth += hpIncrease;
+                            AbstractDungeon.actionManager.addToBottom(
+                                new IncreaseMaxHpAction(m, 0.40F, true)
+                            );
                             logger.info(String.format(
-                                "[Asc55] %s max HP increased by %d (40%% increase)",
-                                m.name, hpIncrease
+                                "[Asc55] %s max HP increased by 40%% (base: 25%%, +15%% bonus)",
+                                m.name
                             ));
                             break;
 

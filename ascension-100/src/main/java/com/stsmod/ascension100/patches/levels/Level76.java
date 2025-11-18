@@ -12,7 +12,6 @@ import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.powers.PlatedArmorPower;
 import com.megacrit.cardcrawl.powers.RegenerateMonsterPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.rooms.MonsterRoom;
 import com.megacrit.cardcrawl.rooms.MonsterRoomElite;
@@ -179,40 +178,21 @@ public class Level76 {
      * Add elite-tier relic reward to special battles
      */
     @SpirePatch(
-        clz = AbstractRoom.class,
-        method = "update"
+        clz = MonsterRoom.class,
+        method = "dropReward"
     )
     public static class AddEliteRelicReward {
         @SpirePostfixPatch
-        public static void Postfix(AbstractRoom __instance) {
+        public static void Postfix(MonsterRoom __instance) {
             if (!SpecialBattleTracker.isSpecialBattle) {
                 return;
             }
 
-            // Only add reward once when phase becomes COMPLETE
-            if (__instance.phase == AbstractRoom.RoomPhase.COMPLETE &&
-                __instance instanceof MonsterRoom &&
-                !(__instance instanceof MonsterRoomElite)) {
+            // Add relic reward like elite battles
+            AbstractRelic.RelicTier tier = AbstractDungeon.returnRandomRelicTier();
+            __instance.addRelicToRewards(tier);
 
-                // Check if we haven't already added the relic
-                boolean hasRelicReward = false;
-                for (RewardItem reward : __instance.rewards) {
-                    if (reward.type == RewardItem.RewardType.RELIC) {
-                        hasRelicReward = true;
-                        break;
-                    }
-                }
-
-                if (!hasRelicReward) {
-                    // Add relic reward like elite battles
-                    AbstractRelic.RelicTier tier = AbstractDungeon.returnRandomRelicTier();
-                    AbstractRelic relic = AbstractDungeon.returnRandomRelic(tier);
-                    __instance.addRelicToRewards(relic);
-
-                    logger.info(String.format("Ascension 76: Added relic reward (%s - %s tier) to Special Battle",
-                        relic.name, tier));
-                }
-            }
+            logger.info(String.format("Ascension 76: Added relic reward (%s tier) to Special Battle", tier));
         }
     }
 

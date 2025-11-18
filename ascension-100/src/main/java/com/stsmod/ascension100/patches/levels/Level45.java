@@ -65,7 +65,7 @@ public class Level45 {
                 switch (actNum) {
                     case 1:
                         // Act 1: Add Gremlin or Small Slime (random choice)
-                        int act1Choice = AbstractDungeon.monsterRng.random(0, 5);
+                        int act1Choice = AbstractDungeon.monsterRng.random(0, 4);
                         switch (act1Choice) {
                             case 0:
                                 extraMonster = new GremlinWarrior(xPos, 0.0f);
@@ -82,9 +82,6 @@ public class Level45 {
                             case 4:
                                 extraMonster = new SpikeSlime_S(xPos, 0.0f, 0);
                                 break;
-                            case 5:
-                                extraMonster = new FungiBeast(xPos, 0.0f);
-                                break;
                         }
                         logger.info(String.format(
                             "Ascension 45: Adding %s to Act 1 battle (Roll: %d < 20)",
@@ -94,16 +91,13 @@ public class Level45 {
 
                     case 2:
                         // Act 2: Add Medium Slime (random choice)
-                        int act2Choice = AbstractDungeon.monsterRng.random(0, 2);
+                        int act2Choice = AbstractDungeon.monsterRng.random(0, 1);
                         switch (act2Choice) {
                             case 0:
                                 extraMonster = new AcidSlime_M(xPos, 0.0f);
                                 break;
                             case 1:
                                 extraMonster = new SpikeSlime_M(xPos, 0.0f);
-                                break;
-                            case 2:
-                                extraMonster = new SlaverBlue(xPos, 0.0f);
                                 break;
                         }
                         logger.info(String.format(

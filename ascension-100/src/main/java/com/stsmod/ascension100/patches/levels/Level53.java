@@ -506,34 +506,65 @@ public class Level53 {
         method = "takeTurn"
     )
     public static class SpikerThornsPowerIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.beyond.Spiker __instance) {
+        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+        @com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch
+        public static void Prefix(com.megacrit.cardcrawl.monsters.beyond.Spiker __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
                 return;
             }
 
             try {
-                // Check if Power move
+                // Store current move before it changes
                 java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
                 nextMoveField.setAccessible(true);
                 byte move = nextMoveField.getByte(__instance);
-
-                if (move == 2) { // POWER move
-                    // Apply additional +1 Thorns
-                    AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                            __instance,
-                            __instance,
-                            new com.megacrit.cardcrawl.powers.ThornsPower(__instance, 1),
-                            1
-                        )
-                    );
-
-                    logger.info("Ascension 53: Spiker gained +1 additional Thorns");
-                }
+                lastMove.set(move);
             } catch (Exception e) {
-                logger.error("Failed to modify Spiker Thorns", e);
+                logger.error("Failed to get Spiker move", e);
             }
+        }
+
+        @com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch
+        public static void Postfix(com.megacrit.cardcrawl.monsters.beyond.Spiker __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            Byte move = lastMove.get();
+            if (move != null && move == 2) { // BUFF_THORNS move
+                // Find and modify the last ApplyPowerAction with ThornsPower
+                try {
+                    for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
+                        com.megacrit.cardcrawl.actions.AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
+
+                        if (action instanceof com.megacrit.cardcrawl.actions.common.ApplyPowerAction) {
+                            java.lang.reflect.Field powerToApplyField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class.getDeclaredField("powerToApply");
+                            powerToApplyField.setAccessible(true);
+                            com.megacrit.cardcrawl.powers.AbstractPower power = (com.megacrit.cardcrawl.powers.AbstractPower) powerToApplyField.get(action);
+
+                            if (power instanceof com.megacrit.cardcrawl.powers.ThornsPower && power.owner == __instance) {
+                                power.amount += 1;
+
+                                java.lang.reflect.Field amountField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class.getDeclaredField("amount");
+                                amountField.setAccessible(true);
+                                int currentAmount = amountField.getInt(action);
+                                amountField.setInt(action, currentAmount + 1);
+
+                                logger.info(String.format(
+                                    "Ascension 53: Spiker Thorns increased by +1 (total: %d)",
+                                    power.amount
+                                ));
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed to modify Spiker Thorns amount", e);
+                }
+            }
+
+            lastMove.remove();
         }
     }
 

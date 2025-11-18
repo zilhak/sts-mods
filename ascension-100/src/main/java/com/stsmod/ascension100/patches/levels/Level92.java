@@ -231,17 +231,8 @@ public class Level92 {
         }
 
         // Transient: Intangible 200
-        if (id.equals("Transient")) {
-            AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(
-                    (AbstractCreature)monster,
-                    (AbstractCreature)monster,
-                    new IntangiblePlayerPower((AbstractCreature)monster, 200),
-                    200
-                )
-            );
-            logger.info("Ascension 92: Transient gained Intangible 200");
-        }
+        // Note: This is handled in ShelledParasiteAndOthers patch below
+        // to ensure it's applied together with Fading increase
 
         // Louse: Curl Up +10 (increase existing Curl Up power)
         if (id.equals("FuzzyLouseNormal") || id.equals("FuzzyLouseDefensive")) {
@@ -289,7 +280,7 @@ public class Level92 {
                 }
             }
 
-            // Transient: Increase Fading by 1
+            // Transient: Increase Fading by 1 and add Intangible 200
             if (id.equals("Transient")) {
                 AbstractPower fading = __instance.getPower("Fading");
                 if (fading != null) {
@@ -302,6 +293,17 @@ public class Level92 {
                         __instance.name, originalAmount, fading.amount
                     ));
                 }
+
+                // Add Intangible 200
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(
+                        (AbstractCreature)__instance,
+                        (AbstractCreature)__instance,
+                        new IntangiblePlayerPower((AbstractCreature)__instance, 200),
+                        200
+                    )
+                );
+                logger.info("Ascension 92: Transient gained Intangible 200");
             }
 
             // Looter: Increase Thievery by 10 and escapeDef by 3
