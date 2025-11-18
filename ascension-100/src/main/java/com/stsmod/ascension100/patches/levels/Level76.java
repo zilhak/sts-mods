@@ -82,23 +82,30 @@ public class Level76 {
 
     /**
      * Play elite BGM for special battles
+     * Intercept playBGM call to change BGM key
      */
     @SpirePatch(
-        clz = MonsterRoom.class,
-        method = "onPlayerEntry"
+        clz = com.megacrit.cardcrawl.rooms.AbstractRoom.class,
+        method = "playBGM",
+        paramtypez = {String.class}
     )
     public static class PlayEliteBGM {
-        @SpirePostfixPatch
-        public static void Postfix(MonsterRoom __instance) {
+        @com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch
+        public static void Prefix(com.megacrit.cardcrawl.rooms.AbstractRoom __instance, @com.evacipated.cardcrawl.modthespire.lib.ByRef String[] key) {
+            // Only apply in special battles
             if (!SpecialBattleTracker.isSpecialBattle) {
                 return;
             }
 
-            // Play elite BGM (BOSS_BOTTOM - Act 1 boss BGM)
-            CardCrawlGame.music.unsilenceBGM();
-            CardCrawlGame.music.playTempBgmInstantly("BOSS_BOTTOM", true);
+            // Only apply in MonsterRoom (not elite/boss rooms)
+            if (!(__instance instanceof MonsterRoom) ||
+                __instance instanceof MonsterRoomElite) {
+                return;
+            }
 
-            logger.info("Ascension 76: Playing elite BGM (BOSS_BOTTOM) for Special Battle");
+            // Change BGM key to elite BGM (ELITE - STS_EliteBoss_NewMix_v1.ogg)
+            key[0] = "ELITE";
+            logger.info("Ascension 76: Changed BGM to ELITE for Special Battle");
         }
     }
 

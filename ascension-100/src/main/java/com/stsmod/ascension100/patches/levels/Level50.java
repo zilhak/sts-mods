@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.actions.common.DamageAction;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.AbstractCreature;
+import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.rooms.MonsterRoomBoss;
@@ -56,10 +57,10 @@ public class Level50 {
 
             AbstractPlayer player = AbstractDungeon.player;
 
-            // Check if player has all 3 keys (stored as relics)
-            boolean hasRubyKey = player.hasRelic("Ruby Key");
-            boolean hasEmeraldKey = player.hasRelic("Emerald Key");
-            boolean hasSapphireKey = player.hasRelic("Sapphire Key");
+            // Check if player has all 3 keys (stored in Settings flags)
+            boolean hasRubyKey = Settings.hasRubyKey;
+            boolean hasEmeraldKey = Settings.hasEmeraldKey;
+            boolean hasSapphireKey = Settings.hasSapphireKey;
 
             boolean hasAllKeys = hasRubyKey && hasEmeraldKey && hasSapphireKey;
 
