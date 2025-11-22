@@ -6,6 +6,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.city.Byrd;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,9 +15,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Ascension Level 24: Normal enemies deal 3% more damage
+ * Ascension Level 24: Normal enemies deal 3% more damage (except Byrd)
  *
- * 일반 적들의 공격력이 3% 증가합니다.
+ * 일반 적들의 공격력이 3% 증가합니다. (섀 제외)
  */
 public class Level24 {
     private static final Logger logger = LogManager.getLogger(Level24.class.getName());
@@ -35,7 +36,8 @@ public class Level24 {
                 return;
             }
 
-            if (__instance.type == AbstractMonster.EnemyType.NORMAL) {
+            // Exclude Byrd from damage increase
+            if (__instance.type == AbstractMonster.EnemyType.NORMAL && !(__instance instanceof Byrd)) {
                 // Check if already patched
                 if (patchedMonsters.contains(__instance)) {
                     logger.warn(String.format(

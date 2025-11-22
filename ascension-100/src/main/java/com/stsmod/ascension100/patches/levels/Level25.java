@@ -379,7 +379,7 @@ public class Level25 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 4) { // Strength gain move (FLY pattern)
+            if (move != null && move == 6) { // Strength gain move (Caw pattern)
                 // Find and modify the last ApplyPowerAction with StrengthPower
                 try {
                     for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
