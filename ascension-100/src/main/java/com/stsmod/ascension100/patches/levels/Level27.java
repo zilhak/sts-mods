@@ -267,6 +267,8 @@ public class Level27 {
 
     /**
      * The Collector: Debuff pattern applies Weak/Vulnerable/Frail 3 each, twice
+     * 디버프 패턴이 약화, 취약, 손상을 3씩 두번씩 부여합니다.
+     * 순서: 약화3, 취약3, 손상3, 약화3, 취약3, 손상3
      */
     @SpirePatch(
         clz = TheCollector.class,
@@ -298,8 +300,9 @@ public class Level27 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 2) { // Mega Debuff move ID
-                // Apply Weak 3, Vulnerable 3, Frail 3 twice
+            if (move != null && move == 4) { // MEGA_DEBUFF move ID (NOT 2!)
+                // Apply second set: Weak 3, Vulnerable 3, Frail 3
+                // (First set already applied by game, we add the second set)
                 AbstractDungeon.actionManager.addToBottom(
                     new ApplyPowerAction(AbstractDungeon.player, __instance,
                         new WeakPower(AbstractDungeon.player, 3, true), 3)
@@ -312,7 +315,7 @@ public class Level27 {
                     new ApplyPowerAction(AbstractDungeon.player, __instance,
                         new FrailPower(AbstractDungeon.player, 3, true), 3)
                 );
-                logger.info("Ascension 27: TheCollector applied additional debuffs (Weak/Vulnerable/Frail 3 each)");
+                logger.info("Ascension 27: TheCollector applied second set of debuffs (Weak/Vulnerable/Frail 3 each, total 6 each)");
             }
 
             lastMove.remove();

@@ -853,6 +853,115 @@ import com.megacrit.cardcrawl.powers.WeakPower;
 
 ## Common Patterns and Utilities
 
+### Monster Modification Timing Rules ⚠️
+
+**CRITICAL**: Different monster properties require different patch timing to work correctly!
+
+#### Damage Modifications → Use `init` Prefix
+
+**Why**: Monster initialization order is:
+1. `Constructor` → Creates damage array
+2. `init()` → Calls `rollMove()` → `getMove()` → `setMove(damage.get(i).base)` ← **First turn move decided HERE**
+3. `usePreBattleAction()` ← **TOO LATE for damage modifications!**
+
+**Problem**: If you modify `damage.base` in `usePreBattleAction` Postfix:
+- First turn uses ORIGINAL damage values
+- Second turn onwards uses MODIFIED damage values
+- Results in confusing inconsistent damage
+
+**Solution**: Patch `init` with Prefix to modify damage BEFORE `rollMove()` is called.
+
+```java
+@SpirePatch(
+    clz = AbstractMonster.class,
+    method = "init"  // NOT usePreBattleAction!
+)
+public static class MonsterDamageIncrease {
+    @SpirePrefixPatch  // Execute BEFORE init() body
+    public static void Prefix(AbstractMonster __instance) {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < TARGET_LEVEL) {
+            return;
+        }
+
+        // Modify damage.base here
+        for (DamageInfo damageInfo : __instance.damage) {
+            if (damageInfo != null && damageInfo.base > 0) {
+                damageInfo.base += 1;  // This will affect first turn correctly
+            }
+        }
+    }
+}
+```
+
+**Examples**:
+- ✅ Level24.java - Normal enemies +5% damage (init Prefix)
+- ✅ Level35.java - Normal enemies +1 damage (init Prefix)
+- ✅ Level52.java - Act-based damage increase (init Prefix)
+
+#### HP Modifications → Use `Constructor` Postfix
+
+**Why**: HP is set during monster construction and never changes timing-wise.
+
+```java
+@SpirePatch(
+    clz = MonsterClass.class,
+    method = SpirePatch.CONSTRUCTOR,
+    paramtypez = {float.class, float.class}
+)
+public static class MonsterHPIncrease {
+    @SpirePostfixPatch
+    public static void Postfix(MonsterClass __instance, float x, float y) {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < TARGET_LEVEL) {
+            return;
+        }
+
+        __instance.maxHealth += 10;
+        __instance.currentHealth += 10;
+    }
+}
+```
+
+**Examples**:
+- ✅ Level53.java - GremlinWarrior HP +10 (Constructor Postfix)
+- ✅ Level25.java - Various monster HP increases (Constructor Postfix)
+
+#### Power/Buff Modifications → Use `usePreBattleAction` Postfix
+
+**Why**: Powers are displayed before combat starts. They don't affect move selection timing.
+
+```java
+@SpirePatch(
+    clz = MonsterClass.class,
+    method = "usePreBattleAction"
+)
+public static class MonsterBuffIncrease {
+    @SpirePostfixPatch
+    public static void Postfix(MonsterClass __instance) {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < TARGET_LEVEL) {
+            return;
+        }
+
+        // Add or modify powers here
+        AbstractDungeon.actionManager.addToBottom(
+            new ApplyPowerAction(__instance, __instance,
+                new StrengthPower(__instance, 2), 2)
+        );
+    }
+}
+```
+
+**Examples**:
+- ✅ Level53.java - Mugger Thievery +5 (usePreBattleAction Postfix)
+- ✅ Level25.java - SnakePlant Malleable +1 (usePreBattleAction Postfix)
+
+#### Summary Table
+
+| Property | Patch Method | Patch Type | Reason |
+|----------|--------------|------------|---------|
+| **Damage** | `init` | Prefix | Affects first turn move selection |
+| **HP** | Constructor | Postfix | Set during construction |
+| **Powers/Buffs** | `usePreBattleAction` | Postfix | Display only, no timing issue |
+
 ### Ascension Level Check Template
 
 ```java

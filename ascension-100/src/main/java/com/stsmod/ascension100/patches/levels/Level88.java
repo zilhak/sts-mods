@@ -29,13 +29,16 @@ public class Level88 {
                 return;
             }
 
-            // Reduce max HP by 10%
-            int reduction = MathUtils.ceil(__instance.maxHealth * 0.1f);
-            __instance.decreaseMaxHealth(reduction);
+            // Reduce max HP by 10% directly without triggering BaseMod events
+            // This prevents conflicts with other mods during initialization
+            int originalMaxHP = __instance.maxHealth;
+            int reduction = MathUtils.ceil(originalMaxHP * 0.1f);
+            __instance.maxHealth -= reduction;
+            __instance.currentHealth = __instance.maxHealth;
 
             logger.info(String.format(
-                "Ascension 88: Starting max HP reduced by %d (10%%) - Max HP: %d",
-                reduction, __instance.maxHealth
+                "Ascension 88: Starting max HP reduced from %d to %d (-%d, -10%%)",
+                originalMaxHP, __instance.maxHealth, reduction
             ));
         }
     }

@@ -3,6 +3,7 @@ package com.stsmod.ascension100.patches.levels;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
 import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.common.MakeTempCardInDiscardAction;
@@ -27,15 +28,14 @@ import org.apache.logging.log4j.Logger;
  */
 public class Level25 {
     private static final Logger logger = LogManager.getLogger(Level25.class.getName());
+    private static final float COMPOUND_RATE = 1.25f;  // 25% compound interest for Slow (Giant Head)
 
     // ========================================
     // 1막 적들
     // ========================================
 
-    /**
-     * Louse (Normal & Defensive): Curl Up +3
-     * MOVED TO: LouseCurlUpPatch.java (unified patch)
-     */
+    // Louse (Normal & Defensive): Curl Up +3
+    // MOVED TO: LouseCurlUpPatch.java (unified patch)
 
     /**
      * Cultist: Damage -4 (rituals stronger, attacks weaker)
@@ -132,7 +132,7 @@ public class Level25 {
     // ========================================
 
     /**
-     * Gremlin Warrior: HP +5
+     * Gremlin Warrior: HP +3
      */
     @SpirePatch(
         clz = GremlinWarrior.class,
@@ -142,9 +142,9 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(GremlinWarrior __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.maxHealth += 5;
-                __instance.currentHealth += 5;
-                logger.info("Ascension 25: GremlinWarrior HP +5");
+                __instance.maxHealth += 3;
+                __instance.currentHealth += 3;
+                logger.info("Ascension 25: GremlinWarrior HP +3");
             }
         }
     }
@@ -167,29 +167,10 @@ public class Level25 {
         }
     }
 
-    /**
-     * Gremlin Thief: Damage +2
-     */
-    @SpirePatch(
-        clz = GremlinThief.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
-    public static class GremlinThiefDamagePatch {
-        @SpirePostfixPatch
-        public static void Postfix(GremlinThief __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.damage.forEach(damageInfo -> {
-                    if (damageInfo != null && damageInfo.base > 0) {
-                        damageInfo.base += 2;
-                    }
-                });
-                logger.info("Ascension 25: GremlinThief Damage +2");
-            }
-        }
-    }
+    // GremlinThief patch moved to line 738 (GremlinThiefDamagePatch25) to avoid duplication
 
     /**
-     * Gremlin Wizard: Damage +5
+     * Gremlin Wizard: Damage +3
      */
     @SpirePatch(
         clz = GremlinWizard.class,
@@ -201,10 +182,10 @@ public class Level25 {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
                 __instance.damage.forEach(damageInfo -> {
                     if (damageInfo != null && damageInfo.base > 0) {
-                        damageInfo.base += 5;
+                        damageInfo.base += 3;
                     }
                 });
-                logger.info("Ascension 25: GremlinWizard Damage +5");
+                logger.info("Ascension 25: GremlinWizard Damage +3");
             }
         }
     }
@@ -214,44 +195,8 @@ public class Level25 {
     // ========================================
 
     /**
-     * Slimes: Add 2 extra Slimed cards
+     * SpikeSlime_M (가시슬라임 중): Flame Tackle adds 1 extra Slimed
      */
-    @SpirePatch(
-        clz = AcidSlime_M.class,
-        method = "takeTurn"
-    )
-    public static class SlimeMediumSlimedPatch {
-        @SpirePostfixPatch
-        public static void Postfix(AcidSlime_M __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                if (__instance.nextMove == 1) { // Lick move
-                    AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Slimed(), 2)
-                    );
-                    logger.info("Ascension 25: Medium Slime added 2 extra Slimed cards");
-                }
-            }
-        }
-    }
-
-    @SpirePatch(
-        clz = AcidSlime_L.class,
-        method = "takeTurn"
-    )
-    public static class SlimeLargeSlimedPatch {
-        @SpirePostfixPatch
-        public static void Postfix(AcidSlime_L __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                if (__instance.nextMove == 1) { // Lick move
-                    AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Slimed(), 2)
-                    );
-                    logger.info("Ascension 25: Large Slime added 2 extra Slimed cards");
-                }
-            }
-        }
-    }
-
     @SpirePatch(
         clz = SpikeSlime_M.class,
         method = "takeTurn"
@@ -260,16 +205,19 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(SpikeSlime_M __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                if (__instance.nextMove == 1) { // Lick move
+                if (__instance.nextMove == 1) { // Flame Tackle (불꽃 태클)
                     AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Slimed(), 2)
+                        new MakeTempCardInDiscardAction(new Slimed(), 1)
                     );
-                    logger.info("Ascension 25: Spike Slime (M) added 2 extra Slimed cards");
+                    logger.info("Ascension 25: Spike Slime (M) Flame Tackle added 1 extra Slimed card");
                 }
             }
         }
     }
 
+    /**
+     * SpikeSlime_L (가시슬라임 대): Flame Tackle adds 1 extra Slimed
+     */
     @SpirePatch(
         clz = SpikeSlime_L.class,
         method = "takeTurn"
@@ -278,18 +226,60 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(SpikeSlime_L __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                if (__instance.nextMove == 1) { // Lick move
+                if (__instance.nextMove == 1) { // Flame Tackle (불꽃 태클)
                     AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Slimed(), 2)
+                        new MakeTempCardInDiscardAction(new Slimed(), 1)
                     );
-                    logger.info("Ascension 25: Spike Slime (L) added 2 extra Slimed cards");
+                    logger.info("Ascension 25: Spike Slime (L) Flame Tackle added 1 extra Slimed card");
                 }
             }
         }
     }
 
     /**
-     * Shape (AcidSlime_M): Dazed pattern adds 3 Dazed total
+     * AcidSlime_M (산성슬라임 중): Corrosive Spit adds 1 extra Slimed
+     */
+    @SpirePatch(
+        clz = AcidSlime_M.class,
+        method = "takeTurn"
+    )
+    public static class AcidSlimeMediumSlimedPatch {
+        @SpirePostfixPatch
+        public static void Postfix(AcidSlime_M __instance) {
+            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
+                if (__instance.nextMove == 1) { // Corrosive Spit (부식의 침)
+                    AbstractDungeon.actionManager.addToBottom(
+                        new MakeTempCardInDiscardAction(new Slimed(), 1)
+                    );
+                    logger.info("Ascension 25: Acid Slime (M) Corrosive Spit added 1 extra Slimed card");
+                }
+            }
+        }
+    }
+
+    /**
+     * AcidSlime_L (산성슬라임 대): Corrosive Spit adds 1 extra Slimed
+     */
+    @SpirePatch(
+        clz = AcidSlime_L.class,
+        method = "takeTurn"
+    )
+    public static class AcidSlimeLargeSlimedPatch {
+        @SpirePostfixPatch
+        public static void Postfix(AcidSlime_L __instance) {
+            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
+                if (__instance.nextMove == 1) { // Corrosive Spit (부식의 침)
+                    AbstractDungeon.actionManager.addToBottom(
+                        new MakeTempCardInDiscardAction(new Slimed(), 1)
+                    );
+                    logger.info("Ascension 25: Acid Slime (L) Corrosive Spit added 1 extra Slimed card");
+                }
+            }
+        }
+    }
+
+    /**
+     * Shape (AcidSlime_M): Dazed pattern adds 1 extra Dazed
      */
     @SpirePatch(
         clz = AcidSlime_M.class,
@@ -301,9 +291,9 @@ public class Level25 {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
                 if (__instance.nextMove == 3) { // Corrosive Spit move
                     AbstractDungeon.actionManager.addToBottom(
-                        new MakeTempCardInDiscardAction(new Dazed(), 2)
+                        new MakeTempCardInDiscardAction(new Dazed(), 1)
                     );
-                    logger.info("Ascension 25: Shape added 2 extra Dazed cards");
+                    logger.info("Ascension 25: Shape added 1 extra Dazed card");
                 }
             }
         }
@@ -426,24 +416,29 @@ public class Level25 {
     }
 
     /**
-     * Centurion: Heals for unblocked damage dealt
+     * Centurion: Defend pattern block +5
      */
     @SpirePatch(
         clz = Centurion.class,
-        method = "damage"
+        method = SpirePatch.CONSTRUCTOR
     )
-    public static class CenturionHealPatch {
+    public static class CenturionDefendPatch {
         @SpirePostfixPatch
-        public static void Postfix(Centurion __instance, DamageInfo info) {
+        public static void Postfix(Centurion __instance, float x, float y) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                if (info.owner == __instance && info.type == DamageInfo.DamageType.NORMAL) {
-                    int unblocked = info.output;
-                    if (unblocked > 0) {
-                        AbstractDungeon.actionManager.addToTop(
-                            new HealAction(__instance, __instance, unblocked)
-                        );
-                        logger.info(String.format("Ascension 25: Centurion healed %d HP", unblocked));
-                    }
+                try {
+                    // Increase blockAmount field by 5
+                    java.lang.reflect.Field blockAmountField = Centurion.class.getDeclaredField("blockAmount");
+                    blockAmountField.setAccessible(true);
+                    int currentBlock = blockAmountField.getInt(__instance);
+                    blockAmountField.setInt(__instance, currentBlock + 5);
+
+                    logger.info(String.format(
+                        "Ascension 25: Centurion defend block increased from %d to %d",
+                        currentBlock, currentBlock + 5
+                    ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Centurion blockAmount", e);
                 }
             }
         }
@@ -542,7 +537,7 @@ public class Level25 {
     // ========================================
 
     /**
-     * Bandit Bear: HP +10
+     * Bandit Bear: HP +6
      */
     @SpirePatch(
         clz = BanditBear.class,
@@ -552,9 +547,9 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(BanditBear __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.maxHealth += 10;
-                __instance.currentHealth += 10;
-                logger.info("Ascension 25: BanditBear HP +10");
+                __instance.maxHealth += 6;
+                __instance.currentHealth += 6;
+                logger.info("Ascension 25: BanditBear HP +6");
             }
         }
     }
@@ -621,7 +616,7 @@ public class Level25 {
     }
 
     /**
-     * Orb Walker: HP +10
+     * Orb Walker: HP +6
      */
     @SpirePatch(
         clz = OrbWalker.class,
@@ -631,15 +626,15 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(OrbWalker __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.maxHealth += 10;
-                __instance.currentHealth += 10;
-                logger.info("Ascension 25: OrbWalker HP +10");
+                __instance.maxHealth += 6;
+                __instance.currentHealth += 6;
+                logger.info("Ascension 25: OrbWalker HP +6");
             }
         }
     }
 
     /**
-     * Darkling: HP +25
+     * Darkling: HP +10
      */
     @SpirePatch(
         clz = Darkling.class,
@@ -649,15 +644,15 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(Darkling __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.maxHealth += 25;
-                __instance.currentHealth += 25;
-                logger.info("Ascension 25: Darkling HP +25");
+                __instance.maxHealth += 10;
+                __instance.currentHealth += 10;
+                logger.info("Ascension 25: Darkling HP +10");
             }
         }
     }
 
     /**
-     * Maw: HP +100
+     * Maw: HP +50
      */
     @SpirePatch(
         clz = Maw.class,
@@ -667,9 +662,9 @@ public class Level25 {
         @SpirePostfixPatch
         public static void Postfix(Maw __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                __instance.maxHealth += 100;
-                __instance.currentHealth += 100;
-                logger.info("Ascension 25: Maw HP +100");
+                __instance.maxHealth += 50;
+                __instance.currentHealth += 50;
+                logger.info("Ascension 25: Maw HP +50");
             }
         }
     }
@@ -700,7 +695,7 @@ public class Level25 {
     // ========================================
 
     /**
-     * GremlinTsundere (방패 그렘린): Block amount +7
+     * GremlinTsundere (방패 그렘린): Block amount +5
      */
     @SpirePatch(
         clz = GremlinTsundere.class,
@@ -711,15 +706,15 @@ public class Level25 {
         public static void Postfix(GremlinTsundere __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
                 try {
-                    // Increase blockAmt field by 7
+                    // Increase blockAmt field by 5
                     java.lang.reflect.Field blockAmtField = GremlinTsundere.class.getDeclaredField("blockAmt");
                     blockAmtField.setAccessible(true);
                     int currentBlockAmt = blockAmtField.getInt(__instance);
-                    blockAmtField.setInt(__instance, currentBlockAmt + 7);
+                    blockAmtField.setInt(__instance, currentBlockAmt + 5);
 
                     logger.info(String.format(
                         "Ascension 25: GremlinTsundere blockAmt increased from %d to %d",
-                        currentBlockAmt, currentBlockAmt + 7
+                        currentBlockAmt, currentBlockAmt + 5
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify GremlinTsundere blockAmt", e);
@@ -729,7 +724,7 @@ public class Level25 {
     }
 
     /**
-     * GremlinThief (교활한 그렘린): Damage +2
+     * GremlinThief (교활한 그렘린): Damage +1
      */
     @SpirePatch(
         clz = GremlinThief.class,
@@ -740,20 +735,20 @@ public class Level25 {
         public static void Postfix(GremlinThief __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
                 try {
-                    // Increase thiefDamage field by 2
+                    // Increase thiefDamage field by 1
                     java.lang.reflect.Field thiefDamageField = GremlinThief.class.getDeclaredField("thiefDamage");
                     thiefDamageField.setAccessible(true);
                     int currentDamage = thiefDamageField.getInt(__instance);
-                    thiefDamageField.setInt(__instance, currentDamage + 2);
+                    thiefDamageField.setInt(__instance, currentDamage + 1);
 
                     // Update damage info
                     if (!__instance.damage.isEmpty()) {
-                        __instance.damage.get(0).base += 2;
+                        __instance.damage.get(0).base += 1;
                     }
 
                     logger.info(String.format(
                         "Ascension 25: GremlinThief damage increased from %d to %d",
-                        currentDamage, currentDamage + 2
+                        currentDamage, currentDamage + 1
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify GremlinThief damage", e);
@@ -763,25 +758,28 @@ public class Level25 {
     }
 
     /**
-     * Looter (도적): Thief +3
+     * Looter (도적): Thief +5
      */
     @SpirePatch(
         clz = Looter.class,
-        method = "usePreBattleAction"
+        method = SpirePatch.CONSTRUCTOR
     )
     public static class LooterThieftPatch {
         @SpirePostfixPatch
-        public static void Postfix(Looter __instance) {
+        public static void Postfix(Looter __instance, float x, float y) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                // Increase Thievery power by 3
-                AbstractPower thieveryPower = __instance.getPower("Thievery");
-                if (thieveryPower != null) {
-                    thieveryPower.amount += 3;
-                    thieveryPower.updateDescription();
+                // Increase goldAmt by 5 (this determines Thievery power amount)
+                try {
+                    java.lang.reflect.Field goldAmtField = Looter.class.getDeclaredField("goldAmt");
+                    goldAmtField.setAccessible(true);
+                    int currentGoldAmt = goldAmtField.getInt(__instance);
+                    goldAmtField.setInt(__instance, currentGoldAmt + 5);
                     logger.info(String.format(
-                        "Ascension 25: Looter Thievery increased by 3 to %d",
-                        thieveryPower.amount
+                        "Ascension 25: Looter goldAmt (Thievery) increased from %d to %d (+5)",
+                        currentGoldAmt, currentGoldAmt + 5
                     ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Looter goldAmt", e);
                 }
             }
         }
@@ -852,8 +850,25 @@ public class Level25 {
     // ========================================
 
     /**
-     * SphericGuardian (구체형 수호기): Block +15
+     * SphericGuardian (구체형 수호기): Block +15, HP -5
      */
+    @SpirePatch(
+        clz = SphericGuardian.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
+    )
+    public static class SphericGuardianStatsPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SphericGuardian __instance, float x, float y) {
+            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
+                // Reduce HP by 5
+                __instance.maxHealth -= 5;
+                __instance.currentHealth -= 5;
+                logger.info("Ascension 25: SphericGuardian HP -5");
+            }
+        }
+    }
+
     @SpirePatch(
         clz = SphericGuardian.class,
         method = "usePreBattleAction"
@@ -876,21 +891,24 @@ public class Level25 {
      */
     @SpirePatch(
         clz = Mugger.class,
-        method = "usePreBattleAction"
+        method = SpirePatch.CONSTRUCTOR
     )
     public static class MuggerThieftPatch {
         @SpirePostfixPatch
-        public static void Postfix(Mugger __instance) {
+        public static void Postfix(Mugger __instance, float x, float y) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                // Increase Thievery power by 10
-                AbstractPower thieveryPower = __instance.getPower("Thievery");
-                if (thieveryPower != null) {
-                    thieveryPower.amount += 10;
-                    thieveryPower.updateDescription();
+                // Increase goldAmt by 10 (this determines Thievery power amount)
+                try {
+                    java.lang.reflect.Field goldAmtField = Mugger.class.getDeclaredField("goldAmt");
+                    goldAmtField.setAccessible(true);
+                    int currentGoldAmt = goldAmtField.getInt(__instance);
+                    goldAmtField.setInt(__instance, currentGoldAmt + 10);
                     logger.info(String.format(
-                        "Ascension 25: Mugger Thievery increased by 10 to %d",
-                        thieveryPower.amount
+                        "Ascension 25: Mugger goldAmt (Thievery) increased from %d to %d (+10)",
+                        currentGoldAmt, currentGoldAmt + 10
                     ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Mugger goldAmt", e);
                 }
             }
         }
@@ -959,6 +977,70 @@ public class Level25 {
                 }
             } catch (Exception e) {
                 logger.error("Failed to modify WrithingMass parasite probability", e);
+            }
+        }
+    }
+
+    // ========================================
+    // Giant Head (거인의 머리) - A92 mechanics moved to A25
+    // ========================================
+
+    /**
+     * Giant Head: Slow debuff uses compound calculation (25% per card played)
+     * 거인의 머리(Giant Head): 둔화 디버프의 효과가 "카드 사용시마다 데미지 25% 증가"로 변경
+     */
+    @SpirePatch(
+        clz = SlowPower.class,
+        method = "atDamageReceive"
+    )
+    public static class GiantHeadSlowPowerCompound {
+        @SpirePrefixPatch
+        public static SpireReturn<Float> Prefix(SlowPower __instance, float damage, DamageInfo.DamageType type) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return SpireReturn.Continue();
+            }
+
+            if (type == DamageInfo.DamageType.NORMAL) {
+                float multiplier = (float) Math.pow(COMPOUND_RATE, __instance.amount);
+                float newDamage = damage * multiplier;
+
+                logger.info(String.format(
+                    "Ascension 25: Giant Head Slow debuff (compound) - stacks: %d, multiplier: %.2f, damage: %.1f → %.1f",
+                    __instance.amount, multiplier, damage, newDamage
+                ));
+
+                return SpireReturn.Return(newDamage);
+            }
+
+            return SpireReturn.Return(damage);
+        }
+    }
+
+    /**
+     * Giant Head: HP increased by 100%
+     * 거인의 머리(Giant Head): 체력이 100% 증가
+     */
+    @SpirePatch(
+        clz = AbstractMonster.class,
+        method = "init"
+    )
+    public static class GiantHeadHPIncrease {
+        @SpirePostfixPatch
+        public static void Postfix(AbstractMonster __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return;
+            }
+
+            if (__instance.id != null && __instance.id.equals("GiantHead")) {
+                // Giant Head gets 100% HP increase
+                int originalHP = __instance.maxHealth;
+                __instance.maxHealth *= 2;
+                __instance.currentHealth *= 2;
+
+                logger.info(String.format(
+                    "Ascension 25: %s HP doubled from %d to %d",
+                    __instance.name, originalHP, __instance.maxHealth
+                ));
             }
         }
     }

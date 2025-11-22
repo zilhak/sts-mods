@@ -1,7 +1,7 @@
 package com.stsmod.ascension100.patches.levels;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
-import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -22,11 +22,11 @@ public class Level52 {
 
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class EnemiesDamageByActIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 52) {
                 return;
             }

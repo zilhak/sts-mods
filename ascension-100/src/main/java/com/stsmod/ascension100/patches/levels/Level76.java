@@ -42,40 +42,66 @@ public class Level76 {
     public static class SpecialBattleTracker {
         public static boolean isSpecialBattle = false;
         public static int specialBattleChance = 15; // Can be modified by Level 78
+        public static int lastSpecialBattleFloor = -999; // Last floor where special battle occurred
+        public static final int SPECIAL_BATTLE_COOLDOWN = 10; // Floors between special battles
     }
 
     /**
      * Determine if current battle should be a special battle
+     * Check AFTER monster group is initialized to ensure lastCombatMetricKey is set
      */
     @SpirePatch(
-        clz = MonsterRoom.class,
-        method = "onPlayerEntry"
+        clz = MonsterGroup.class,
+        method = "init"
     )
     public static class TriggerSpecialBattle {
         @SpirePostfixPatch
-        public static void Postfix(MonsterRoom __instance) {
+        public static void Postfix(MonsterGroup __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 76) {
                 return;
             }
 
-            // Only trigger in Strong Enemy battles (floor 3+)
-            // Exclude elite rooms
-            if (__instance instanceof MonsterRoomElite) {
+            // Only trigger in MonsterRoom (not elite/boss rooms)
+            if (!(AbstractDungeon.getCurrRoom() instanceof MonsterRoom) ||
+                AbstractDungeon.getCurrRoom() instanceof MonsterRoomElite) {
                 return;
             }
 
             // Check if this is a Strong Enemy encounter
+            // lastCombatMetricKey is now properly set after init()
             if (!EncounterHelper.isStrongEncounter()) {
+                logger.info(String.format("Ascension 76: Not a strong encounter (%s), skipping special battle check",
+                    AbstractDungeon.lastCombatMetricKey));
                 return;
             }
 
-            if (AbstractDungeon.getCurrMapNode() != null && AbstractDungeon.getCurrMapNode().y >= 3) {
-                int roll = AbstractDungeon.miscRng.random(0, 99);
-                if (roll < SpecialBattleTracker.specialBattleChance) {
-                    SpecialBattleTracker.isSpecialBattle = true;
-                    logger.info(String.format("Ascension 76: Special Battle triggered! (Roll: %d < %d)",
-                        roll, SpecialBattleTracker.specialBattleChance));
-                }
+            // Special battles cannot occur before floor 10
+            int currentFloor = AbstractDungeon.floorNum;
+            if (currentFloor < 10) {
+                logger.info(String.format("Ascension 76: Special Battle cannot occur before floor 10 (Current floor: %d)",
+                    currentFloor));
+                return;
+            }
+
+            // Check cooldown - special battles cannot occur within 10 floors of each other
+            int floorsSinceLastSpecial = currentFloor - SpecialBattleTracker.lastSpecialBattleFloor;
+
+            if (floorsSinceLastSpecial < SpecialBattleTracker.SPECIAL_BATTLE_COOLDOWN) {
+                logger.info(String.format("Ascension 76: Special Battle on cooldown (Floor %d, last was %d, need %d floors apart)",
+                    currentFloor, SpecialBattleTracker.lastSpecialBattleFloor, SpecialBattleTracker.SPECIAL_BATTLE_COOLDOWN));
+                return;
+            }
+
+            // Roll for special battle
+            int roll = AbstractDungeon.miscRng.random(0, 99);
+            if (roll < SpecialBattleTracker.specialBattleChance) {
+                SpecialBattleTracker.isSpecialBattle = true;
+                SpecialBattleTracker.lastSpecialBattleFloor = currentFloor;
+                logger.info(String.format("Ascension 76: Special Battle triggered! (Floor: %d, Roll: %d < %d, Encounter: %s)",
+                    currentFloor, roll, SpecialBattleTracker.specialBattleChance, AbstractDungeon.lastCombatMetricKey));
+            } else {
+                logger.info(String.format("Ascension 76: Special Battle NOT triggered (Floor: %d, Roll: %d >= %d, Encounter: %s)",
+                    currentFloor, roll, SpecialBattleTracker.specialBattleChance, AbstractDungeon.lastCombatMetricKey));
             }
         }
     }
@@ -200,6 +226,22 @@ public class Level76 {
             __instance.addRelicToRewards(tier);
 
             logger.info(String.format("Ascension 76: Added relic reward (%s tier) to Special Battle", tier));
+        }
+    }
+
+    /**
+     * Reset special battle cooldown when starting a new game
+     */
+    @SpirePatch(
+        clz = com.megacrit.cardcrawl.dungeons.AbstractDungeon.class,
+        method = "generateMap"
+    )
+    public static class ResetCooldownOnNewGame {
+        @SpirePostfixPatch
+        public static void Postfix() {
+            // Reset cooldown at start of each act/run
+            SpecialBattleTracker.lastSpecialBattleFloor = -999;
+            logger.info("Ascension 76: Reset special battle cooldown for new game/act");
         }
     }
 

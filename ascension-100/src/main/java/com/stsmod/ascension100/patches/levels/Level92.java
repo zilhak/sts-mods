@@ -60,52 +60,21 @@ import java.lang.reflect.Field;
  *
  * NOTE: This is a MASSIVE level with enhancements to 40+ monsters
  * Due to complexity, this implementation focuses on:
- * 1. Slow Power compound calculation (Giant Head mechanic)
- * 2. Health and damage stat increases for various monsters
- * 3. Starting power bonuses
- * 4. Pattern-specific changes require individual monster patches (TODO for future implementation)
+ * 1. Health and damage stat increases for various monsters
+ * 2. Starting power bonuses
+ * 3. Pattern-specific changes require individual monster patches (TODO for future implementation)
  *
- * Giant Head - Slow debuff: 15% compound interest per card played
+ * NOTE: Giant Head mechanics (Slow compound + HP double) moved to Level25
  * Various monsters: HP, damage, and power bonuses as documented
  */
 public class Level92 {
     private static final Logger logger = LogManager.getLogger(Level92.class.getName());
-    private static final float COMPOUND_RATE = 1.15f;  // 15% compound interest for Slow
-
-    /**
-     * Patch SlowPower to use compound calculation at A92+
-     * Giant Head mechanic: 15% compound damage increase per card played
-     */
-    @SpirePatch(
-        clz = SlowPower.class,
-        method = "atDamageReceive"
-    )
-    public static class SlowPowerCompoundDamage {
-        @SpirePrefixPatch
-        public static SpireReturn<Float> Prefix(SlowPower __instance, float damage, DamageInfo.DamageType type) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
-                return SpireReturn.Continue();
-            }
-
-            if (type == DamageInfo.DamageType.NORMAL) {
-                float multiplier = (float) Math.pow(COMPOUND_RATE, __instance.amount);
-                float newDamage = damage * multiplier;
-
-                logger.info(String.format(
-                    "Ascension 92: Slow debuff (compound) - stacks: %d, multiplier: %.2f, damage: %.1f → %.1f",
-                    __instance.amount, multiplier, damage, newDamage
-                ));
-
-                return SpireReturn.Return(newDamage);
-            }
-
-            return SpireReturn.Return(damage);
-        }
-    }
 
     /**
      * Common stat and power increases for various monsters at A92+
      * Applied at monster initialization
+     *
+     * NOTE: Giant Head mechanics (Slow compound + HP double) moved to Level25
      */
     @SpirePatch(
         clz = AbstractMonster.class,
@@ -133,15 +102,17 @@ public class Level92 {
                 case "Exploder": hpBonus = 5; break;
                 case "Spire Growth": hpBonus = 20; break;
                 case "GiantHead":
-                    // Giant Head gets 100% HP increase
+                    // Giant Head gets additional 20% HP increase at A92
+                    // (On top of 100% increase from Level25)
                     int originalHP = __instance.maxHealth;
-                    __instance.maxHealth *= 2;
-                    __instance.currentHealth *= 2;
+                    float multiplier = 1.20f;
+                    __instance.maxHealth = (int)(__instance.maxHealth * multiplier);
+                    __instance.currentHealth = (int)(__instance.currentHealth * multiplier);
                     logger.info(String.format(
-                        "Ascension 92: %s HP doubled from %d to %d",
+                        "Ascension 92: %s HP increased by 20%% from %d to %d",
                         __instance.name, originalHP, __instance.maxHealth
                     ));
-                    return; // Skip regular HP bonus
+                    return; // Skip regular HP bonus processing
             }
 
             if (hpBonus > 0) {

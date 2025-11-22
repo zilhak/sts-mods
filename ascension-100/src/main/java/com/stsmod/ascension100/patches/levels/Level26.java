@@ -26,7 +26,7 @@ public class Level26 {
     private static final Logger logger = LogManager.getLogger(Level26.class.getName());
 
     /**
-     * Slime Boss: +15 HP
+     * Slime Boss: +10 HP
      */
     @SpirePatch(
         clz = SlimeBoss.class,
@@ -37,10 +37,10 @@ public class Level26 {
         public static void Postfix(SlimeBoss __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth += 15;
-                __instance.currentHealth += 15;
+                __instance.maxHealth += 10;
+                __instance.currentHealth += 10;
                 logger.info(String.format(
-                    "Ascension 26: SlimeBoss HP increased from %d to %d (+15)",
+                    "Ascension 26: SlimeBoss HP increased from %d to %d (+10)",
                     originalHP,
                     __instance.maxHealth
                 ));
@@ -49,7 +49,7 @@ public class Level26 {
     }
 
     /**
-     * The Guardian: +50 HP
+     * The Guardian: +20 HP
      */
     @SpirePatch(
         clz = TheGuardian.class,
@@ -60,10 +60,10 @@ public class Level26 {
         public static void Postfix(TheGuardian __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth += 50;
-                __instance.currentHealth += 50;
+                __instance.maxHealth += 20;
+                __instance.currentHealth += 20;
                 logger.info(String.format(
-                    "Ascension 26: TheGuardian HP increased from %d to %d (+50)",
+                    "Ascension 26: TheGuardian HP increased from %d to %d (+20)",
                     originalHP,
                     __instance.maxHealth
                 ));
@@ -126,6 +126,28 @@ public class Level26 {
     }
 
     /**
+     * Bronze Automaton: +1 Artifact
+     */
+    @SpirePatch(
+        clz = BronzeAutomaton.class,
+        method = "usePreBattleAction"
+    )
+    public static class BronzeAutomatonArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(BronzeAutomaton __instance) {
+            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
+                AbstractDungeon.actionManager.addToBottom(
+                    new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
+                        __instance, __instance,
+                        new com.megacrit.cardcrawl.powers.ArtifactPower(__instance, 1), 1
+                    )
+                );
+                logger.info("Ascension 26: BronzeAutomaton gained +1 Artifact (total 4)");
+            }
+        }
+    }
+
+    /**
      * The Champ: +2 Damage
      */
     @SpirePatch(
@@ -149,7 +171,7 @@ public class Level26 {
     }
 
     /**
-     * The Collector: +60 HP
+     * The Collector: +40 HP
      */
     @SpirePatch(
         clz = TheCollector.class,
@@ -160,11 +182,11 @@ public class Level26 {
         public static void Postfix(TheCollector __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth += 60;
-                __instance.currentHealth += 60;
+                __instance.maxHealth += 40;
+                __instance.currentHealth += 40;
 
                 logger.info(String.format(
-                    "Ascension 26: TheCollector HP increased from %d to %d (+60)",
+                    "Ascension 26: TheCollector HP increased from %d to %d (+40)",
                     originalHP,
                     __instance.maxHealth
                 ));
@@ -173,7 +195,7 @@ public class Level26 {
     }
 
     /**
-     * Awakened One: +30 HP (Phase 1), +40 HP (Phase 2)
+     * Awakened One: +30 HP (Phase 1 only)
      */
     @SpirePatch(
         clz = AwakenedOne.class,
@@ -188,28 +210,11 @@ public class Level26 {
                 __instance.maxHealth += 30;
                 __instance.currentHealth += 30;
 
-                // Phase 2 HP +40
-                try {
-                    java.lang.reflect.Field form2HPField = AwakenedOne.class.getDeclaredField("form2HP");
-                    form2HPField.setAccessible(true);
-                    int originalForm2HP = form2HPField.getInt(__instance);
-                    form2HPField.setInt(__instance, originalForm2HP + 40);
-
-                    logger.info(String.format(
-                        "Ascension 26: AwakenedOne Phase 1 HP increased from %d to %d (+30), Phase 2 HP increased from %d to %d (+40)",
-                        originalHP,
-                        __instance.maxHealth,
-                        originalForm2HP,
-                        originalForm2HP + 40
-                    ));
-                } catch (Exception e) {
-                    logger.error("Failed to modify AwakenedOne Phase 2 HP", e);
-                    logger.info(String.format(
-                        "Ascension 26: AwakenedOne Phase 1 HP increased from %d to %d (+30)",
-                        originalHP,
-                        __instance.maxHealth
-                    ));
-                }
+                logger.info(String.format(
+                    "Ascension 26: AwakenedOne Phase 1 HP increased from %d to %d (+30)",
+                    originalHP,
+                    __instance.maxHealth
+                ));
             }
         }
     }
@@ -287,7 +292,7 @@ public class Level26 {
     }
 
     /**
-     * Corrupt Heart: +100 HP
+     * Corrupt Heart: +50 HP
      */
     @SpirePatch(
         clz = CorruptHeart.class,
@@ -298,11 +303,11 @@ public class Level26 {
         public static void Postfix(CorruptHeart __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth += 100;
-                __instance.currentHealth += 100;
+                __instance.maxHealth += 50;
+                __instance.currentHealth += 50;
 
                 logger.info(String.format(
-                    "Ascension 26: CorruptHeart HP increased from %d to %d (+100)",
+                    "Ascension 26: CorruptHeart HP increased from %d to %d (+50)",
                     originalHP,
                     __instance.maxHealth
                 ));

@@ -56,11 +56,14 @@ public class Level48 {
                 int oldHpBonus = (int)(AbstractDungeon.player.maxHealth * 0.1F);
                 optionLabel = optionLabel.replace(" " + oldHpBonus + " ]", " " + newHpBonus + " ]");
 
+                // Also update HUNDRED_GOLD if present: 100 -> 80
+                optionLabel = optionLabel.replace("100", "80");
+
                 optionLabelField.set(__instance, optionLabel);
 
                 logger.info(String.format(
-                    "Ascension 48: Modified Constructor1 - hp_bonus: %d -> %d, optionLabel updated",
-                    oldHpBonus, newHpBonus
+                    "Ascension 48: Modified Constructor1 - hp_bonus: %d -> %d, optionLabel: %s",
+                    oldHpBonus, newHpBonus, optionLabel
                 ));
             } catch (Exception e) {
                 logger.error("Failed to modify NeowReward constructor (boolean)", e);
@@ -146,12 +149,19 @@ public class Level48 {
                 }
 
                 // 4. Update HUNDRED_GOLD: 100 -> 80
-                // Original text uses special character 'd' for 100
-                // Pattern: "[Obtain {100} Gold]" - represented as TEXT[8] + 'd' + TEXT[9]
-                // We need to replace 'd' with '80'
-                optionLabel = optionLabel.replace("d Gold", "80 Gold");
-                optionLabel = optionLabel.replace("골드 d", "골드 80");  // Korean
-                optionLabel = optionLabel.replace("d 金币", "80 金币");  // Chinese
+                // The character 'd' in source code is actually rendered as "100" by the game
+                // So we need to replace the actual number "100" in the text
+                String originalLabel = optionLabel;
+
+                // Try multiple patterns for different languages
+                optionLabel = optionLabel.replace("100", "80");  // Universal number replacement
+
+                if (!originalLabel.equals(optionLabel)) {
+                    logger.info(String.format(
+                        "Ascension 48: Updated HUNDRED_GOLD text: '%s' -> '%s'",
+                        originalLabel, optionLabel
+                    ));
+                }
 
                 optionLabelField.set(__instance, optionLabel);
 
@@ -162,6 +172,133 @@ public class Level48 {
             } catch (Exception e) {
                 logger.error("Failed to modify NeowReward constructor (int)", e);
             }
+        }
+    }
+
+    /**
+     * Patch getRewardOptions to modify HUNDRED_GOLD text at creation time
+     * This is the only way to modify the text before it's displayed
+     */
+    @SpirePatch(
+        clz = NeowReward.class,
+        method = "getRewardOptions",
+        paramtypez = {int.class}
+    )
+    public static class ModifyRewardOptionsText {
+        @SpirePostfixPatch
+        public static Object Postfix(Object __result, NeowReward __instance, int category) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 48) {
+                return __result;
+            }
+
+            try {
+                @SuppressWarnings("unchecked")
+                java.util.ArrayList<Object> rewardOptions = (java.util.ArrayList<Object>) __result;
+
+                for (Object rewardDef : rewardOptions) {
+                    java.lang.reflect.Field typeField = rewardDef.getClass().getDeclaredField("type");
+                    java.lang.reflect.Field descField = rewardDef.getClass().getDeclaredField("desc");
+                    typeField.setAccessible(true);
+                    descField.setAccessible(true);
+
+                    Object type = typeField.get(rewardDef);
+                    String desc = (String) descField.get(rewardDef);
+
+                    // HUNDRED_GOLD: Replace 'd' character or "100" with "80"
+                    if (type.toString().equals("HUNDRED_GOLD")) {
+                        String originalDesc = desc;
+                        // The 'd' character in source is rendered as "100" by the game
+                        // But at this point it might still be 'd', so replace both
+                        desc = desc.replace("d", "80");
+                        desc = desc.replace("100", "80");
+                        descField.set(rewardDef, desc);
+                        logger.info(String.format(
+                            "Ascension 48: Modified HUNDRED_GOLD option text: '%s' -> '%s'",
+                            originalDesc, desc
+                        ));
+                    }
+
+                    // Also update hp_bonus related text
+                    int oldHpBonus = (int)(AbstractDungeon.player.maxHealth * 0.1F);
+                    int newHpBonus = (int)(AbstractDungeon.player.maxHealth * 0.08F);
+
+                    if (type.toString().equals("TEN_PERCENT_HP_BONUS")) {
+                        desc = desc.replace(" " + oldHpBonus + " ]", " " + newHpBonus + " ]");
+                        descField.set(rewardDef, desc);
+                    } else if (type.toString().equals("TWENTY_PERCENT_HP_BONUS")) {
+                        desc = desc.replace(" " + (oldHpBonus * 2) + " ]", " " + (newHpBonus * 2) + " ]");
+                        descField.set(rewardDef, desc);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Failed to modify reward options text", e);
+            }
+
+            return __result;
+        }
+    }
+
+    /**
+     * Patch getRewardDrawbackOptions to modify drawback text at creation time
+     * This is critical for TEN_PERCENT_HP_LOSS and PERCENT_DAMAGE
+     */
+    @SpirePatch(
+        clz = NeowReward.class,
+        method = "getRewardDrawbackOptions"
+    )
+    public static class ModifyDrawbackOptionsText {
+        @SpirePostfixPatch
+        public static Object Postfix(Object __result, NeowReward __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 48) {
+                return __result;
+            }
+
+            try {
+                @SuppressWarnings("unchecked")
+                java.util.ArrayList<Object> drawbackOptions = (java.util.ArrayList<Object>) __result;
+
+                int oldHpBonus = (int)(AbstractDungeon.player.maxHealth * 0.1F);
+                int hp15Percent = (int)(AbstractDungeon.player.maxHealth * 0.15F);
+
+                for (Object drawbackDef : drawbackOptions) {
+                    java.lang.reflect.Field typeField = drawbackDef.getClass().getDeclaredField("type");
+                    java.lang.reflect.Field descField = drawbackDef.getClass().getDeclaredField("desc");
+                    typeField.setAccessible(true);
+                    descField.setAccessible(true);
+
+                    Object type = typeField.get(drawbackDef);
+                    String desc = (String) descField.get(drawbackDef);
+
+                    // TEN_PERCENT_HP_LOSS: -10% -> -15%
+                    if (type.toString().equals("TEN_PERCENT_HP_LOSS")) {
+                        String originalDesc = desc;
+                        // Replace old hp_bonus (10%) with 15%
+                        desc = desc.replace(String.valueOf(oldHpBonus), String.valueOf(hp15Percent));
+                        descField.set(drawbackDef, desc);
+                        logger.info(String.format(
+                            "Ascension 48: Modified TEN_PERCENT_HP_LOSS drawback option: '%s' -> '%s'",
+                            originalDesc, desc
+                        ));
+                    }
+
+                    // PERCENT_DAMAGE: 30% -> 40%
+                    if (type.toString().equals("PERCENT_DAMAGE")) {
+                        String originalDesc = desc;
+                        int old30Percent = AbstractDungeon.player.currentHealth / 10 * 3;
+                        int new40Percent = AbstractDungeon.player.currentHealth / 10 * 4;
+                        desc = desc.replace(String.valueOf(old30Percent), String.valueOf(new40Percent));
+                        descField.set(drawbackDef, desc);
+                        logger.info(String.format(
+                            "Ascension 48: Modified PERCENT_DAMAGE drawback option: '%s' -> '%s'",
+                            originalDesc, desc
+                        ));
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Failed to modify drawback options text", e);
+            }
+
+            return __result;
         }
     }
 

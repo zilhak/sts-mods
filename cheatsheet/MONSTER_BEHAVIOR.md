@@ -4,12 +4,206 @@
 
 ## 📑 목차
 
-1. [버프/디버프 추가](#버프디버프-추가)
-2. [행동 패턴 수정](#행동-패턴-수정)
-3. [카드 추가 효과](#카드-추가-효과)
-4. [조건부 행동](#조건부-행동)
-5. [특수 파워 추가](#특수-파워-추가)
-6. [실전 예제](#실전-예제)
+1. [⚠️ 패치 타이밍 규칙 (중요!)](#-패치-타이밍-규칙-중요)
+2. [버프/디버프 추가](#버프디버프-추가)
+3. [행동 패턴 수정](#행동-패턴-수정)
+4. [카드 추가 효과](#카드-추가-효과)
+5. [조건부 행동](#조건부-행동)
+6. [특수 파워 추가](#특수-파워-추가)
+7. [실전 예제](#실전-예제)
+
+---
+
+## ⚠️ 패치 타이밍 규칙 (중요!)
+
+**CRITICAL**: 적의 속성을 수정할 때 **어떤 메서드를 패치하는지**에 따라 적용 시점이 달라집니다!
+
+### 몬스터 초기화 순서
+
+```
+1. Constructor → HP, damage 배열 생성
+2. init() → rollMove() 호출 → getMove() → setMove(damage.get(i).base)
+   ↑ 첫 턴 공격 패턴과 데미지가 여기서 결정됨!
+3. usePreBattleAction() → 버프 추가, 전투 시작 효과
+   ↑ 여기서 damage.base 수정하면 첫 턴에는 적용 안됨!
+4. 전투 시작
+5. 두 번째 턴: rollMove() 다시 호출 → 이제 수정된 damage.base 사용
+```
+
+### 🔴 데미지 수정 → `init` Prefix 사용
+
+**문제 상황**: `usePreBattleAction`에서 데미지를 수정하면?
+- ❌ 첫 턴: 원래 데미지 (수정 전)
+- ✅ 두 번째 턴부터: 수정된 데미지
+- 결과: 일관성 없는 이상한 데미지!
+
+**해결방법**: `init` 메서드를 Prefix로 패치
+
+```java
+@SpirePatch(
+    clz = AbstractMonster.class,
+    method = "init"  // ✅ usePreBattleAction이 아님!
+)
+public static class MonsterDamageIncrease {
+    @SpirePrefixPatch  // ✅ Prefix로 rollMove() 이전에 실행
+    public static void Prefix(AbstractMonster __instance) {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 24) {
+            return;
+        }
+
+        // 데미지 수정
+        for (DamageInfo damageInfo : __instance.damage) {
+            if (damageInfo != null && damageInfo.base > 0) {
+                damageInfo.base += 1;  // ✅ 첫 턴부터 적용됨
+            }
+        }
+    }
+}
+```
+
+**실제 예시**:
+- ✅ Level24.java - 일반 적 데미지 +5% (init Prefix)
+- ✅ Level35.java - 일반 적 데미지 +1 (init Prefix)
+- ✅ Level52.java - 막별 데미지 증가 (init Prefix)
+
+### 🟢 체력(HP) 수정 → `Constructor` Postfix 사용
+
+체력은 몬스터 생성 시점에 고정되므로 Constructor에서 수정합니다.
+
+```java
+@SpirePatch(
+    clz = GremlinWarrior.class,
+    method = SpirePatch.CONSTRUCTOR,
+    paramtypez = {float.class, float.class}
+)
+public static class GremlinWarriorHPPatch {
+    @SpirePostfixPatch
+    public static void Postfix(GremlinWarrior __instance, float x, float y) {
+        if (AbstractDungeon.ascensionLevel >= 25) {
+            __instance.maxHealth += 10;
+            __instance.currentHealth += 10;
+        }
+    }
+}
+```
+
+**실제 예시**:
+- ✅ Level53.java - 그렘린 전사 HP +10 (Constructor Postfix)
+- ✅ Level25.java - 다양한 몬스터 HP 증가 (Constructor Postfix)
+
+### 🟢 버프/파워 추가 → `usePreBattleAction` Postfix 사용
+
+버프는 전투 시작 전에 표시되기만 하면 되므로 `usePreBattleAction`에서 추가해도 문제없습니다.
+
+```java
+@SpirePatch(
+    clz = Mugger.class,
+    method = "usePreBattleAction"
+)
+public static class MuggerThieveryIncrease {
+    @SpirePostfixPatch
+    public static void Postfix(Mugger __instance) {
+        if (AbstractDungeon.ascensionLevel >= 53) {
+            AbstractPower thieveryPower = __instance.getPower("Thievery");
+            if (thieveryPower != null) {
+                thieveryPower.amount += 5;
+                thieveryPower.updateDescription();
+            }
+        }
+    }
+}
+```
+
+**실제 예시**:
+- ✅ Level53.java - 강도 도둑질 +5 (usePreBattleAction Postfix)
+- ✅ Level25.java - 뱀 식물 탄성 +1 (usePreBattleAction Postfix)
+
+### 🔵 특정 패턴만 수정 → `takeTurn` Postfix 사용 (주의!)
+
+**특정 패턴의 데미지만 수정**하는 경우 (예: Byrd의 Headbutt 패턴만 +2)
+
+```java
+@SpirePatch(
+    clz = Byrd.class,
+    method = "takeTurn"
+)
+public static class ByrdHeadbuttEnhancement {
+    private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
+
+    @SpirePrefixPatch
+    public static void Prefix(Byrd __instance) {
+        if (AbstractDungeon.ascensionLevel < 35) return;
+
+        try {
+            Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+            nextMoveField.setAccessible(true);
+            byte move = nextMoveField.getByte(__instance);
+            lastMove.set(move);
+        } catch (Exception e) {
+            logger.error("Failed to get Byrd move", e);
+        }
+    }
+
+    @SpirePostfixPatch
+    public static void Postfix(Byrd __instance) {
+        if (AbstractDungeon.ascensionLevel < 35) return;
+
+        Byte move = lastMove.get();
+        if (move != null && move == 2) { // HEADBUTT move ID
+            // 이번 턴에 사용한 패턴의 데미지를 수정
+            // 다음 턴 rollMove() 이전이므로 다음 턴부터 적용됨
+            __instance.damage.get(0).base += 2;
+        }
+        lastMove.remove();
+    }
+}
+```
+
+**⚠️ 주의사항**:
+- 이 방식은 **첫 턴에는 적용되지 않을 수 있음**
+- 만약 몬스터가 첫 턴에 해당 패턴을 사용한다면, 첫 턴은 원래 데미지로 나감
+- 두 번째 턴부터는 수정된 데미지가 적용됨
+- **첫 턴부터 적용이 필요하면 `init` Prefix에서 해당 패턴의 damage index를 찾아 수정해야 함**
+
+**실제 예시**:
+- ⚠️ Level35.java - Byrd Headbutt +2 (takeTurn Postfix, 첫 턴 미적용 가능성)
+
+### 📋 요약표
+
+| 수정 대상 | 패치 메서드 | 패치 타입 | 첫 턴 적용 | 비고 |
+|----------|------------|----------|----------|------|
+| **전체 데미지** | `init` | **Prefix** | ✅ 적용됨 | Level24, 35, 52 |
+| **특정 패턴 데미지** | `takeTurn` | **Postfix** | ⚠️ 적용 안될 수 있음 | Level35 Byrd |
+| **체력(HP)** | `Constructor` | **Postfix** | ✅ 적용됨 | 생성 시점 고정 |
+| **버프/파워** | `usePreBattleAction` | **Postfix** | ✅ 적용됨 | 표시만 되면 됨 |
+
+### 🔍 첫 턴부터 특정 패턴 데미지를 수정하려면?
+
+만약 **특정 패턴의 데미지를 첫 턴부터 확실히 적용**하고 싶다면 `init` Prefix에서 패턴을 식별해야 합니다:
+
+```java
+@SpirePatch(
+    clz = Byrd.class,
+    method = "init"
+)
+public static class ByrdHeadbuttFirstTurnFix {
+    @SpirePrefixPatch
+    public static void Prefix(Byrd __instance) {
+        if (AbstractDungeon.ascensionLevel < 35) return;
+
+        // Byrd의 damage 배열에서 Headbutt에 해당하는 인덱스를 찾아 수정
+        // 주의: 이 방법은 damage 배열의 구조를 정확히 알아야 함
+        if (__instance.damage.size() > 0 && __instance.damage.get(0) != null) {
+            __instance.damage.get(0).base += 2;  // 첫 턴부터 적용됨
+        }
+    }
+}
+```
+
+**trade-off**:
+- ✅ 첫 턴부터 적용됨
+- ❌ damage 배열의 인덱스 구조를 정확히 알아야 함
+- ❌ 다른 패턴에도 영향을 줄 수 있음 (만약 같은 damage 인덱스를 공유한다면)
 
 ---
 

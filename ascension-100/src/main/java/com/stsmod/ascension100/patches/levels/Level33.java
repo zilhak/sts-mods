@@ -39,11 +39,11 @@ public class Level33 {
             }
 
             int originalMaxHP = __instance.maxHealth;
-            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
-            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
+            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.02f);
+            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.02f);
 
             logger.info(String.format(
-                "Ascension 33: Strong Enemy %s HP increased from %d to %d (+5%%)",
+                "Ascension 33: Strong Enemy %s HP increased from %d to %d (+2%%)",
                 __instance.name, originalMaxHP, __instance.maxHealth
             ));
         }

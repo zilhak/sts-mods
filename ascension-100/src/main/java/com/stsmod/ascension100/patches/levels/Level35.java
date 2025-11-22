@@ -25,11 +25,11 @@ public class Level35 {
      */
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class NormalDamageIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
                 return;
             }
@@ -54,49 +54,34 @@ public class Level35 {
 
     /**
      * Byrd: Headbutt pattern deals +2 damage
+     * HEADBUTT uses damage.get(2) - fixed damage of 3
+     * We modify it in Constructor to avoid stacking issues
      */
     @SpirePatch(
         clz = Byrd.class,
-        method = "takeTurn"
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {float.class, float.class}
     )
     public static class ByrdHeadbuttEnhancement {
-        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
-
-        @SpirePrefixPatch
-        public static void Prefix(Byrd __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
-                return;
-            }
-
-            try {
-                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte move = nextMoveField.getByte(__instance);
-                lastMove.set(move);
-            } catch (Exception e) {
-                logger.error("Failed to get Byrd move", e);
-            }
-        }
-
         @SpirePostfixPatch
-        public static void Postfix(Byrd __instance) {
+        public static void Postfix(Byrd __instance, float x, float y) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
                 return;
             }
 
-            try {
-                Byte move = lastMove.get();
-                if (move != null && move == 2) { // HEADBUTT move
-                    // Apply +2 damage to Headbutt pattern
-                    if (__instance.damage.size() > 0 && __instance.damage.get(0) != null) {
-                        __instance.damage.get(0).base += 2;
-                        logger.info("Ascension 35: Byrd Headbutt damage +2");
-                    }
-                }
-            } catch (Exception e) {
-                logger.error("Failed to enhance Byrd Headbutt", e);
-            } finally {
-                lastMove.remove();
+            // Byrd damage array structure:
+            // damage.get(0) = PECK (1 damage, multi-hit)
+            // damage.get(1) = SWOOP (12/14 damage)
+            // damage.get(2) = HEADBUTT (3 damage) ← This one!
+
+            if (__instance.damage.size() > 2 && __instance.damage.get(2) != null) {
+                int originalDamage = __instance.damage.get(2).base;
+                __instance.damage.get(2).base += 2;
+
+                logger.info(String.format(
+                    "Ascension 35: Byrd Headbutt damage increased from %d to %d",
+                    originalDamage, __instance.damage.get(2).base
+                ));
             }
         }
     }

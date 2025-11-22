@@ -27,12 +27,13 @@ import org.apache.logging.log4j.Logger;
  * 귀족 그렘린(Gremlin Nob): 공격력 +1
  * 라가불린(Lagavulin): 공격력 +2
  * 보초기(Sentry): 공격력 +1
- * 칼부림의 책(Book of Stabbing): 공격력 +1
  * 그렘린 리더(Gremlin Leader): 격려 패턴 힘 +1
  * 노예 관리자(Taskmaster): 공격력 +3
- * 거인의 머리(Giant Head): It Is Time 데미지 +10
+ * 거인의 머리(Giant Head): It Is Time 데미지 +10 (MOVED TO LEVEL25)
  * 네메시스(Nemesis): 공격력 +5
  * 파충류 주술사(Reptomancer): 공격력 +2
+ *
+ * NOTE: Book of Stabbing damage increase removed (too strong)
  */
 public class Level23 {
     private static final Logger logger = LogManager.getLogger(Level23.class.getName());
@@ -109,29 +110,8 @@ public class Level23 {
         }
     }
 
-    /**
-     * Book of Stabbing: +1 damage
-     */
-    @SpirePatch(
-        clz = BookOfStabbing.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {}
-    )
-    public static class BookOfStabbingDamagePatch {
-        @SpirePostfixPatch
-        public static void Postfix(BookOfStabbing __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 23) {
-                return;
-            }
-
-            for (DamageInfo damageInfo : __instance.damage) {
-                if (damageInfo != null && damageInfo.base > 0) {
-                    damageInfo.base += 1;
-                }
-            }
-            logger.info("Ascension 23: Book of Stabbing damage +1");
-        }
-    }
+    // Book of Stabbing: Damage increase removed (too strong)
+    // REMOVED: BookOfStabbingDamagePatch
 
     /**
      * Taskmaster: +3 damage

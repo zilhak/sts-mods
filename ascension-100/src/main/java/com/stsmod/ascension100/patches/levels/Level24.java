@@ -2,7 +2,7 @@ package com.stsmod.ascension100.patches.levels;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
-import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -14,23 +14,23 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Ascension Level 24: Normal enemies deal 5% more damage
+ * Ascension Level 24: Normal enemies deal 3% more damage
  *
- * 일반 적들의 공격력이 5% 증가합니다.
+ * 일반 적들의 공격력이 3% 증가합니다.
  */
 public class Level24 {
     private static final Logger logger = LogManager.getLogger(Level24.class.getName());
 
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class NormalDamageIncrease {
         // Track which monsters have already been patched to prevent duplicate application
         private static final Set<AbstractMonster> patchedMonsters = Collections.newSetFromMap(new WeakHashMap<>());
 
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 24) {
                 return;
             }
@@ -45,7 +45,7 @@ public class Level24 {
                     return;
                 }
 
-                float multiplier = 1.05f;
+                float multiplier = 1.03f;
 
                 for (DamageInfo damageInfo : __instance.damage) {
                     if (damageInfo != null && damageInfo.base > 0) {
