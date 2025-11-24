@@ -43,6 +43,23 @@ public class Level80 {
             // Make it Exhaust when played (only disappears when used)
             __instance.exhaust = true;
 
+            // Update card text based on language
+            try {
+                java.lang.reflect.Field rawDescriptionField = AbstractCard.class.getDeclaredField("rawDescription");
+                rawDescriptionField.setAccessible(true);
+
+                String newDescription;
+                if (com.megacrit.cardcrawl.core.Settings.language == com.megacrit.cardcrawl.core.Settings.GameLanguage.KOR) {
+                    newDescription = "소멸.";  // Korean: Exhaust.
+                } else {
+                    newDescription = "Exhaust.";  // English and other languages
+                }
+
+                rawDescriptionField.set(__instance, newDescription);
+            } catch (Exception e) {
+                logger.error("Failed to update AscendersBane description", e);
+            }
+
             // Reinitialize description - exhaust keyword will be added automatically
             __instance.initializeDescription();
 

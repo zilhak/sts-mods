@@ -103,32 +103,31 @@ public class Level86 {
     }
 
     /**
-     * FungiBeast: Spore Cloud +1 vulnerable, +1 weak on death
+     * FungiBeast: Spore Cloud +1 vulnerable, +1 weak on death (via constructor intercept)
      */
     @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.exordium.FungiBeast.class,
-        method = "usePreBattleAction"
+        clz = com.megacrit.cardcrawl.powers.SporeCloudPower.class,
+        method = SpirePatch.CONSTRUCTOR
     )
     public static class FungiBeastSporeCloudBoost {
         @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.exordium.FungiBeast __instance) {
+        public static void Postfix(com.megacrit.cardcrawl.powers.SporeCloudPower __instance,
+                                    com.megacrit.cardcrawl.core.AbstractCreature owner, int amount) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 86) {
                 return;
             }
 
-            // Add +1 to Spore Cloud power
-            com.megacrit.cardcrawl.powers.AbstractPower sporeCloudPower = __instance.getPower("Spore Cloud");
-            if (sporeCloudPower != null) {
-                sporeCloudPower.amount += 1;
-                sporeCloudPower.updateDescription();
+            // Check if owner is FungiBeast
+            if (owner instanceof com.megacrit.cardcrawl.monsters.exordium.FungiBeast) {
+                __instance.amount += 1;
+                __instance.updateDescription();
                 logger.info(String.format(
-                    "Ascension 86: FungiBeast Spore Cloud increased by 1 to %d",
-                    sporeCloudPower.amount
+                    "Ascension 86: FungiBeast SporeCloud constructor intercepted, increased from %d to %d",
+                    amount, __instance.amount
                 ));
             }
 
-            // Add WeakPower on death via SporeCloud modification
-            // Note: We'll add Weak debuff in die() method
+            // Note: Weak debuff is added in die() method
         }
     }
 

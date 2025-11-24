@@ -32,12 +32,14 @@ import com.megacrit.cardcrawl.monsters.beyond.SpireGrowth;
 import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.common.GainBlockAction;
+import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.powers.ExplosivePower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
 import com.megacrit.cardcrawl.powers.VulnerablePower;
 import com.megacrit.cardcrawl.powers.WeakPower;
 import com.megacrit.cardcrawl.powers.PlatedArmorPower;
+import com.megacrit.cardcrawl.powers.SporeCloudPower;
 import javassist.CtBehavior;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -956,29 +958,91 @@ public class Level53 {
     }
 
     /**
-     * FungiBeast (동물하초): Death debuff +1
-     * 죽을 때 가하는 취약과 약화가 1 증가 (SporeCloud 파워를 통해)
+     * FungiBeast (동물하초): SporeCloud -1 and adds Frail on death
+     * 포자 구름 수치 -1, 죽을 때 취약과 손상을 같이 부여
      */
     @SpirePatch(
-        clz = FungiBeast.class,
-        method = "usePreBattleAction"
+        clz = SporeCloudPower.class,
+        method = SpirePatch.CONSTRUCTOR
     )
-    public static class FungiBeastDeathDebuffIncrease {
+    public static class FungiBeastSporeCloudReduction {
         @SpirePostfixPatch
-        public static void Postfix(FungiBeast __instance) {
+        public static void Postfix(SporeCloudPower __instance, AbstractCreature owner, int amount) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
                 return;
             }
 
-            // Increase SporeCloud power by 1 (it applies Weak and Vulnerable on death)
-            AbstractPower sporeCloudPower = __instance.getPower("Spore Cloud");
-            if (sporeCloudPower != null) {
-                sporeCloudPower.amount += 1;
-                sporeCloudPower.updateDescription();
+            // Check if owner is FungiBeast
+            if (owner instanceof com.megacrit.cardcrawl.monsters.exordium.FungiBeast) {
+                __instance.amount = Math.max(1, __instance.amount - 1);
+                __instance.updateDescription();
                 logger.info(String.format(
-                    "Ascension 53: FungiBeast SporeCloud increased by 1 to %d (death debuff +1)",
-                    sporeCloudPower.amount
+                    "Ascension 53: FungiBeast SporeCloud reduced from %d to %d",
+                    amount, __instance.amount
                 ));
+            }
+        }
+    }
+
+    /**
+     * FungiBeast: Add Frail debuff on death (in addition to Vulnerable)
+     */
+    @SpirePatch(
+        clz = SporeCloudPower.class,
+        method = "onDeath"
+    )
+    public static class FungiBeastSporeCloudFrail {
+        @SpirePostfixPatch
+        public static void Postfix(SporeCloudPower __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Check if owner is FungiBeast
+            if (__instance.owner instanceof com.megacrit.cardcrawl.monsters.exordium.FungiBeast) {
+                // Add Frail debuff (same amount as Vulnerable)
+                AbstractDungeon.actionManager.addToTop(
+                    new ApplyPowerAction(
+                        AbstractDungeon.player,
+                        null,
+                        new com.megacrit.cardcrawl.powers.FrailPower(
+                            AbstractDungeon.player,
+                            __instance.amount,
+                            true
+                        ),
+                        __instance.amount
+                    )
+                );
+                logger.info(String.format(
+                    "Ascension 53: FungiBeast death also applies %d Frail (in addition to Vulnerable)",
+                    __instance.amount
+                ));
+            }
+        }
+    }
+
+    /**
+     * SporeCloudPower: Update description for Ascension 53+ (adds Frail info)
+     */
+    @SpirePatch(
+        clz = SporeCloudPower.class,
+        method = "updateDescription"
+    )
+    public static class SporeCloudPowerDescriptionPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SporeCloudPower __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 53) {
+                return;
+            }
+
+            // Check if owner is FungiBeast
+            if (__instance.owner instanceof com.megacrit.cardcrawl.monsters.exordium.FungiBeast) {
+                // Update description to mention both Vulnerable and Frail
+                if (com.megacrit.cardcrawl.core.Settings.language == com.megacrit.cardcrawl.core.Settings.GameLanguage.KOR) {
+                    __instance.description = "사망 시, 당신에게 #y취약 과 #y손상 을 #b" + __instance.amount + " 부여합니다.";
+                } else {
+                    __instance.description = "On death, applies #b" + __instance.amount + " #yVulnerable and #yFrail.";
+                }
             }
         }
     }

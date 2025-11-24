@@ -2,8 +2,10 @@ package com.stsmod.ascension100.patches.levels;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.city.Byrd;
@@ -15,9 +17,10 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Ascension Level 24: Normal enemies deal 3% more damage (except Byrd)
+ * Ascension Level 24: Normal enemies deal 3% more damage (except Byrd), Player max HP increases by 5%
  *
  * 일반 적들의 공격력이 3% 증가합니다. (섀 제외)
+ * 플레이어의 최대체력이 5% 증가합니다.
  */
 public class Level24 {
     private static final Logger logger = LogManager.getLogger(Level24.class.getName());
@@ -66,4 +69,14 @@ public class Level24 {
             }
         }
     }
+
+    /**
+     * Player max HP increase: +5%
+     *
+     * IMPLEMENTATION NOTE:
+     * This level's HP modification is implemented in PlayerHPInitPatch.java
+     * along with Level 32 to ensure correct execution order.
+     *
+     * @see com.stsmod.ascension100.patches.levels.PlayerHPInitPatch
+     */
 }

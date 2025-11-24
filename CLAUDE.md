@@ -246,6 +246,147 @@ Check logs at:
 - Linux/Mac: `~/.config/ModTheSpire/logs/`
 
 
+## Monster Name Translation Reference
+
+**IMPORTANT**: Korean ↔ English monster mapping verified from official localization file (`monsters.json`).
+Use these exact class names and IDs when patching monsters.
+
+### Act 1 (Exordium) - 1막
+
+**Normal Enemies**:
+- 턱벌레 = `JawWorm` (ID: "JawWorm")
+- 공벌레 = `LouseNormal` / `LouseDefensive` (ID: "FuzzyLouseNormal" / "FuzzyLouseDefensive")
+- 산성 슬라임 = `AcidSlime_S` / `AcidSlime_M` / `AcidSlime_L` (ID: "AcidSlime_S/M/L")
+- 가시 슬라임 = `SpikeSlime_S` / `SpikeSlime_M` / `SpikeSlime_L` (ID: "SpikeSlime_S/M/L")
+- 동물하초 = `FungiBeast` (ID: "FungiBeast")
+- 광신자 = `Cultist` (ID: "Cultist")
+- 도적 = `Looter` (ID: "Looter")
+- 노예 상인 = `SlaverBlue` / `SlaverRed` (ID: "SlaverBlue" / "SlaverRed")
+
+**Gremlins** (그렘린):
+- 뚱뚱한 그렘린 = `GremlinFat` (ID: "GremlinFat")
+- 교활한 그렘린 = `GremlinThief` (ID: "GremlinThief")
+- 화난 그렘린 = `GremlinWarrior` (ID: "GremlinWarrior")
+- 그렘린 마법사 = `GremlinWizard` (ID: "GremlinWizard")
+- 방패 그렘린 = `GremlinTsundere` (ID: "GremlinTsundere")
+
+**Elites**:
+- 귀족 그렘린 = `GremlinNob` (ID: "GremlinNob")
+- 라가불린 = `Lagavulin` (ID: "Lagavulin")
+- 보초기 = `Sentry` (ID: "Sentry")
+
+**Bosses**:
+- 대왕 슬라임 = `SlimeBoss` (ID: "SlimeBoss")
+- 수호자 = `TheGuardian` (ID: "TheGuardian")
+- 육각령 = `Hexaghost` (ID: "Hexaghost")
+
+### Act 2 (City) - 2막
+
+**Normal Enemies**:
+- 강도 = `Mugger` (ID: "Mugger")
+- 로미오 = `BanditLeader` (ID: "BanditLeader")
+- 촉새 = `BanditPointy` (ID: "BanditChild")
+- 곰 = `BanditBear` (ID: "BanditBear")
+- 스네코 = `Snecko` (ID: "Snecko")
+- 구체형 수호기 = `SphericGuardian` (ID: "SphericGuardian")
+- 섀 = `Byrd` (ID: "Byrd")
+- 갑각기생충 = `ShelledParasite` (ID: "Shelled Parasite")
+- 뱀 식물 = `SnakePlant` (ID: "SnakePlant")
+- 선택받은 자 = `Chosen` (ID: "Chosen")
+- 백부장 = `Centurion` (ID: "Centurion")
+- 신비주의자 = `Healer` (ID: "Healer")
+- 구체 = `BronzeOrb` (ID: "BronzeOrb")
+- 횃불 머리 = `TorchHead` (ID: "TorchHead")
+
+**Elites**:
+- 칼부림의 책 = `BookOfStabbing` (ID: "BookOfStabbing")
+- 노예 관리자 = `Taskmaster` (ID: "SlaverBoss")
+- 그렘린 리더 = `GremlinLeader` (ID: "GremlinLeader")
+
+**Bosses**:
+- 청동 자동인형 = `BronzeAutomaton` (ID: "BronzeAutomaton")
+- 수집가 = `TheCollector` (ID: "TheCollector")
+- 투사 = `Champ` (ID: "Champ")
+
+### Act 3 (Beyond) - 3막
+
+**Normal Enemies**:
+- 어두미 = `Darkling` (ID: "Darkling")
+- 구체 순찰기 = `OrbWalker` (ID: "Orb Walker")
+- 현혹기 = `Repulsor` (ID: "Repulsor")
+- 첨탑 암종 = `SpireGrowth` (ID: "Serpent")
+- 과도자 = `Transient` (ID: "Transient")
+- 반사기 = `Spiker` (ID: "Spiker")
+- 꿈틀대는 덩어리 = `WrithingMass` (ID: "WrithingMass")
+- 아귀 = `Maw` (ID: "Maw")
+- 폭탄기 = `Exploder` (ID: "Exploder")
+- 단검 = `SnakeDagger` (ID: "Dagger")
+
+**Elites**:
+- 거인의 머리 = `GiantHead` (ID: "GiantHead")
+- 파충류 주술사 = `Reptomancer` (ID: "Reptomancer")
+- 네메시스 = `Nemesis` (ID: "Nemesis")
+
+**Bosses**:
+- 깨어난 자 = `AwakenedOne` (ID: "AwakenedOne")
+- 시간 포식자 = `TimeEater` (ID: "TimeEater")
+- 도누 = `Donu` (ID: "Donu")
+- 데카 = `Deca` (ID: "Deca")
+
+### Act 4 (Ending) - 4막
+
+**Bosses**:
+- 타락한 심장 = `CorruptHeart` (ID: "CorruptHeart")
+- 첨탑의 방패 = `SpireShield` (ID: "SpireShield")
+- 첨탑의 창 = `SpireSpear` (ID: "SpireSpear")
+
+### Common Attack/Pattern Names
+
+**Darkling (어둠이)**:
+- 씹기 = Chomp (move byte 1)
+- 물고 늘어지기 = Nip (move byte 2)
+- 부활 = Reincarnate (move byte 5)
+
+**Byrd (섀)**:
+- 박치기 = Headbutt (move byte 2)
+- 울음 = Caw (move byte 6)
+- 날아오름 = Fly (move byte 1)
+
+**BanditLeader (로미오)**:
+- 십자 베기 = Cross Slash (move byte 1)
+
+**Maw (아귀)**:
+- 포효 = Roar (move byte 3)
+
+**SpireGrowth (첨탑 암종)**:
+- 신속 태클 = Quick Tackle (move byte 1)
+
+**GiantHead (거대한 머리)**:
+- 응시 = Gaze
+
+**SlimeBoss (점액 군주)**:
+- 횡혈 = Goop Spray
+
+### Common Power/Debuff Names
+
+**Buffs**:
+- 힘 = Strength (`StrengthPower`)
+- 방어도 = Block
+- 가시 = Thorns (`ThornsPower`)
+- 판금 갑옷 = Plated Armor (`PlatedArmorPower`)
+- 금속화 = Metallicize (`MetallicizePower`)
+- 재생 = Regeneration (`RegenerateMonsterPower`)
+- 탄성 = Malleable (`MalleablePower`)
+- 인공물 = Artifact (`ArtifactPower`)
+- 불가침 = Intangible (`IntangiblePower`)
+
+**Debuffs**:
+- 느림 = Slow (`SlowPower`)
+- 취약 = Vulnerable (`VulnerablePower`)
+- 약화 = Weak (`WeakPower`)
+- 포박 = Constricted (`ConstrictedPower`)
+- 허약 = Frail (`FrailPower`)
+
 ##중요 : 기획문서
 기획 문서 경로 : E:\workspace\sts-mods\.claude\ascension-detail.md
 해당 문서의 내용이 절대적인 진실의 원천이 되어야하며, 모든 소스코드는 이 문서의 내용을 따라야 합니다.

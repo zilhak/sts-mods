@@ -2,86 +2,268 @@ package com.stsmod.ascension100.patches.levels;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
-import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
+import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
+import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
-import com.megacrit.cardcrawl.monsters.city.Byrd;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinNob;
+import com.megacrit.cardcrawl.monsters.exordium.Lagavulin;
+import com.megacrit.cardcrawl.monsters.exordium.Sentry;
+import com.megacrit.cardcrawl.monsters.city.BookOfStabbing;
+import com.megacrit.cardcrawl.monsters.city.GremlinLeader;
+import com.megacrit.cardcrawl.monsters.city.Taskmaster;
+import com.megacrit.cardcrawl.monsters.beyond.GiantHead;
+import com.megacrit.cardcrawl.monsters.beyond.Nemesis;
+import com.megacrit.cardcrawl.monsters.beyond.Reptomancer;
+import com.megacrit.cardcrawl.powers.StrengthPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Field;
-
 /**
- * Ascension Level 35: Normal enemies deal +1 damage (except Byrd)
+ * Ascension Level 35: Elite enemies attack enhancements
  *
- * 일반 적들의 공격력이 1 증가합니다 (섀(Byrd) 제외)
- * Byrd는 대신, Headbutt 패턴에서 공격력이 2 증가합니다.
+ * 엘리트 적들의 공격이 강화됩니다.
+ *
+ * 귀족 그렘린(Gremlin Nob): 공격력 +1
+ * 라가불린(Lagavulin): 공격력 +1
+ * 보초기(Sentry): 공격력 +1
+ * 칼부림의 책(Book of Stabbing): 공격력 +1
+ * 그렘린 리더(Gremlin Leader): 격려 패턴 힘 +1
+ * 노예 관리자(Taskmaster): 공격력 +2
+ * 거인의 머리(Giant Head): It Is Time 데미지 +5
+ * 네메시스(Nemesis): 공격력 +2
+ * 파충류 주술사(Reptomancer): 공격력 +2
  */
 public class Level35 {
     private static final Logger logger = LogManager.getLogger(Level35.class.getName());
 
     /**
-     * Normal enemies (except Byrd) get +1 damage
+     * Gremlin Nob: +1 damage to all attacks
      */
     @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "init"
+        clz = GremlinNob.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
     )
-    public static class NormalDamageIncrease {
-        @SpirePrefixPatch
-        public static void Prefix(AbstractMonster __instance) {
+    public static class GremlinNobDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinNob __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
                 return;
             }
 
-            // Exclude Byrd - it has special handling
-            if (__instance.type == AbstractMonster.EnemyType.NORMAL && !(__instance instanceof Byrd)) {
-                int damageIncrease = 1;
-
-                for (int i = 0; i < __instance.damage.size(); i++) {
-                    if (__instance.damage.get(i) != null && __instance.damage.get(i).base > 0) {
-                        __instance.damage.get(i).base += damageIncrease;
-                    }
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
                 }
-
-                logger.info(String.format(
-                    "Ascension 35: Normal %s damage increased by %d",
-                    __instance.name, damageIncrease
-                ));
             }
+            logger.info("Ascension 35: Gremlin Nob damage +1");
         }
     }
 
     /**
-     * Byrd: Headbutt pattern deals +2 damage
-     * HEADBUTT uses damage.get(2) - fixed damage of 3
-     * We modify it in Constructor to avoid stacking issues
+     * Lagavulin: +1 damage
      */
     @SpirePatch(
-        clz = Byrd.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
+        clz = Lagavulin.class,
+        paramtypez = {boolean.class},
+        method = SpirePatch.CONSTRUCTOR
     )
-    public static class ByrdHeadbuttEnhancement {
+    public static class LagavulinDamagePatch {
         @SpirePostfixPatch
-        public static void Postfix(Byrd __instance, float x, float y) {
+        public static void Postfix(Lagavulin __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
                 return;
             }
 
-            // Byrd damage array structure:
-            // damage.get(0) = PECK (1 damage, multi-hit)
-            // damage.get(1) = SWOOP (12/14 damage)
-            // damage.get(2) = HEADBUTT (3 damage) ← This one!
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 35: Lagavulin damage +1");
+        }
+    }
 
-            if (__instance.damage.size() > 2 && __instance.damage.get(2) != null) {
-                int originalDamage = __instance.damage.get(2).base;
-                __instance.damage.get(2).base += 2;
+    /**
+     * Sentry: +1 damage
+     */
+    @SpirePatch(
+        clz = Sentry.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class SentryDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Sentry __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
 
-                logger.info(String.format(
-                    "Ascension 35: Byrd Headbutt damage increased from %d to %d",
-                    originalDamage, __instance.damage.get(2).base
-                ));
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 35: Sentry damage +1");
+        }
+    }
+
+    /**
+     * Book of Stabbing: +1 damage
+     */
+    @SpirePatch(
+        clz = BookOfStabbing.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class BookOfStabbingDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(BookOfStabbing __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 1;
+                }
+            }
+            logger.info("Ascension 35: Book of Stabbing damage +1");
+        }
+    }
+
+    /**
+     * Taskmaster: +2 damage
+     */
+    @SpirePatch(
+        clz = Taskmaster.class,
+        paramtypez = {float.class, float.class},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class TaskmasterDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Taskmaster __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 35: Taskmaster damage +2");
+        }
+    }
+
+    /**
+     * Giant Head: +5 damage (It Is Time attack)
+     */
+    @SpirePatch(
+        clz = GiantHead.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class GiantHeadDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(GiantHead __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 5;
+                }
+            }
+            logger.info("Ascension 35: Giant Head damage +5");
+        }
+    }
+
+    /**
+     * Nemesis: +2 damage
+     */
+    @SpirePatch(
+        clz = Nemesis.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class NemesisDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Nemesis __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 35: Nemesis damage +2");
+        }
+    }
+
+    /**
+     * Reptomancer: +2 damage
+     */
+    @SpirePatch(
+        clz = Reptomancer.class,
+        paramtypez = {},
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class ReptomancerDamagePatch {
+        @SpirePostfixPatch
+        public static void Postfix(Reptomancer __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            for (DamageInfo damageInfo : __instance.damage) {
+                if (damageInfo != null && damageInfo.base > 0) {
+                    damageInfo.base += 2;
+                }
+            }
+            logger.info("Ascension 35: Reptomancer damage +2");
+        }
+    }
+
+    /**
+     * Gremlin Leader: Encourage pattern grants +1 additional Strength
+     */
+    @SpirePatch(
+        clz = GremlinLeader.class,
+        method = "takeTurn"
+    )
+    public static class GremlinLeaderEncourageBuff {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinLeader __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35) {
+                return;
+            }
+
+            // Check if Gremlin Leader just used Encourage move (byte 3)
+            try {
+                java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte nextMove = nextMoveField.getByte(__instance);
+
+                if (nextMove == 3) { // Encourage move
+                    // Apply +1 Strength to all non-dead minions
+                    for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+                        if (m != __instance && !m.isDying && !m.isDead) {
+                            AbstractDungeon.actionManager.addToBottom(
+                                new ApplyPowerAction(m, __instance,
+                                    new StrengthPower(m, 1), 1)
+                            );
+                        }
+                    }
+
+                    logger.info("Ascension 35: Gremlin Leader Encourage +1 Strength to minions");
+                }
+            } catch (Exception e) {
+                logger.error("Failed to modify Gremlin Leader Encourage pattern", e);
             }
         }
     }

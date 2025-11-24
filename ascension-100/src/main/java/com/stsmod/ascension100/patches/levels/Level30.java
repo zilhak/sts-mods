@@ -2,126 +2,113 @@ package com.stsmod.ascension100.patches.levels;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
-import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.monsters.AbstractMonster;
-import com.megacrit.cardcrawl.monsters.ending.SpireShield;
-import com.megacrit.cardcrawl.monsters.ending.SpireSpear;
-import com.megacrit.cardcrawl.monsters.exordium.Sentry;
-import com.megacrit.cardcrawl.powers.ArtifactPower;
+import com.megacrit.cardcrawl.dungeons.Exordium;
+import com.megacrit.cardcrawl.dungeons.TheCity;
+import com.megacrit.cardcrawl.dungeons.TheBeyond;
+import com.megacrit.cardcrawl.dungeons.TheEnding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 30: Construct monsters more resistant to debuffs
- * 인공 몬스터가 디버프에 더욱 강해집니다.
+ * Ascension Level 30: Luck decreased - Relic probability adjusted
+ * 운이 감소합니다.
  *
- * Monsters that start with Artifact gain +1 additional Artifact
+ * 상세효과:
+ * 유물 확률 조정
+ * - 일반 50% (변화 없음)
+ * - 고급 35% (33% → 35%)
+ * - 희귀 15% (17% → 15%)
  */
 public class Level30 {
 
     private static final Logger logger = LogManager.getLogger(Level30.class.getName());
 
     /**
-     * Patch monster pre-battle action to add extra artifact
+     * Adjust relic probabilities for all dungeons
      */
-    @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "usePreBattleAction"
-    )
-    public static class ExtraArtifactPatch {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
-                return;
-            }
+    private static void adjustRelicProbabilities() {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
+            return;
+        }
 
-            // Check if monster already has Artifact power
-            if (__instance.hasPower("Artifact")) {
-                // Add 1 more Artifact
-                AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new ArtifactPower(__instance, 1), 1)
-                );
+        try {
+            // Access the protected static fields via reflection
+            java.lang.reflect.Field commonField = AbstractDungeon.class.getDeclaredField("commonRelicChance");
+            java.lang.reflect.Field uncommonField = AbstractDungeon.class.getDeclaredField("uncommonRelicChance");
+            java.lang.reflect.Field rareField = AbstractDungeon.class.getDeclaredField("rareRelicChance");
 
-                logger.info(String.format(
-                    "Ascension 30: %s gained +1 Artifact",
-                    __instance.name
-                ));
-            }
+            commonField.setAccessible(true);
+            uncommonField.setAccessible(true);
+            rareField.setAccessible(true);
+
+            // Set new probabilities
+            // Common: 50% (unchanged)
+            // Uncommon: 35% (from 33%)
+            // Rare: 15% (from 17%)
+            commonField.setInt(null, 50);
+            uncommonField.setInt(null, 35);
+            rareField.setInt(null, 15);
+
+            logger.info("Ascension 30: Relic probabilities adjusted to Common 50%, Uncommon 35%, Rare 15%");
+        } catch (Exception e) {
+            logger.error("Failed to adjust relic probabilities", e);
         }
     }
 
     /**
-     * Sentry: Direct usePreBattleAction patch to ensure +1 Artifact
+     * Patch Exordium dungeon initialization
      */
     @SpirePatch(
-        clz = Sentry.class,
-        method = "usePreBattleAction"
+        clz = Exordium.class,
+        method = "initializeLevelSpecificChances"
     )
-    public static class SentryArtifactPatch {
+    public static class ExordiumRelicProbabilityPatch {
         @SpirePostfixPatch
-        public static void Postfix(Sentry __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
-                return;
-            }
-
-            // Sentry applies Artifact 1 in its own usePreBattleAction
-            // Add 1 more to make it 2 total
-            AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new ArtifactPower(__instance, 1), 1)
-            );
-
-            logger.info("Ascension 30: Sentry gained +1 Artifact (total: 2)");
+        public static void Postfix(Exordium __instance) {
+            adjustRelicProbabilities();
         }
     }
 
     /**
-     * Spire Spear: +1 Artifact (spawned by Corrupt Heart)
+     * Patch TheCity dungeon initialization
      */
     @SpirePatch(
-        clz = SpireSpear.class,
-        method = "usePreBattleAction"
+        clz = TheCity.class,
+        method = "initializeLevelSpecificChances"
     )
-    public static class SpireSpearArtifactPatch {
+    public static class TheCityRelicProbabilityPatch {
         @SpirePostfixPatch
-        public static void Postfix(SpireSpear __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
-                return;
-            }
-
-            // Add +1 Artifact to Spire Spear
-            AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new ArtifactPower(__instance, 1), 1)
-            );
-
-            logger.info("Ascension 30: Spire Spear gained +1 Artifact");
+        public static void Postfix(TheCity __instance) {
+            adjustRelicProbabilities();
         }
     }
 
     /**
-     * Spire Shield: +1 Artifact (spawned by Corrupt Heart)
+     * Patch TheBeyond dungeon initialization
      */
     @SpirePatch(
-        clz = SpireShield.class,
-        method = "usePreBattleAction"
+        clz = TheBeyond.class,
+        method = "initializeLevelSpecificChances"
     )
-    public static class SpireShieldArtifactPatch {
+    public static class TheBeyondRelicProbabilityPatch {
         @SpirePostfixPatch
-        public static void Postfix(SpireShield __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
-                return;
-            }
+        public static void Postfix(TheBeyond __instance) {
+            adjustRelicProbabilities();
+        }
+    }
 
-            // Add +1 Artifact to Spire Shield
-            AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new ArtifactPower(__instance, 1), 1)
-            );
-
-            logger.info("Ascension 30: Spire Shield gained +1 Artifact");
+    /**
+     * Patch TheEnding dungeon initialization
+     */
+    @SpirePatch(
+        clz = TheEnding.class,
+        method = "initializeLevelSpecificChances"
+    )
+    public static class TheEndingRelicProbabilityPatch {
+        @SpirePostfixPatch
+        public static void Postfix(TheEnding __instance) {
+            adjustRelicProbabilities();
         }
     }
 }
