@@ -285,7 +285,7 @@ Use these exact class names and IDs when patching monsters.
 **Normal Enemies**:
 - 강도 = `Mugger` (ID: "Mugger")
 - 로미오 = `BanditLeader` (ID: "BanditLeader")
-- 촉새 = `BanditPointy` (ID: "BanditChild")
+- 촉새 = `BanditChild` (ID: "BanditChild")
 - 곰 = `BanditBear` (ID: "BanditBear")
 - 스네코 = `Snecko` (ID: "Snecko")
 - 구체형 수호기 = `SphericGuardian` (ID: "SphericGuardian")

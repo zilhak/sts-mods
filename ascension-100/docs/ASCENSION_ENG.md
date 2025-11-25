@@ -58,6 +58,10 @@ Base game ascension effects apply unchanged.
 - Explosive Potion: Damage -2
 - Blood Potion: Heal -5%
 - Poison Potion: Poison -1
+- Heart of Iron: Metallicize -2
+- Fruit Juice: Max HP gain -2
+- Snecko Oil: Cards drawn -1
+- Fairy in a Bottle: Revival heal -10%
 
 ---
 
@@ -219,8 +223,11 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 39: Max HP Reduction
-**Effect**: Starting max HP reduced by additional 5.
+## Level 39: Rest Healing Reduction
+**Effect**: Rest healing is reduced.
+
+**Details**:
+- Rest healing reduced by 3% of max HP (30% → 27%)
 
 ---
 

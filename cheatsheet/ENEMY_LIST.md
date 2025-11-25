@@ -55,9 +55,9 @@
 
 | 한글명 | 영문명 | 클래스명 | 전체 경로 |
 |--------|--------|----------|-----------|
-| 그렘린 두목 | Gremlin Nob | `GremlinNob` | `com.megacrit.cardcrawl.monsters.exordium.GremlinNob` |
+| 귀족 그렘린 | Gremlin Nob | `GremlinNob` | `com.megacrit.cardcrawl.monsters.exordium.GremlinNob` |
 | 라가불린 | Lagavulin | `Lagavulin` | `com.megacrit.cardcrawl.monsters.exordium.Lagavulin` |
-| 센트리 | Sentry | `Sentry` | `com.megacrit.cardcrawl.monsters.exordium.Sentry` |
+| 보초기 | Sentry | `Sentry` | `com.megacrit.cardcrawl.monsters.exordium.Sentry` |
 
 ### 1막 보스
 
@@ -92,23 +92,23 @@
 | 구체형 수호기 | Spheric Guardian | `SphericGuardian` | `com.megacrit.cardcrawl.monsters.city.SphericGuardian` |
 | 강도 | Mugger | `Mugger` | `com.megacrit.cardcrawl.monsters.city.Mugger` |
 | 갑각기생충 | Shelled Parasite | `ShelledParasite` | `com.megacrit.cardcrawl.monsters.city.ShelledParasite` |
-| 햇불머리 | Torch Head | `TorchHead` | `com.megacrit.cardcrawl.monsters.city.TorchHead` |
+| 횃불 머리 | Torch Head | `TorchHead` | `com.megacrit.cardcrawl.monsters.city.TorchHead` |
 
 #### 붉은 가면 도적단
 
 | 한글명 | 영문명 | 클래스명 | 전체 경로 |
 |--------|--------|----------|-----------|
 | 곰 | Bear | `BanditBear` | `com.megacrit.cardcrawl.monsters.city.BanditBear` |
-| 촉새 | Pointy | `BanditPointy` | `com.megacrit.cardcrawl.monsters.city.BanditPointy` |
+| 촉새 | Pointy | `BanditChild` | `com.megacrit.cardcrawl.monsters.city.BanditChild` |
 | 로미오 | Romeo | `BanditLeader` | `com.megacrit.cardcrawl.monsters.city.BanditLeader` |
 
 ### 2막 엘리트
 
 | 한글명 | 영문명 | 클래스명 | 전체 경로 |
 |--------|--------|----------|-----------|
-| 찌르는 책 | Book of Stabbing | `BookOfStabbing` | `com.megacrit.cardcrawl.monsters.city.BookOfStabbing` |
+| 칼부림의 책 | Book of Stabbing | `BookOfStabbing` | `com.megacrit.cardcrawl.monsters.city.BookOfStabbing` |
 | 그렘린 리더 | Gremlin Leader | `GremlinLeader` | `com.megacrit.cardcrawl.monsters.city.GremlinLeader` |
-| 임무 포기자 | Taskmaster | `Taskmaster` | `com.megacrit.cardcrawl.monsters.city.Taskmaster` |
+| 노예 관리자 | Taskmaster | `Taskmaster` | `com.megacrit.cardcrawl.monsters.city.Taskmaster` |
 
 ### 2막 보스
 
@@ -135,16 +135,16 @@
 | 과도자 | Transient | `Transient` | `com.megacrit.cardcrawl.monsters.beyond.Transient` |
 | 첨탑 암종 | Spire Growth | `SpireGrowth` | `com.megacrit.cardcrawl.monsters.beyond.SpireGrowth` |
 | 꿈틀대는 덩어리 | Writhing Mass | `WrithingMass` | `com.megacrit.cardcrawl.monsters.beyond.WrithingMass` |
-| 격퇴기 | Repulsor | `Repulsor` | `com.megacrit.cardcrawl.monsters.beyond.Repulsor` |
+| 현혹기 | Repulsor | `Repulsor` | `com.megacrit.cardcrawl.monsters.beyond.Repulsor` |
 
 ### 3막 엘리트
 
 | 한글명 | 영문명 | 클래스명 | 전체 경로 |
 |--------|--------|----------|-----------|
-| 거대한 머리 | Giant Head | `GiantHead` | `com.megacrit.cardcrawl.monsters.beyond.GiantHead` |
+| 거인의 머리 | Giant Head | `GiantHead` | `com.megacrit.cardcrawl.monsters.beyond.GiantHead` |
 | 네메시스 | Nemesis | `Nemesis` | `com.megacrit.cardcrawl.monsters.beyond.Nemesis` |
-| 파충술사 | Reptomancer | `Reptomancer` | `com.megacrit.cardcrawl.monsters.beyond.Reptomancer` |
-| 뱀 단검 | Snake Dagger | `SnakeDagger` | `com.megacrit.cardcrawl.monsters.beyond.SnakeDagger` |
+| 파충류 주술사 | Reptomancer | `Reptomancer` | `com.megacrit.cardcrawl.monsters.beyond.Reptomancer` |
+| 단검 | Dagger | `SnakeDagger` | `com.megacrit.cardcrawl.monsters.beyond.SnakeDagger` |
 
 ### 3막 보스
 
