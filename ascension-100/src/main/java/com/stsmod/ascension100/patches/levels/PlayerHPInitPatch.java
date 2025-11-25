@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Unified Player HP initialization patch for Ascension 24, 32, 39, and 88
+ * Unified Player HP initialization patch for Ascension 24, 32, and 88
  *
  * This patch executes AFTER vanilla ascension penalties in AbstractDungeon.dungeonTransitionSetup()
  * to ensure correct HP values.
@@ -23,8 +23,9 @@ import org.apache.logging.log4j.Logger;
  * Our modifications (applied after vanilla penalties):
  * 1. Level 24: Max HP +5% (restores HP lost from A14 penalty)
  * 2. Level 32: Current HP -5
- * 3. Level 39: Max HP -5, Current HP -5
- * 4. Level 88: Max HP -10%, Current HP = Max HP
+ * 3. Level 88: Max HP -10%, Current HP = Max HP
+ *
+ * Note: Level 39 (rest heal reduction) is implemented separately in Level39.java
  */
 @SpirePatch(
     clz = AbstractDungeon.class,
@@ -82,28 +83,6 @@ public class PlayerHPInitPatch {
             ));
         }
 
-        // Level 39: Max HP -5 (affects both max and current HP)
-        if (level >= 39) {
-            int beforeMaxHP = p.maxHealth;
-            int beforeCurrentHP = p.currentHealth;
-
-            p.maxHealth -= 5;
-            p.currentHealth -= 5;
-
-            // Ensure HP doesn't go below 1
-            if (p.maxHealth < 1) {
-                p.maxHealth = 1;
-            }
-            if (p.currentHealth < 1) {
-                p.currentHealth = 1;
-            }
-
-            logger.info(String.format(
-                "Ascension 39: Max HP reduced from %d to %d (-5), Current HP from %d to %d (-5)",
-                beforeMaxHP, p.maxHealth, beforeCurrentHP, p.currentHealth
-            ));
-        }
-
         // Level 88: Max HP -10%, Current HP = Max HP (full heal)
         if (level >= 88) {
             int beforeMaxHP = p.maxHealth;
@@ -125,7 +104,7 @@ public class PlayerHPInitPatch {
         }
 
         // Log final result
-        if (level >= 24 || level >= 32 || level >= 39 || level >= 88) {
+        if (level >= 24 || level >= 32 || level >= 88) {
             logger.info(String.format(
                 "Final HP: %d/%d (from %d/%d)",
                 p.currentHealth, p.maxHealth,

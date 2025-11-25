@@ -670,30 +670,6 @@ public class Level86 {
         }
     }
 
-    /**
-     * Transient: Fading +1
-     */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.beyond.Transient.class,
-        method = "usePreBattleAction"
-    )
-    public static class TransientFadingBoost {
-        @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.monsters.beyond.Transient __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 86) {
-                return;
-            }
-
-            // Add +1 to Fading power
-            com.megacrit.cardcrawl.powers.AbstractPower fadingPower = __instance.getPower("Fading");
-            if (fadingPower != null) {
-                fadingPower.amount += 1;
-                fadingPower.updateDescription();
-                logger.info(String.format(
-                    "Ascension 86: Transient Fading increased by 1 to %d",
-                    fadingPower.amount
-                ));
-            }
-        }
-    }
+    // Transient: Fading +1
+    // MOVED TO: TransientFadingPatch.java (unified patch)
 }

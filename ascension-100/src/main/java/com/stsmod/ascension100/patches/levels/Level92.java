@@ -251,30 +251,20 @@ public class Level92 {
                 }
             }
 
-            // Transient: Increase Fading by 1 and add Intangible 200
+            // Transient: Increase Fading by 1 (MOVED TO TransientFadingPatch.java) and add Invincible 200
             if (id.equals("Transient")) {
-                AbstractPower fading = __instance.getPower("Fading");
-                if (fading != null) {
-                    int originalAmount = fading.amount;
-                    fading.amount += 1;
-                    fading.updateDescription();
+                // Fading increase moved to unified patch (TransientFadingPatch.java)
 
-                    logger.info(String.format(
-                        "Ascension 92: %s Fading increased from %d to %d (+1)",
-                        __instance.name, originalAmount, fading.amount
-                    ));
-                }
-
-                // Add Intangible 200
+                // Add Invincible 200 (blocks up to 200 damage, resets each turn)
                 AbstractDungeon.actionManager.addToBottom(
                     new ApplyPowerAction(
                         (AbstractCreature)__instance,
                         (AbstractCreature)__instance,
-                        new IntangiblePlayerPower((AbstractCreature)__instance, 200),
+                        new InvinciblePower((AbstractCreature)__instance, 200),
                         200
                     )
                 );
-                logger.info("Ascension 92: Transient gained Intangible 200");
+                logger.info("Ascension 92: Transient gained Invincible 200");
             }
 
             // Looter: Increase Thievery by 10 and escapeDef by 3

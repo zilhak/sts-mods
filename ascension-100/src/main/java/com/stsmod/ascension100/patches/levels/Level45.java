@@ -20,7 +20,9 @@ import org.apache.logging.log4j.Logger;
  * Strong Enemies 전투는 20% 확률로, 다음 적을 추가합니다:
  * - 1막: 그렘린 또는 소형 슬라임들 중 한마리 추가
  * - 2막: 중형 슬라임들 중 한마리 추가
- * - 3막: 뚱뚱한 그렘린, 섀, 폭탄기 중 하나
+ * - 3막: 뚱뚱한 그렘린, 갑각기생충, 폭탄기 중 하나
+ *
+ * 추가되는 적은 원래 최대 체력의 30%만을 가집니다.
  */
 public class Level45 {
     private static final Logger logger = LogManager.getLogger(Level45.class.getName());
@@ -128,6 +130,18 @@ public class Level45 {
                 }
 
                 if (extraMonster != null) {
+                    // Apply 30% max HP cap to spawned enemies
+                    int originalMaxHP = extraMonster.maxHealth;
+                    int reducedMaxHP = Math.max(1, (int)(originalMaxHP * 0.3f));
+
+                    extraMonster.maxHealth = reducedMaxHP;
+                    extraMonster.currentHealth = reducedMaxHP;
+
+                    logger.info(String.format(
+                        "Ascension 45: %s HP reduced from %d to %d (30%% cap)",
+                        extraMonster.name, originalMaxHP, reducedMaxHP
+                    ));
+
                     __instance.addMonster(extraMonster);
                     extraMonster.init();
                     extraMonster.applyPowers();

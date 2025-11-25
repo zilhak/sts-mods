@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  *
  * 얻는 돈이 늘어나며, 상점의 유물 가격이 증가합니다.
  * 전투 종료시 얻는 돈이 20% 증가합니다. (올림 계산)
- * 상점의 유물 가격이 15% 증가합니다.
+ * 상점의 유물 가격이 20% 증가합니다.
  */
 public class Level46 {
     private static final Logger logger = LogManager.getLogger(Level46.class.getName());
@@ -63,10 +63,10 @@ public class Level46 {
             }
 
             int originalPrice = __result;
-            int newPrice = MathUtils.ceil(__result * 1.15f);
+            int newPrice = MathUtils.ceil(__result * 1.20f);
 
             logger.debug(String.format(
-                "Ascension 46: Relic price increased from %d to %d",
+                "Ascension 46: Relic price increased from %d to %d (+20%%)",
                 originalPrice, newPrice
             ));
 

@@ -968,30 +968,8 @@ public class Level26 {
     // Additional Act 3 Enemies
     // ========================================
 
-    /**
-     * Transient (과도자): Fades one turn later
-     */
-    @SpirePatch(
-        clz = Transient.class,
-        method = "usePreBattleAction"
-    )
-    public static class TransientFadePatch {
-        @SpirePostfixPatch
-        public static void Postfix(Transient __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
-                // Increase FadingPower amount by 1 (delays fading by 1 turn)
-                AbstractPower fadingPower = __instance.getPower("Fading");
-                if (fadingPower != null) {
-                    fadingPower.amount += 1;
-                    fadingPower.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 26: Transient Fading increased by 1 to %d turns",
-                        fadingPower.amount
-                    ));
-                }
-            }
-        }
-    }
+    // Transient (과도자): Fades one turn later
+    // MOVED TO: TransientFadingPatch.java (unified patch)
 
     /**
      * WrithingMass (꿈틀대는 덩어리): Parasite spawn probability increases

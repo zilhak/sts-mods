@@ -32,6 +32,14 @@ import org.apache.logging.log4j.Logger;
  * 폭발 포션(Explosive Potion): 가하는 피해가 2 줄어듭니다. (10 → 8)
  * 피 포션(Blood Potion): 회복하는 수치가 최대체력의 5%만큼 감소합니다. (20% → 15%)
  * 중독 포션(Poison Potion): 가하는 중독 수치가 1 줄어듭니다. (6 → 5)
+ * 공격 포션(Attack Potion): 카드 선택지가 1개 줄어듭니다. (3 → 2)
+ * 스킬 포션(Skill Potion): 카드 선택지가 1개 줄어듭니다. (3 → 2)
+ * 파워 포션(Power Potion): 카드 선택지가 1개 줄어듭니다. (3 → 2)
+ * 무색 포션(Colorless Potion): 카드 선택지가 1개 줄어듭니다. (3 → 2)
+ * 무쇠의 심장(Heart of Iron): 금속화 수치가 2 줄어듭니다. (6 → 4)
+ * 과일 주스(Fruit Juice): 증가하는 최대 체력이 2 줄어듭니다. (5 → 3)
+ * 스네코 기름(Snecko Oil): 뽑는 카드의 개수가 1장 줄어듭니다. (5 → 4)
+ * 병 속의 요정(Fairy in a Bottle): 부활 시 회복하는 최대 체력 수치가 10% 줄어듭니다. (30% → 20%)
  */
 public class Level25 {
     private static final Logger logger = LogManager.getLogger(Level25.class.getName());
@@ -386,6 +394,90 @@ public class Level25 {
                 return __result;
             }
             return Math.max(0, __result - 1); // 6 → 5
+        }
+    }
+
+    // ========================================
+    // Card Selection Potions (handled by separate patch files)
+    // ========================================
+    // Attack Potion: Card choices -1 (3 → 2) - see AttackPotionPatch.java
+    // Skill Potion: Card choices -1 (3 → 2) - see SkillPotionPatch.java
+    // Power Potion: Card choices -1 (3 → 2) - see PowerPotionPatch.java
+    // Colorless Potion: Card choices -1 (3 → 2) - see ColorlessPotionPatch.java
+
+    // ========================================
+    // Rare Potions
+    // ========================================
+
+    /**
+     * Heart of Iron: Metallicize -2 (6 → 4)
+     */
+    @SpirePatch(
+        clz = HeartOfIron.class,
+        method = "getPotency",
+        paramtypez = { int.class }
+    )
+    public static class HeartOfIronPatch {
+        @SpirePostfixPatch
+        public static int Postfix(int __result) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return __result;
+            }
+            return Math.max(0, __result - 2); // 6 → 4
+        }
+    }
+
+    /**
+     * Fruit Juice: Max HP increase -2 (5 → 3)
+     */
+    @SpirePatch(
+        clz = FruitJuice.class,
+        method = "getPotency",
+        paramtypez = { int.class }
+    )
+    public static class FruitJuicePatch {
+        @SpirePostfixPatch
+        public static int Postfix(int __result) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return __result;
+            }
+            return Math.max(0, __result - 2); // 5 → 3
+        }
+    }
+
+    /**
+     * Snecko Oil: Draw cards -1 (5 → 4)
+     */
+    @SpirePatch(
+        clz = SneckoOil.class,
+        method = "getPotency",
+        paramtypez = { int.class }
+    )
+    public static class SneckoOilPatch {
+        @SpirePostfixPatch
+        public static int Postfix(int __result) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return __result;
+            }
+            return Math.max(0, __result - 1); // 5 → 4
+        }
+    }
+
+    /**
+     * Fairy Potion: Revival heal -10% of max HP (30% → 20%)
+     */
+    @SpirePatch(
+        clz = FairyPotion.class,
+        method = "getPotency",
+        paramtypez = { int.class }
+    )
+    public static class FairyPotionPatch {
+        @SpirePostfixPatch
+        public static int Postfix(int __result) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
+                return __result;
+            }
+            return Math.max(0, __result - 10); // 30% → 20%
         }
     }
 }
