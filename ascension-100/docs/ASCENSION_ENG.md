@@ -39,29 +39,37 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 25: Potion System Changes
-**Effect**: +1 Potion slot, Potion prices -40%, Potion effects reduced
+**Effect**: Potion prices decrease, potion effects are reduced, and you gain an additional potion slot.
 
 **Details**:
-- Essence of Steel: Plated Armor -1
-- Liquid Bronze: Thorns -1
-- Distilled Chaos: Cards played -1
-- Regen Potion: Regen -1
-- Potion of Capacity: Orb slots -1
-- Cunning Potion: Shivs -1
-- Swift Potion: Cards drawn -1
-- Speed Potion: Dexterity ±1
-- Steroid Potion: Strength ±1
-- Block Potion: Block -3
-- Fear Potion: Vulnerable -1
-- Weak Potion: Weak -1
+- +1 Potion slot
+- All potion prices in shops reduced by 40%
+
+**Potion Effect Reductions**:
+- Blood Potion: Healing reduced by 5% of max HP
+- Poison Potion: Poison -1
 - Fire Potion: Damage -5
 - Explosive Potion: Damage -2
-- Blood Potion: Heal -5%
-- Poison Potion: Poison -1
+- Weak Potion: Weak -1
+- Fear Potion: Vulnerable -1
+- Block Potion: Block -3
+- Steroid Potion: Strength gain/loss ±1
+- Speed Potion: Dexterity gain/loss ±1
+- Swift Potion: Cards drawn -1
+- Attack Potion: Card choices -1
+- Skill Potion: Card choices -1
+- Power Potion: Card choices -1
+- Colorless Potion: Card choices -1
+- Cunning Potion: Shivs -1
+- Potion of Capacity: Orb slots -1
+- Regen Potion: Regeneration -1
+- Liquid Bronze: Thorns -1
+- Essence of Steel: Plated Armor -1
+- Distilled Chaos: Cards played -1
 - Heart of Iron: Metallicize -2
-- Fruit Juice: Max HP gain -2
+- Fruit Juice: Max HP increase -2
 - Snecko Oil: Cards drawn -1
-- Fairy in a Bottle: Revival heal -10%
+- Fairy in a Bottle: Revival healing reduced by 10% of max HP
 
 ---
 
