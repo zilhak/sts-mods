@@ -173,6 +173,39 @@ public class Level87 {
         }
     }
 
+    /**
+     * Remove Thorns when Guardian exits defensive mode (rollMove transition)
+     */
+    @SpirePatch(
+        clz = TheGuardian.class,
+        method = "rollMove"
+    )
+    public static class GuardianRemoveThornsOnOffensive {
+        @SpirePostfixPatch
+        public static void Postfix(TheGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
+                return;
+            }
+
+            try {
+                // Check if Guardian is switching to offensive mode
+                Field closeDefenseField = TheGuardian.class.getDeclaredField("closeDefense");
+                closeDefenseField.setAccessible(true);
+                boolean isClosedDefense = closeDefenseField.getBoolean(__instance);
+
+                // If not in defensive mode, remove Thorns (equivalent to Sharp Hide removal)
+                if (!isClosedDefense && __instance.hasPower("Thorns")) {
+                    AbstractDungeon.actionManager.addToBottom(
+                        new RemoveSpecificPowerAction(__instance, __instance, "Thorns")
+                    );
+                    logger.info("Ascension 87: Guardian removed Thorns when exiting defensive mode");
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                logger.error("Ascension 87: Failed to check Guardian defensive mode", e);
+            }
+        }
+    }
+
     // ========================================
     // Hexaghost: Gains 30 block on first turn
     // ========================================
