@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 69: Bosses enhanced by act
  *
  * 보스가 강화됩니다.
- * 1막의 보스의 체력이 5% 증가하고, 공격력이 1 증가합니다.
+ * 1막의 보스의 체력이 5% 증가하고, 공격력이 1 증가합니다. (수호자 제외)
  * 2막의 보스의 체력이 10% 증가하고, 공격력이 3 증가합니다.
  * 3막의 보스의 체력이 15% 증가하고, 공격력이 6 증가합니다.
  * (타락한 심장 제외)
@@ -35,6 +35,14 @@ public class Level69 {
             if (__instance.type == AbstractMonster.EnemyType.BOSS) {
                 int actNum = AbstractDungeon.actNum;
                 float hpMultiplier = 1.0f;
+
+                // Exclude Guardian from Act 1 buffs
+                if (actNum == 1 && __instance.id.equals("TheGuardian")) {
+                    logger.info(String.format(
+                        "Ascension 69: Guardian excluded from Act 1 HP buff"
+                    ));
+                    return;
+                }
 
                 if (actNum == 1) {
                     hpMultiplier = 1.05f;
@@ -73,6 +81,14 @@ public class Level69 {
             if (__instance.type == AbstractMonster.EnemyType.BOSS) {
                 int actNum = AbstractDungeon.actNum;
                 int damageIncrease = 0;
+
+                // Exclude Guardian from Act 1 buffs
+                if (actNum == 1 && __instance.id.equals("TheGuardian")) {
+                    logger.info(String.format(
+                        "Ascension 69: Guardian excluded from Act 1 damage buff"
+                    ));
+                    return;
+                }
 
                 if (actNum == 1) {
                     damageIncrease = 1;

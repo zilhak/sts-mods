@@ -396,7 +396,7 @@ Base game ascension effects apply unchanged.
 **Effect**: Bosses enhanced by act.
 
 **Details**:
-- Act 1 bosses have 5% HP increase and +2 damage increase
+- Act 1 bosses have 5% HP increase and +1 damage increase (Guardian excluded)
 - Act 2 bosses have 10% HP increase and +3 damage increase
 - Act 3 bosses have 15% HP increase and +6 damage increase
 

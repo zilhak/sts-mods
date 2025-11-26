@@ -174,11 +174,12 @@ public class Level87 {
     }
 
     /**
-     * Remove Thorns when Guardian exits defensive mode (rollMove transition)
+     * Remove Thorns when Guardian exits defensive mode (useTwinSmash transition)
+     * This mirrors the vanilla behavior where Sharp Hide is removed in useTwinSmash
      */
     @SpirePatch(
         clz = TheGuardian.class,
-        method = "rollMove"
+        method = "useTwinSmash"
     )
     public static class GuardianRemoveThornsOnOffensive {
         @SpirePostfixPatch
@@ -187,21 +188,13 @@ public class Level87 {
                 return;
             }
 
-            try {
-                // Check if Guardian is switching to offensive mode
-                Field closeDefenseField = TheGuardian.class.getDeclaredField("closeDefense");
-                closeDefenseField.setAccessible(true);
-                boolean isClosedDefense = closeDefenseField.getBoolean(__instance);
-
-                // If not in defensive mode, remove Thorns (equivalent to Sharp Hide removal)
-                if (!isClosedDefense && __instance.hasPower("Thorns")) {
-                    AbstractDungeon.actionManager.addToBottom(
-                        new RemoveSpecificPowerAction(__instance, __instance, "Thorns")
-                    );
-                    logger.info("Ascension 87: Guardian removed Thorns when exiting defensive mode");
-                }
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                logger.error("Ascension 87: Failed to check Guardian defensive mode", e);
+            // Remove Thorns when exiting defensive mode
+            // This happens after the offensive mode transition, just like Sharp Hide removal
+            if (__instance.hasPower("Thorns")) {
+                AbstractDungeon.actionManager.addToBottom(
+                    new RemoveSpecificPowerAction(__instance, __instance, "Thorns")
+                );
+                logger.info("Ascension 87: Guardian removed Thorns when exiting defensive mode");
             }
         }
     }
