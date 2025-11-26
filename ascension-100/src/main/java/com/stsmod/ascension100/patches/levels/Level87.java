@@ -707,27 +707,51 @@ public class Level87 {
             }
 
             // Find and replace the first Cultist with Chosen
+            // Original spawn positions from MonsterHelper.java:556:
+            // new Cultist(-590.0F, 10.0F, false)  - left Cultist
+            // new Cultist(-298.0F, -10.0F, false) - right Cultist
+            // We replace the first one found (left Cultist) with Chosen at same position
+
+            boolean replaced = false;
             for (int i = 0; i < (AbstractDungeon.getMonsters()).monsters.size(); i++) {
                 AbstractMonster m = (AbstractDungeon.getMonsters()).monsters.get(i);
 
-                if (m instanceof Cultist) {
-                    // Store Cultist position
-                    float x = m.drawX;
-                    float y = m.drawY;
-
-                    // Remove Cultist
-                    (AbstractDungeon.getMonsters()).monsters.remove(i);
-
-                    // Add Chosen at same position
-                    Chosen chosen = new Chosen(x, y);
-                    (AbstractDungeon.getMonsters()).monsters.add(i, chosen);
+                if (m instanceof Cultist && !replaced) {
+                    // Use original spawn coordinates for left Cultist
+                    float x = -590.0F;
+                    float y = 10.0F;
 
                     logger.info(String.format(
-                        "Ascension 87: Replaced Cultist at (%.1f, %.1f) with Chosen",
+                        "Ascension 87: Replacing Cultist at index %d with Chosen at fixed position (%.1f, %.1f)",
+                        i, x, y
+                    ));
+
+                    // Mark as dead BEFORE removal to prevent state corruption
+                    m.isDead = true;
+                    m.isDying = true;
+
+                    // Remove from monster list
+                    (AbstractDungeon.getMonsters()).monsters.remove(i);
+
+                    // Create and properly initialize Chosen at original Cultist position
+                    Chosen chosen = new Chosen(x, y);
+
+                    // Initialize the Chosen monster (calls init())
+                    chosen.init();
+
+                    // Add Chosen at same position
+                    (AbstractDungeon.getMonsters()).monsters.add(i, chosen);
+
+                    // Manually trigger usePreBattleAction for the new Chosen
+                    chosen.usePreBattleAction();
+
+                    logger.info(String.format(
+                        "Ascension 87: Successfully replaced Cultist with Chosen at (%.1f, %.1f)",
                         x, y
                     ));
 
-                    // Only replace one Cultist
+                    // Mark as replaced and exit loop
+                    replaced = true;
                     break;
                 }
             }

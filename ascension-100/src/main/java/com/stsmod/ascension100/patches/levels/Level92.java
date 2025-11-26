@@ -255,7 +255,7 @@ public class Level92 {
             if (id.equals("Transient")) {
                 // Fading increase moved to unified patch (TransientFadingPatch.java)
 
-                // Add Invincible 200 (blocks up to 200 damage, resets each turn)
+                // Add Invincible 200 (천하무적: blocks damage above 200, like Corrupt Heart)
                 AbstractDungeon.actionManager.addToBottom(
                     new ApplyPowerAction(
                         (AbstractCreature)__instance,
@@ -264,7 +264,7 @@ public class Level92 {
                         200
                     )
                 );
-                logger.info("Ascension 92: Transient gained Invincible 200");
+                logger.info("Ascension 92: Transient gained Invincible 200 (천하무적)");
             }
 
             // Looter: Increase Thievery by 10 and escapeDef by 3
