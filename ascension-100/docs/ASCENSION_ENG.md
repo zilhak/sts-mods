@@ -138,7 +138,6 @@ Base game ascension effects apply unchanged.
 - Awakened One: Curiosity +1
 - Time Eater: Heal up to 70%
 - Donu & Deca: Donu attack Dazed +1
-- Corrupt Heart: Invincible 180
 
 ---
 
