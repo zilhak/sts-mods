@@ -59,10 +59,11 @@ public class Level62 {
 
     /**
      * Byrd special handling: Flight +1
+     * Increases the flightAmt field so it applies to both initial flight and re-flight (GO_AIRBORNE move)
      */
     @SpirePatch(
         clz = Byrd.class,
-        method = "usePreBattleAction"
+        method = SpirePatch.CONSTRUCTOR
     )
     public static class ByrdFlightIncrease {
         @SpirePostfixPatch
@@ -71,17 +72,21 @@ public class Level62 {
                 return;
             }
 
-            // Increase existing Flight power by 1
-            com.megacrit.cardcrawl.powers.AbstractPower flightPower = __instance.getPower("Flight");
-            if (flightPower != null) {
-                int originalAmount = flightPower.amount;
-                flightPower.amount += 1;
-                flightPower.updateDescription();
+            try {
+                // Access flightAmt field via reflection
+                Field flightAmtField = Byrd.class.getDeclaredField("flightAmt");
+                flightAmtField.setAccessible(true);
+
+                int originalFlightAmt = flightAmtField.getInt(__instance);
+                int newFlightAmt = originalFlightAmt + 1;
+                flightAmtField.setInt(__instance, newFlightAmt);
 
                 logger.info(String.format(
-                    "Ascension 62: Byrd Flight increased from %d to %d (+1)",
-                    originalAmount, flightPower.amount
+                    "Ascension 62: Byrd flightAmt increased from %d to %d (+1)",
+                    originalFlightAmt, newFlightAmt
                 ));
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                logger.error("Ascension 62: Failed to modify Byrd flightAmt", e);
             }
         }
     }

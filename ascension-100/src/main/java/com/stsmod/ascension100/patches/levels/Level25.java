@@ -9,12 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 25: Potion slot increase, price decrease, and effects decrease
+ * Ascension Level 25: Potion effects decrease
  *
- * 포션 슬롯이 1개 증가하고, 가격이 하락하고, 효과가 감소합니다.
- *
- * 포션 슬롯이 1개 증가합니다.
- * 상점에서 모든 포션의 가격이 40% 감소합니다.
+ * 포션의 효과가 감소합니다.
  *
  * 강철의 정수(Essence of Steel): 판금 갑옷이 1 줄어듭니다. (4 → 3)
  * 청동 액체(Liquid Bronze): 가시 효과가 1 줄어듭니다. (3 → 2)
@@ -43,67 +40,6 @@ import org.apache.logging.log4j.Logger;
  */
 public class Level25 {
     private static final Logger logger = LogManager.getLogger(Level25.class.getName());
-
-    /**
-     * Potion slot restoration: Restore to base 3 slots
-     *
-     * Note: Ascension 11 reduces potion slots by 1 in the constructor (3 → 2).
-     * Ascension 25 restores this penalty, bringing slots back to base value.
-     *
-     * IMPORTANT: We must also add a PotionSlot object because the constructor
-     * creates PotionSlot objects based on potionSlots value BEFORE our patch runs.
-     *
-     * Final result: Base 3 - Asc11(1) + Asc25(1) = 3 slots (restored)
-     */
-    @SpirePatch(
-        clz = AbstractPlayer.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
-    public static class PotionSlotIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractPlayer __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 25) {
-                // Add +1 to restore Ascension 11's -1 penalty
-                int slotsToAdd = 1;
-                int oldSlots = __instance.potionSlots;
-                __instance.potionSlots += slotsToAdd;
-
-                // Add PotionSlot object for the restored slot
-                __instance.potions.add(new PotionSlot(oldSlots));
-
-                logger.info(String.format(
-                    "Ascension 25: Potion slots restored from %d to %d (Asc11 penalty removed)",
-                    oldSlots, __instance.potionSlots
-                ));
-            }
-        }
-    }
-
-    /**
-     * Potion price reduction: -40%
-     */
-    @SpirePatch(
-        clz = AbstractPotion.class,
-        method = "getPrice"
-    )
-    public static class PotionPriceReduction {
-        @SpirePostfixPatch
-        public static int Postfix(int __result) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 25) {
-                return __result;
-            }
-
-            // Reduce price by 40%
-            int reducedPrice = (int) Math.ceil(__result * 0.6f);
-
-            logger.debug(String.format(
-                "Ascension 25: Potion price reduced from %d to %d (-40%%)",
-                __result, reducedPrice
-            ));
-
-            return reducedPrice;
-        }
-    }
 
     // ========================================
     // Individual Potion Patches

@@ -33,19 +33,15 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 24: Normal Enemy Attack Enhancement & Player Max HP Increase
-**Effect**: Normal enemies' damage increased by 3%. Player max HP increased by 5%.
+## Level 24: Normal Enemy Attack Enhancement
+**Effect**: Normal enemies' damage increased by 3%.
 
 ---
 
 ## Level 25: Potion System Changes
-**Effect**: Potion prices decrease, potion effects are reduced, and you gain an additional potion slot.
+**Effect**: Potion effects are reduced.
 
 **Details**:
-- +1 Potion slot
-- All potion prices in shops reduced by 40%
-
-**Potion Effect Reductions**:
 - Blood Potion: Healing reduced by 5% of max HP
 - Poison Potion: Poison -1
 - Fire Potion: Damage -5
@@ -249,8 +245,8 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 42: Gold Increase & Removal Cost Increase
-**Effect**: Combat gold reward increased, shop card removal initial cost increased
+## Level 42: Card Removal Cost Increase
+**Effect**: Shop card removal initial cost increased by 25 gold
 
 ---
 
@@ -269,8 +265,8 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 46: Gold Increase & Relic Price Increase
-**Effect**: Combat gold reward increased, shop relic prices increased
+## Level 46: Relic Price Increase
+**Effect**: Shop relic prices increased by 10%.
 
 ---
 
@@ -284,8 +280,8 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 49: Chest Gold Increase & Card Price Increase
-**Effect**: Chest gold reward increased, shop card prices increased
+## Level 49: Card Price Increase & Rarity Change
+**Effect**: Shop card prices increased by 10%. Card rarity probabilities changed to Rare 12%, Uncommon 48%, Common 40%.
 
 ---
 

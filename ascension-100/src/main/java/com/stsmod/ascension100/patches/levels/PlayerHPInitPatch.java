@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Unified Player HP initialization patch for Ascension 24, 32, and 88
+ * Unified Player HP initialization patch for Ascension 32 and 88
  *
  * This patch executes AFTER vanilla ascension penalties in AbstractDungeon.dungeonTransitionSetup()
  * to ensure correct HP values.
@@ -21,9 +21,8 @@ import org.apache.logging.log4j.Logger;
  * - Ascension 6+: Current HP = Max HP * 0.9
  *
  * Our modifications (applied after vanilla penalties):
- * 1. Level 24: Max HP +5% (restores HP lost from A14 penalty)
- * 2. Level 32: Current HP -5
- * 3. Level 88: Max HP -10%, Current HP = Max HP
+ * 1. Level 32: Current HP -5
+ * 2. Level 88: Max HP -10%, Current HP = Max HP
  *
  * Note: Level 39 (rest heal reduction) is implemented separately in Level39.java
  */
@@ -55,19 +54,7 @@ public class PlayerHPInitPatch {
         int originalMaxHP = p.maxHealth;
         int originalCurrentHP = p.currentHealth;
 
-        // Level 24: Max HP +5% (restores HP lost from A14 penalty)
-        if (level >= 24) {
-            int increase = MathUtils.ceil(originalMaxHP * 0.05f);
-            p.maxHealth += increase;
-            p.currentHealth += increase;
-
-            logger.info(String.format(
-                "Ascension 24: Max HP increased from %d to %d (+%d, +5%%)",
-                originalMaxHP, p.maxHealth, increase
-            ));
-        }
-
-        // Level 32: Current HP -5 (after Level 24 increase)
+        // Level 32: Current HP -5
         if (level >= 32) {
             int beforeReduction = p.currentHealth;
             p.currentHealth -= 5;
@@ -104,7 +91,7 @@ public class PlayerHPInitPatch {
         }
 
         // Log final result
-        if (level >= 24 || level >= 32 || level >= 88) {
+        if (level >= 32 || level >= 88) {
             logger.info(String.format(
                 "Final HP: %d/%d (from %d/%d)",
                 p.currentHealth, p.maxHealth,

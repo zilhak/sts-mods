@@ -17,10 +17,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Ascension Level 24: Normal enemies deal 3% more damage (except Byrd), Player max HP increases by 5%
+ * Ascension Level 24: Normal enemies deal 3% more damage (except Byrd)
  *
  * 일반 적들의 공격력이 3% 증가합니다. (섀 제외)
- * 플레이어의 최대체력이 5% 증가합니다.
  */
 public class Level24 {
     private static final Logger logger = LogManager.getLogger(Level24.class.getName());
@@ -70,13 +69,4 @@ public class Level24 {
         }
     }
 
-    /**
-     * Player max HP increase: +5%
-     *
-     * IMPLEMENTATION NOTE:
-     * This level's HP modification is implemented in PlayerHPInitPatch.java
-     * along with Level 32 to ensure correct execution order.
-     *
-     * @see com.stsmod.ascension100.patches.levels.PlayerHPInitPatch
-     */
 }
