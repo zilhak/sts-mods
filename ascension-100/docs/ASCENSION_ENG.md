@@ -365,161 +365,386 @@ Base game ascension effects apply unchanged.
 
 ## Level 66: Enemy Starting Buff
 **Effect**: Some enemies spawn with buffs.
+
+**Details**:
+- Some monsters may spawn with special buffs at the start of combat.
+- The probability and types of buffs vary by act.
+
 ---
 
 ## Level 67: Normal Enemy HP Additional Increase
 **Effect**: Enemy HP increases by act and difficulty.
+
+**Details**:
+- Act 1: Strong Enemy combats have 3% HP increase
+- Act 2: Weak Enemy combats have 2% HP increase, Strong Enemy combats have 4% HP increase
+- Act 3: Weak Enemy combats have 5% HP increase, Strong Enemy combats have 6% HP increase
+
 ---
 
 ## Level 68: Normal Enemy Attack Act-Based Enhancement
 **Effect**: Enemy damage increases by act.
+
+**Details**:
+- Act 1: Strong Enemy combats have +1 damage increase
+- Act 2: Weak Enemy combats have +1 damage increase, Strong Enemy combats have +2 damage increase
+- Act 3: Weak Enemy combats have +2 damage increase, Strong Enemy combats have +4 damage increase
+
 ---
 
 ## Level 69: Boss Act-Based Enhancement
 **Effect**: Bosses enhanced by act.
+
+**Details**:
+- Act 1 bosses have 5% HP increase and +2 damage increase
+- Act 2 bosses have 10% HP increase and +3 damage increase
+- Act 3 bosses have 15% HP increase and +6 damage increase
+
 ---
 
 ## Level 70: Normal Elite Special Advantages
 **Effect**: Normal elites gain special advantages.
+
+**Details**:
+- Act 1 elites gain Metallicize 2
+- Act 2 elites gain Strength 2
+- Act 3 elites gain Intangible 1
+
 ---
 
 ## Level 71: Enemy Attack Side Effects
 **Effect**: Some enemy attacks have additional effects.
+
+**Details**:
+- Bandit Leader (Romeo): Cross Slash pattern applies Vulnerable 1
+- Darkling: Nip pattern applies Weak 1
+- Spire Growth: Quick Tackle pattern applies additional Constricted 2 if already constricted
+
 ---
 
 ## Level 72: Enemy Pattern Addition
 **Effect**: Some monsters use special attack patterns
+
+**Details**:
+- Mystic (Healer): When Centurion is not present, uses "Vampiric Attack" pattern (11 damage + heals self for 5 HP)
 
 ---
 
 ## Level 73: Shop Increase
 **Effect**: Normal enemy symbols on map reduced, replaced with shops
 
+**Details**:
+- During map generation, normal enemy symbols have 10% chance to be replaced with shops
+
 ---
 
 ## Level 74: Rare Card Probability Reduction
 **Effect**: Rare card probability reduced in normal combat card rewards, Uncommon probability increased
+
+**Details**:
+- Rare card probability in normal combat rewards decreased by 1%
+- Uncommon card probability increased by 1%
 
 ---
 
 ## Level 75: Combat Composition Addition
 **Effect**: New enemy combat composition combinations added
 
+**Details**:
+- Act 2 Strong Enemies: Added Mugger + Chosen composition
+
 ---
 
 ## Level 76: Special Combat Occurrence
 **Effect**: 15% chance for special combat in Strong Enemy battles above floor 10
+
+**Details**:
+- Special combats provide elite-level rewards
+- Enemies start with buffs and initial block:
+  - Act 1: Metallicize 2, Regen 2, and 6 starting block
+  - Act 2: Metallicize 5, Regen 3, and 10 starting block
+  - Act 3: Metallicize 8, Regen 5, and 25 starting block
+
 ---
 
 ## Level 77: Special Combat Difficulty Increase
 **Effect**: Special combat difficulty increased.
+
+**Details**:
+- Act 1: Enemies gain Ritual 1 buff
+- Act 2: Enemies gain Buffer 1 buff
+- Act 3: Enemies gain Time Warp buff
+
 ---
 
 ## Level 78: Special Combat Probability Increase
 **Effect**: Special combat probability increased to 20%.
+
+**Details**:
+- Special combat occurrence probability increased from 15% to 20%
 
 ---
 
 ## Level 79: ? Room Special Combat
 **Effect**: Special combat can occur in Strong Enemy battles from ? rooms.
 
+**Details**:
+- Special combats can now occur in Strong Enemy battles triggered from ? (question mark) rooms
+
 ---
 
 ## Level 80: Starting Curse Change
 **Effect**: Starting "Ascender's Bane" curse enhanced.
-- Changed to 1-cost playable curse card (Exhaust on play)
+
+**Details**:
+- The enhanced Ascender's Bane is now a 1-cost playable curse card (Exhausts when played)
 
 ---
 
 ## Level 81: Enemy Starting Buff Addition
 **Effect**: All normal enemies have low chance to spawn with Strength 1, Metallicize 2, or Regen 1.
-- Only one enemy per combat gains buff
+
+**Details**:
+- All normal enemies have 15% chance to spawn with one random buff: Strength 1, Metallicize 2, or Regen 1
+- Only one enemy per combat gains a buff
 
 ---
 
 ## Level 82: Heart Enhancement
 **Effect**: Corrupt Heart enhanced.
+
+**Details**:
+- The Heart gains an additional Metallicize 20
+- The Heart's "Beat of Death" value increases by 1
+
 ---
 
 ## Level 83: Enemy Defense Pattern Enhancement
 **Effect**: Block-gaining enemies' pattern block amounts increased.
+
+**Details**:
+- Block amounts in enemy patterns that gain block are increased by 10%
 
 ---
 
 ## Level 84: Potion Drop Probability Reduction
 **Effect**: Potion drop probability reduced.
 
+**Details**:
+- Potion drop probability decreased by 10%
+
 ---
 
 ## Level 85: Event Hostility
 **Effect**: Some events changed to be more hostile.
+
+**Details**:
+- "Match and Keep!" event: Card composition changed (includes paired character color cards, special character color cards, rare cards, special colorless cards, and curse cards)
+- "Face Trader" event: "Touch" option now reduces max HP by 15%
+- "Bonfire Elementals" event: Special card offering now heals only 80% of missing HP instead of full heal
+- "N'loth" event: All options cost 10 more gold
+- "Shining Light" event: HP loss increased by 1, relic acquisition probability increased by 10%
+
 ---
 
 ## Level 86: Enemy Pattern Major Enhancement
 **Effect**: Enemy patterns majorly enhanced.
 
+**Details**: Multiple enemies receive major pattern enhancements. See planning document for full details.
+
+**Key enhancements**:
+- Louse: Curl Up +6
+- Looter: Smoke Bomb block +5, Thievery +10
+- Fungi Beast: Death debuffs (Vulnerable/Weak) +1
+- Gremlins (Shield +3 protection, Wizard +5 damage, Angry +2 HP, Fat +2 HP, Sneaky +1 damage)
+- Shelled Parasite: Plated Armor +2
+- Mugger: Thievery +15, Smoke Bomb block +3
+- Mystic: Heal pattern HP +3
+- Snake Plant: Base Malleable +2
+- Spheric Guardian: Harden block +10
+- Masked Bandits (Bear hug Dexterity reduction +1)
+- Spiker: Power pattern Thorns +1
+- Exploder: Explosion damage 60
+- The Maw: Roar Weak/Frail +1
+- Transient: Fading +1
+
 ---
 
-## Level 87: Enemy Balance Adjustment
-**Effect**: Enemy balance adjusted.
+## Level 87: Boss Balance Adjustment
+**Effect**: Boss balance adjusted.
+
+**Details**:
+- Slime Boss: Slam pattern damage +40
+- The Guardian: Gains Thorns 5 instead of Sharp Hide. Starts with Barricade.
+- Hexaghost: Gains 30 block on first turn.
+- Bronze Automaton: Spawns 1 additional Bronze Orb in summon pattern.
+- The Champ: Execute pattern changed from 2 hits to 3 hits.
+- The Collector: Mega Debuff pattern shuffles 2 Void cards into draw pile and 2 into discard pile.
+- Awakened One: One Cultist is replaced with a Chosen.
+- Time Eater: Ripple pattern gains +180 additional block.
+- Corrupt Heart: Gains Malleable 1.
+- Donu & Deca: Gain Life Link. When one dies, it enters a half-dead state and both must be defeated. Revives with buffs restored.
 
 ---
 
 ## Level 88: Max HP Reduction
 **Effect**: Starting max HP reduced.
 
+**Details**:
+- Starting max HP reduced by 10%
+
 ---
 
 ## Level 89: Buffed Elite Act-Based Additional Enhancement
 **Effect**: Buffed elite HP increases additionally by act.
+
+**Details**:
+- Buffed elites have additional HP increases by act: 10% / 20% / 30%
+
 ---
 
 ## Level 90: Enemy Composition Addition
 **Effect**: Enemy compositions added.
+
+**Details**:
+- Act 2: 10% chance to add GremlinFat to combats
+- Act 3: 10% chance to add Looter to combats
+
 ---
 
 ## Level 91: Enemy Pattern Side Effect Addition
 **Effect**: Some enemy patterns gain additional effects.
+
+**Details**:
+- Torch Head: Tackle pattern applies Frail 1
+- Corrupt Heart: Debilitate pattern shuffles additional Ascender's Bane and Pain into deck
+
 ---
 
 ## Level 92: Enemy Gimmick Enhancement
 **Effect**: Enemy gimmicks enhanced.
+
+**Details**: Massive enhancements to all enemy types.
+
+**Normal Monsters**:
+- Louse: HP +2, Curl Up +10
+- Slime: Damage +1
+- Looter: Thievery +10, Smoke Bomb block +3
+- Jaw Worm: Strength gain pattern +1 additional Strength
+- Slaver: Red Slaver's Entangle pattern probability increased when Taskmaster present
+- Fungi Beast: Strength gain pattern +3 additional Strength
+- Gremlins (Shield +8 protection, Wizard +15 damage, Angry +1 additional Anger, Fat attacks apply Vulnerable, Sneaky +7 damage)
+- Shelled Parasite: Plated Armor +4
+- Mugger: Thievery +20, Smoke Bomb block +12
+- Chosen: HP +20
+- Centurion: HP +15
+- Mystic: Debuff attack pattern applies additional Weak 2
+- Snecko: Confusion not blocked by Artifact
+- Snake Plant: Base Malleable +2
+- Spheric Guardian: Starts with Plated Armor 5
+- Masked Bandits (Pointy HP +5, Romeo damage +1, Bear HP +5)
+- Repulsor: Repulse pattern shuffles 1 additional Dazed
+- Spiker: Power pattern Thorns +4
+- Exploder: HP +5
+- Orb Walker: Laser pattern shuffles 1 additional Burn into draw and discard piles
+- Darkling: Revives with Regen 2
+- The Maw: Drool pattern gains +3 additional Strength
+- Transient: Fading +1, gains Invincible 200
+- Spire Growth: HP +20
+- Writhing Mass: Malleable +5
+
+**Elites**:
+- Gremlin Nob: Bellow pattern gains +2 additional Enrage
+- Lagavulin: Siphon Soul reduces Dexterity/Strength by 3, Focus by 2
+- Sentry: Bolt pattern shuffles 1 additional Dazed
+- Book of Stabbing: Multi-Stab count +1
+- Gremlin Leader: Rally pattern Strength +4
+- Taskmaster: Attack shuffles 1 additional Wound
+- Giant Head: HP +20%
+- Nemesis: Debuff pattern shuffles 2 additional Burns
+- Reptomancer: Summon pattern always summons to 4 Daggers total
+
+**Bosses**:
+- Slime Boss: Goop Spray shuffles 2 additional Slimed
+- The Guardian: Defensive mode gains +2 additional Sharp Hide, Fierce Bash damage +8
+- Hexaghost: Inferno shuffles 2 additional Burns into discard pile
+- Bronze Automaton: Hyper Beam damage +10
+- The Champ: Anger pattern gains Ritual 2
+- The Collector: Mega Debuff increases all debuff values by 1
+- Awakened One: Curiosity +2
+- Time Eater: Ripple pattern gains +30 additional block
+- Donu & Deca: Deca's Beam shuffles 2 additional Dazed, Donu's Circle of Power gains +2 additional Strength
 
 ---
 
 ## Level 93: Relic Price Increase
 **Effect**: Shop relic prices increased.
 
+**Details**:
+- Shop relic prices increased by 10%
+
 ---
 
 ## Level 94: Event Disadvantage
 **Effect**: Some events become more disadvantageous.
+
+**Details**:
+- "N'loth" event: "Don't buy" option reduces current HP and max HP by 50%
+- "Golden Shrine" event: Pray option has 50% chance to receive nothing
+- "Purifier" event: Can occur even without curse cards
+- "Designer-In-Spire" event: Attack option reduces max HP by 10
+
 ---
 
 ## Level 95: Time Limit
 **Effect**: Death 10 turns after combat start
+
+**Details**:
+- Gain Fading 10 at combat start
 
 ---
 
 ## Level 96: Rest Site Reduction
 **Effect**: Rest site spawn probability reduced.
 
+**Details**:
+- Rest site spawn probability reduced
+
 ---
 
 ## Level 97: Luck Additional Reduction
 **Effect**: Rare card spawn probability reduced in card rewards.
+
+**Details**:
+- Rare card spawn probability reduced in card rewards
 
 ---
 
 ## Level 98: Campfire Heal Reduction
 **Effect**: Heal amount reduced when resting at campfire.
 
+**Details**:
+- Heal amount reduced by 5 when resting at campfire
+
 ---
 
 ## Level 99: Unreasonable Events
 **Effect**: Certain seed-based effects can occur at game start.
 
+**Details**:
+- A random value between 0-99 is chosen at game start, determining the effect:
+  - 0-9: Start with 30% HP lost
+  - 10-19: 20% chance to receive no gold from combat victories
+  - 20-29: 30% chance to lose 1 max HP when ascending floors
+  - 30-39: Heal 1 less HP when healing
+  - 40-49: 50% chance to lose potion rewards from combat
+  - 50-59: 10% chance for elites to not drop relics
+  - 60-99: Normal
+
 ---
 
 ## Level 100: ???
 **Effect**: Corrupt Heart starts with Time Warp buff.
+
+**Details**:
+- Corrupt Heart: Starts with Time Warp buff

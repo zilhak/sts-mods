@@ -76,13 +76,26 @@ public class Level60 {
                     m.currentHealth += hpBonus;
 
                     // Add damage bonus to all damage info
-                    // m.damage is ArrayList<DamageInfo>, need to update each entry's base value
-                    // This is complex and requires proper understanding of damage system
-                    // Skipping for now - TODO
+                    // AbstractMonster.damage is an ArrayList<DamageInfo>
+                    // We need to increase the base damage value for each DamageInfo entry
+                    if (m.damage != null && !m.damage.isEmpty()) {
+                        for (int i = 0; i < m.damage.size(); i++) {
+                            com.megacrit.cardcrawl.cards.DamageInfo damageInfo = m.damage.get(i);
+                            if (damageInfo != null) {
+                                // Increase base damage
+                                damageInfo.base += damageBonus;
+                                damageInfo.output = damageInfo.base;
+                            }
+                        }
+                        logger.info(String.format(
+                            "[Asc60] %s damage increased by +%d for %d attack patterns",
+                            m.name, damageBonus, m.damage.size()
+                        ));
+                    }
 
                     logger.info(String.format(
-                        "[Asc60] %s stats increased: HP %d → %d (+%d)",
-                        m.name, originalMaxHP, m.maxHealth, hpBonus
+                        "[Asc60] %s stats increased: HP %d → %d (+%d), Damage +%d",
+                        m.name, originalMaxHP, m.maxHealth, hpBonus, damageBonus
                     ));
                 }
             }

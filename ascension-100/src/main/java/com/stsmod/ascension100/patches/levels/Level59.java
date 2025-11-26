@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * Ascension Level 59: Elite HP increased even more
  *
  * 엘리트의 체력이 더더욱 증가합니다.
- * 모든 엘리트의 체력이 10 증가합니다.
+ * 모든 엘리트의 체력이 5 증가합니다.
  */
 public class Level59 {
     private static final Logger logger = LogManager.getLogger(Level59.class.getName());
@@ -28,7 +28,7 @@ public class Level59 {
             }
 
             if (__instance.type == AbstractMonster.EnemyType.ELITE) {
-                int hpBonus = 10;
+                int hpBonus = 5;
                 int originalMaxHP = __instance.maxHealth;
 
                 __instance.maxHealth += hpBonus;
