@@ -736,10 +736,9 @@ Base game ascension effects apply unchanged.
   - 0-9: Start with 30% HP lost
   - 10-19: 20% chance to receive no gold from combat victories
   - 20-29: 30% chance to lose 1 max HP when ascending floors
-  - 30-39: Heal 1 less HP when healing
-  - 40-49: 50% chance to lose potion rewards from combat
-  - 50-59: 10% chance for elites to not drop relics
-  - 60-99: Normal
+  - 30-39: 50% chance to lose potion rewards from combat
+  - 40-49: 10% chance for elites to not drop relics
+  - 50-99: Normal
 
 ---
 

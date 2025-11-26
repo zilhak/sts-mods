@@ -20,9 +20,9 @@ import org.apache.logging.log4j.Logger;
  * 0~9: 시작시 30%의 체력을 잃은 채로 시작
  * 10~19: 전투 승리시 20% 확률로 골드를 얻지 못함
  * 20~29: 각 층을 오를때, 30% 확률로 최대체력이 1 감소
- * 30~39: 회복시 1 덜 회복
- * 40~49: 전투 보상에 물약이 포함될시, 50% 확률로 물약 보상이 제거
- * 50~59: 10% 확률로 엘리트가 유물을 주지 않음
+ * 30~39: 전투 보상에 물약이 포함될시, 50% 확률로 물약 보상이 제거
+ * 40~49: 10% 확률로 엘리트가 유물을 주지 않음
+ * 50~99: 정상
  */
 public class Level99 {
     private static final Logger logger = LogManager.getLogger(Level99.class.getName());
@@ -66,10 +66,6 @@ public class Level99 {
         public static boolean isEffect5Active() {
             return randomValue >= 40 && randomValue <= 49;
         }
-
-        public static boolean isEffect6Active() {
-            return randomValue >= 50 && randomValue <= 59;
-        }
     }
 
     /**
@@ -103,7 +99,7 @@ public class Level99 {
     }
 
     /**
-     * Effect 2: 30% chance to not gain gold from combat
+     * Effect 2: 20% chance to not gain gold from combat
      */
     @SpirePatch(
         clz = RewardItem.class,
@@ -176,35 +172,7 @@ public class Level99 {
     }
 
     /**
-     * Effect 4: Heal 1 less when healing
-     */
-    @SpirePatch(
-        clz = AbstractPlayer.class,
-        method = "heal",
-        paramtypez = {int.class, boolean.class}
-    )
-    public static class ReduceHealing {
-        @SpirePrefixPatch
-        public static void Prefix(AbstractPlayer __instance, @ByRef int[] healAmount) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 99) {
-                return;
-            }
-
-            // Effect 4 (30~39): Heal 1 less
-            if (UnfairEventTracker.isEffect4Active() && healAmount[0] > 0) {
-                int original = healAmount[0];
-                healAmount[0] = Math.max(0, healAmount[0] - 1);
-
-                logger.info(String.format(
-                    "Ascension 99 (Effect 4): Heal reduced from %d to %d (-1)",
-                    original, healAmount[0]
-                ));
-            }
-        }
-    }
-
-    /**
-     * Effect 5: 50% chance to remove potion rewards from combat
+     * Effect 4: 50% chance to remove potion rewards from combat
      */
     @SpirePatch(
         clz = AbstractDungeon.class,
@@ -217,8 +185,8 @@ public class Level99 {
                 return;
             }
 
-            // Effect 5 (40~49): 50% chance to remove potion from rewards
-            if (UnfairEventTracker.isEffect5Active() && AbstractDungeon.getCurrRoom() != null) {
+            // Effect 4 (30~39): 50% chance to remove potion from rewards
+            if (UnfairEventTracker.isEffect4Active() && AbstractDungeon.getCurrRoom() != null) {
                 if (AbstractDungeon.getCurrRoom().rewards != null) {
                     // Check after combat rewards are generated
                     for (int i = AbstractDungeon.getCurrRoom().rewards.size() - 1; i >= 0; i--) {
@@ -228,7 +196,7 @@ public class Level99 {
                             if (roll < 50) {
                                 AbstractDungeon.getCurrRoom().rewards.remove(i);
                                 logger.info(String.format(
-                                    "Ascension 99 (Effect 5): Potion reward removed (Roll: %d < 50)",
+                                    "Ascension 99 (Effect 4): Potion reward removed (Roll: %d < 50)",
                                     roll
                                 ));
                             }
@@ -240,7 +208,7 @@ public class Level99 {
     }
 
     /**
-     * Effect 6: 10% chance for elites to not give relic
+     * Effect 5: 10% chance for elites to not give relic
      */
     @SpirePatch(
         clz = AbstractDungeon.class,
@@ -253,8 +221,8 @@ public class Level99 {
                 return;
             }
 
-            // Effect 6 (50~59): 10% chance for elite to not give relic
-            if (UnfairEventTracker.isEffect6Active() && AbstractDungeon.getCurrRoom() != null) {
+            // Effect 5 (40~49): 10% chance for elite to not give relic
+            if (UnfairEventTracker.isEffect5Active() && AbstractDungeon.getCurrRoom() != null) {
                 if (AbstractDungeon.getCurrRoom().rewards != null) {
                     // Check after combat rewards are generated
                     for (int i = AbstractDungeon.getCurrRoom().rewards.size() - 1; i >= 0; i--) {
@@ -264,7 +232,7 @@ public class Level99 {
                             if (roll < 10) {
                                 AbstractDungeon.getCurrRoom().rewards.remove(i);
                                 logger.info(String.format(
-                                    "Ascension 99 (Effect 6): Elite relic reward removed (Roll: %d < 10)",
+                                    "Ascension 99 (Effect 5): Elite relic reward removed (Roll: %d < 10)",
                                     roll
                                 ));
                             }
