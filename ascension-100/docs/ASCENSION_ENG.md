@@ -80,7 +80,12 @@ Base game ascension effects apply unchanged.
 - Slavers (SlaverBlue/SlaverRed): Blue damage +1, Red unlimited Entangle
 - Cultist: Base attack -4, Incantation Ritual +2 (or +1 if floor ≤3)
 - Fungi Beast: Spore Cloud +1
-- Gremlins: Various enhancements per type
+- Gremlins:
+  - Shield Gremlin: Block +5
+  - Wizard Gremlin: Damage +3
+  - Mad Gremlin: HP +3
+  - Fat Gremlin: HP +2
+  - Sneaky Gremlin: Damage +1
 - Shelled Parasite: Plated Armor +2
 - Mugger: Thievery +10
 - Byrd: Caw Strength +1
