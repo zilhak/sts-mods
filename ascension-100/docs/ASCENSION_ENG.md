@@ -227,41 +227,61 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 39: Rest Healing Reduction
-**Effect**: Rest healing is reduced.
-
-**Details**:
-- Rest healing reduced by 3% of max HP (30% → 27%)
+## Level 39: Max HP Reduction
+**Effect**: Starting max HP reduced by additional 5.
 
 ---
 
 ## Level 40: Adaptive AI
 **Effect**: Monster patterns adapt to player situation.
 
+**Details**:
+- Writhing Mass's reactive patterns change based on player hand:
+  - If no attack cards remain in hand, or if Malleable grants 20+ block, forces Implant pattern if available
+  - If Strength is below -2, does not use multi-attack patterns
+
 ---
 
 ## Level 41: Elite Increase
 **Effect**: More elites generated on map.
 
+**Details**:
+- During map generation, ? rooms have 10% chance to be converted to elite encounters
+
 ---
 
 ## Level 42: Card Removal Cost Increase
-**Effect**: Shop card removal initial cost increased by 25 gold
+**Effect**: Shop card removal initial cost increased by 25 gold.
+
+**Details**:
+- Shop card removal base cost increased by 25 gold
 
 ---
 
 ## Level 43: Event Adaptive Changes
 **Effect**: Some event probabilities change based on player situation.
 
+**Details**:
+- Wheel of Change event: If HP below 15%, damaging events are selected
+- Wheel of Change event: If HP above 80%, healing events are selected
+
 ---
 
 ## Level 44: Thievery Enhancement
 **Effect**: Thieves' Thievery amount increased.
 
+**Details**:
+- All thief enemies' Thievery amount increased by 10
+
 ---
 
 ## Level 45: Enemy Composition Addition
-**Effect**: Strong Enemies 20% chance to add enemy (added enemies have 30% of original max HP)
+**Effect**: Strong Enemies 20% chance to add enemy (added enemies have 30% of original max HP).
+
+**Details**:
+- Act 1: Adds one Gremlin or Small Slime
+- Act 2: Adds one Medium Slime
+- Act 3: Adds one of: GremlinFat, Shelled Parasite, or Exploder
 
 ---
 
@@ -276,7 +296,13 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 48: Neow's Blessing Weakened
-**Effect**: Neow's blessing rewards partially changed
+**Effect**: Neow's blessing rewards partially changed.
+
+**Details**:
+- TEN_PERCENT_HP_BONUS: Max HP +10% → Max HP +8%
+- HUNDRED_GOLD: 100 gold → 80 gold
+- TEN_PERCENT_HP_LOSS: Max HP -15%
+- PERCENT_DAMAGE: 40% of current HP damage
 
 ---
 
@@ -286,75 +312,136 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 50: ??? Act Forced
-**Effect**: Death when entering Act 3 boss without three keys
+**Effect**: Death when entering Act 3 boss without three keys.
+
+**Details**:
+- In Act 3 boss combat, if three keys not collected, HP is locked to 1 and Energy locked to 0
+- At start of Act 3 boss combat without three keys, take 100 damage 5 times
 
 ---
 
 ## Level 51: Stage-Based Enemy HP Growth
 **Effect**: Enemy HP increases by act and difficulty.
 
+**Details**:
+- Act 1: Strong Enemies combats have +4% HP increase
+- Act 2: Weak Enemies combats have +3% HP increase, Strong Enemies combats have +5% HP increase
+- Act 3: Weak Enemies combats have +5% HP increase, Strong Enemies combats have +8% HP increase
+
 ---
 
 ## Level 52: Stage-Based Enemy Attack Growth
 **Effect**: Enemy damage increases by act and difficulty.
+
+**Details**:
+- Act 1: Strong Enemies combats have +1 damage increase
+- Act 2: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +2 damage increase
+- Act 3: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +5 damage increase
 
 ---
 
 ## Level 53: Enemy Pattern Additional Enhancement
 **Effect**: Enemy behavior patterns further enhanced.
 
+**Details**: Multiple enemies receive pattern enhancements. See planning document for full details.
+
 ---
 
 ## Level 54: Boss Pattern Additional Enhancement
 **Effect**: Boss patterns further enhanced.
+
+**Details**: All bosses receive pattern enhancements. See planning document for full details.
 
 ---
 
 ## Level 55: Buffed Elite Additional Enhancement
 **Effect**: Buffed elite random effects increased.
 
+**Details**:
+- Max HP: Additional 15% max HP increase
+- Strength: Additional 2 Strength increase
+- Metallicize: Additional 4 Metallicize increase
+- Regeneration: Additional 3 Regeneration increase
+
 ---
 
 ## Level 56: Debuff Effect Enhancement
 **Effect**: Debuff effects enhanced.
+
+**Details**:
+- Vulnerable: Deals 10% additional damage
+- Weak: Applies 10% additional damage reduction
+- Frail: Applies 10% additional block reduction
 
 ---
 
 ## Level 57: Normal Enemy HP Additional Increase
 **Effect**: Enemy HP increases by act and difficulty.
 
+**Details**:
+- Act 1: Strong Enemies combats have +5% HP increase
+- Act 2: Weak Enemies combats have +5% HP increase, Strong Enemies combats have +8% HP increase
+- Act 3: Weak Enemies combats have +8% HP increase, Strong Enemies combats have +10% HP increase
+
 ---
 
 ## Level 58: Normal Enemy Attack Additional Enhancement
 **Effect**: Normal enemy damage increased.
+
+**Details**:
+- Normal enemy damage increased by 1 (except Byrd)
+- Byrd: Headbutt pattern damage increased by 2 instead
 
 ---
 
 ## Level 59: Elite HP Increase
 **Effect**: All elite HP increased.
 
+**Details**:
+- All elite HP increased by 5
+
 ---
 
 ## Level 60: Buffed Elite Act-Based Growth
 **Effect**: Buffed elites grow more per act.
+
+**Details**:
+- Buffed elites gain HP per act: +10 / +20 / +50
+- Buffed elites gain damage per act: +1 / +2 / +5
 ---
 
 ## Level 61: Normal Enemy HP Additional Increase
 **Effect**: Enemy HP increases by act and difficulty.
+
+**Details**:
+- Act 1: Strong Enemies combats have +3% HP increase
+- Act 2: Weak Enemies combats have +3% HP increase, Strong Enemies combats have +5% HP increase
+- Act 3: Weak Enemies combats have +5% HP increase, Strong Enemies combats have +7% HP increase
+
 ---
 
 ## Level 62: Normal Enemy Attack Additional Enhancement
 **Effect**: Normal enemy damage increased.
+
+**Details**:
+- Normal enemy damage increased by 1 (except Byrd)
+- Byrd: Flight value increased by 1 instead
 
 ---
 
 ## Level 63: Boss HP Increase
 **Effect**: All boss HP increased.
 
+**Details**:
+- All boss HP increased by 8%
+
 ---
 
 ## Level 64: Boss Damage Increase
 **Effect**: All boss damage increased.
+
+**Details**:
+- All boss damage increased by 8%
 
 ---
 
@@ -367,8 +454,9 @@ Base game ascension effects apply unchanged.
 **Effect**: Some enemies spawn with buffs.
 
 **Details**:
-- Some monsters may spawn with special buffs at the start of combat.
-- The probability and types of buffs vary by act.
+- Act 1: All enemies have 5% chance to spawn with one random buff: Strength 1 or Metallicize 2
+- Act 2: All enemies have 5% chance to spawn with one random buff: Metallicize 4 or Regeneration 3
+- Act 3: All enemies have 5% chance to spawn with one random buff: Strength 6, Metallicize 8, or Regeneration 6
 
 ---
 
@@ -376,9 +464,9 @@ Base game ascension effects apply unchanged.
 **Effect**: Enemy HP increases by act and difficulty.
 
 **Details**:
-- Act 1: Strong Enemy combats have 3% HP increase
-- Act 2: Weak Enemy combats have 2% HP increase, Strong Enemy combats have 4% HP increase
-- Act 3: Weak Enemy combats have 5% HP increase, Strong Enemy combats have 6% HP increase
+- Act 1: Strong Enemies combats have +5% HP increase
+- Act 2: Weak Enemies combats have +5% HP increase, Strong Enemies combats have +8% HP increase
+- Act 3: Weak Enemies combats have +8% HP increase, Strong Enemies combats have +10% HP increase
 
 ---
 
@@ -386,9 +474,9 @@ Base game ascension effects apply unchanged.
 **Effect**: Enemy damage increases by act.
 
 **Details**:
-- Act 1: Strong Enemy combats have +1 damage increase
-- Act 2: Weak Enemy combats have +1 damage increase, Strong Enemy combats have +2 damage increase
-- Act 3: Weak Enemy combats have +2 damage increase, Strong Enemy combats have +4 damage increase
+- Act 1: Enemy damage increased by 1
+- Act 2: Enemy damage increased by 2 (except Byrd)
+- Act 3: Enemy damage increased by 5
 
 ---
 
