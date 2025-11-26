@@ -790,10 +790,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 95: Time Limit
-**Effect**: Death 10 turns after combat start
+**Effect**: Death 15 turns after combat start
 
 **Details**:
-- Gain Fading 10 at combat start
+- Gain Turn Limit 15 at combat start
 
 ---
 
