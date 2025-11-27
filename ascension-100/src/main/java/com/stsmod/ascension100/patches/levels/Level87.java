@@ -230,8 +230,31 @@ public class Level87 {
     // ========================================
 
     /**
-     * Add third Execute hit when Champ uses Execute pattern
+     * Champ Execute pattern changed from 2 hits to 3 hits
+     * Intercepts setMove() call in getMove() and changes multiplier from 2 to 3
      */
+    @SpirePatch(
+        clz = AbstractMonster.class,
+        method = "setMove",
+        paramtypez = { String.class, byte.class, AbstractMonster.Intent.class, int.class, int.class, boolean.class }
+    )
+    public static class ChampExecuteIntentFix {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance, String moveName, byte nextMove,
+                                  AbstractMonster.Intent intent, int baseDamage, @com.evacipated.cardcrawl.modthespire.lib.ByRef int[] multiplier, boolean isMultiDamage) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
+                return;
+            }
+
+            // Check if this is Champ's Execute move
+            if (__instance instanceof Champ && nextMove == 3 && multiplier[0] == 2) {
+                // Change multiplier from 2 to 3
+                multiplier[0] = 3;
+                logger.info("Ascension 87: Champ Execute intent multiplier changed from 2 to 3");
+            }
+        }
+    }
+
     @SpirePatch(
         clz = Champ.class,
         method = "takeTurn"

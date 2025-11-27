@@ -1102,16 +1102,65 @@ public class Level92 {
      * Base game: Stabs based on stabCount (increases over time)
      * A92+: Additional 1 stab on STAB move
      *
-     * Uses Prefix to increase stabCount BEFORE takeTurn executes,
-     * so the original logic executes with +1 stabs automatically
+     * Part 1: Modifies stabCount before getMove() for correct intent display
+     */
+    @SpirePatch(
+        clz = BookOfStabbing.class,
+        method = "getMove",
+        paramtypez = { int.class }
+    )
+    public static class BookOfStabbingExtraStabIntent {
+        @SpirePrefixPatch
+        public static void Prefix(BookOfStabbing __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Increase stabCount by 1 BEFORE getMove executes
+                // This ensures the intent display shows the correct number of hits
+                Field stabCountField = BookOfStabbing.class.getDeclaredField("stabCount");
+                stabCountField.setAccessible(true);
+                int originalCount = stabCountField.getInt(__instance);
+                stabCountField.setInt(__instance, originalCount + 1);
+
+                logger.info(String.format(
+                    "Ascension 92: Book of Stabbing stabCount temporarily increased from %d to %d for getMove()",
+                    originalCount, originalCount + 1
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to increase Book of Stabbing stabCount", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(BookOfStabbing __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Reset stabCount back to original after getMove
+                Field stabCountField = BookOfStabbing.class.getDeclaredField("stabCount");
+                stabCountField.setAccessible(true);
+                int currentCount = stabCountField.getInt(__instance);
+                stabCountField.setInt(__instance, currentCount - 1);
+
+                logger.info("Ascension 92: Book of Stabbing stabCount reset to original after getMove()");
+            } catch (Exception e) {
+                logger.error("Failed to reset Book of Stabbing stabCount", e);
+            }
+        }
+    }
+
+    /**
+     * Part 2: Modifies stabCount before takeTurn() for actual execution
      */
     @SpirePatch(
         clz = BookOfStabbing.class,
         method = "takeTurn"
     )
-    public static class BookOfStabbingExtraStab {
-        private static boolean increased = false;
-
+    public static class BookOfStabbingExtraStabExecution {
         @SpirePrefixPatch
         public static void Prefix(BookOfStabbing __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
@@ -1124,21 +1173,20 @@ public class Level92 {
                 nextMoveField.setAccessible(true);
                 byte move = nextMoveField.getByte(__instance);
 
-                if (move == 1 && !increased) { // STAB move
+                if (move == 1) { // STAB move
                     // Increase stabCount by 1 BEFORE takeTurn executes
                     Field stabCountField = BookOfStabbing.class.getDeclaredField("stabCount");
                     stabCountField.setAccessible(true);
                     int originalCount = stabCountField.getInt(__instance);
                     stabCountField.setInt(__instance, originalCount + 1);
-                    increased = true;
 
                     logger.info(String.format(
-                        "Ascension 92: Book of Stabbing stabCount increased from %d to %d",
+                        "Ascension 92: Book of Stabbing stabCount increased from %d to %d for execution",
                         originalCount, originalCount + 1
                     ));
                 }
             } catch (Exception e) {
-                logger.error("Failed to increase Book of Stabbing stabCount", e);
+                logger.error("Failed to increase Book of Stabbing stabCount for execution", e);
             }
         }
 
@@ -1154,17 +1202,16 @@ public class Level92 {
                 nextMoveField.setAccessible(true);
                 byte move = nextMoveField.getByte(__instance);
 
-                if (move == 1 && increased) { // STAB move just executed
+                if (move == 1) { // STAB move just executed
                     Field stabCountField = BookOfStabbing.class.getDeclaredField("stabCount");
                     stabCountField.setAccessible(true);
                     int currentCount = stabCountField.getInt(__instance);
                     stabCountField.setInt(__instance, currentCount - 1);
-                    increased = false;
 
-                    logger.info("Ascension 92: Book of Stabbing stabCount reset to original");
+                    logger.info("Ascension 92: Book of Stabbing stabCount reset to original after execution");
                 }
             } catch (Exception e) {
-                logger.error("Failed to reset Book of Stabbing stabCount", e);
+                logger.error("Failed to reset Book of Stabbing stabCount after execution", e);
             }
         }
     }
