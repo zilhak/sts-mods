@@ -310,8 +310,8 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 49: Card Price Increase & Rarity Change
-**Effect**: Shop card prices increased by 10%. Card rarity probabilities changed to Rare 12%, Uncommon 48%, Common 40%.
+## Level 49: Card Price Increase
+**Effect**: Shop card prices increased by 10%.
 
 ---
 
