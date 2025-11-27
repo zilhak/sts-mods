@@ -20,6 +20,7 @@ import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.MonsterGroup;
 import com.megacrit.cardcrawl.monsters.beyond.Deca;
 import com.megacrit.cardcrawl.monsters.beyond.Donu;
 import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
@@ -717,15 +718,33 @@ public class Level87 {
 
     /**
      * Replace one Cultist with Chosen in Awakened One encounter
+     * IMPORTANT: Must be done in MonsterGroup.init() POSTFIX to avoid ConcurrentModificationException
      */
     @SpirePatch(
-        clz = AwakenedOne.class,
-        method = "usePreBattleAction"
+        clz = MonsterGroup.class,
+        method = "init"
     )
     public static class AwakenedOneReplaceCultist {
         @SpirePostfixPatch
-        public static void Postfix(AwakenedOne __instance) {
+        public static void Postfix(MonsterGroup __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
+                return;
+            }
+
+            // Check if this is Awakened One encounter (has both AwakenedOne and Cultist)
+            boolean hasAwakenedOne = false;
+            boolean hasCultist = false;
+
+            for (AbstractMonster m : __instance.monsters) {
+                if (m instanceof AwakenedOne) {
+                    hasAwakenedOne = true;
+                }
+                if (m instanceof Cultist) {
+                    hasCultist = true;
+                }
+            }
+
+            if (!hasAwakenedOne || !hasCultist) {
                 return;
             }
 
@@ -735,11 +754,10 @@ public class Level87 {
             // new Cultist(-298.0F, -10.0F, false) - right Cultist
             // We replace the first one found (left Cultist) with Chosen at same position
 
-            boolean replaced = false;
-            for (int i = 0; i < (AbstractDungeon.getMonsters()).monsters.size(); i++) {
-                AbstractMonster m = (AbstractDungeon.getMonsters()).monsters.get(i);
+            for (int i = 0; i < __instance.monsters.size(); i++) {
+                AbstractMonster m = __instance.monsters.get(i);
 
-                if (m instanceof Cultist && !replaced) {
+                if (m instanceof Cultist) {
                     // Use original spawn coordinates for left Cultist
                     float x = -590.0F;
                     float y = 10.0F;
@@ -749,32 +767,19 @@ public class Level87 {
                         i, x, y
                     ));
 
-                    // Mark as dead BEFORE removal to prevent state corruption
-                    m.isDead = true;
-                    m.isDying = true;
-
-                    // Remove from monster list
-                    (AbstractDungeon.getMonsters()).monsters.remove(i);
-
-                    // Create and properly initialize Chosen at original Cultist position
+                    // Create and initialize Chosen at original Cultist position
                     Chosen chosen = new Chosen(x, y);
-
-                    // Initialize the Chosen monster (calls init())
                     chosen.init();
 
-                    // Add Chosen at same position
-                    (AbstractDungeon.getMonsters()).monsters.add(i, chosen);
-
-                    // Manually trigger usePreBattleAction for the new Chosen
-                    chosen.usePreBattleAction();
+                    // Replace Cultist with Chosen
+                    __instance.monsters.set(i, chosen);
 
                     logger.info(String.format(
                         "Ascension 87: Successfully replaced Cultist with Chosen at (%.1f, %.1f)",
                         x, y
                     ));
 
-                    // Mark as replaced and exit loop
-                    replaced = true;
+                    // Only replace one Cultist
                     break;
                 }
             }
