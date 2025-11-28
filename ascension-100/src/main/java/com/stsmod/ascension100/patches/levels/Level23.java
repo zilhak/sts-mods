@@ -238,12 +238,25 @@ public class Level23 {
                     damageInfo.base += 5;
                 }
             }
-            logger.info("Ascension 23: Nemesis damage +5");
+
+            // Also update fireDmg field (used in Burns attack - move 2)
+            try {
+                java.lang.reflect.Field fireDmgField = Nemesis.class.getDeclaredField("fireDmg");
+                fireDmgField.setAccessible(true);
+                int currentFireDmg = fireDmgField.getInt(__instance);
+                fireDmgField.setInt(__instance, currentFireDmg + 5);
+                logger.info(String.format("Ascension 23: Nemesis damage +5 (Scythe: %d, Burns: %d)",
+                    __instance.damage.get(0).base, currentFireDmg + 5));
+            } catch (Exception e) {
+                logger.error("Failed to modify Nemesis fireDmg field", e);
+            }
         }
     }
 
     /**
-     * Nemesis getMove() fix: Use actual damage.get(0).base instead of hardcoded 45
+     * Nemesis getMove() fix: Use actual damage values instead of hardcoded values
+     * - Move 3 (Scythe): hardcoded 45 → use damage.get(0).base
+     * - Move 2 (Burns): uses fireDmg field → already fixed in constructor
      */
     @SpirePatch(
         clz = Nemesis.class,
@@ -257,7 +270,7 @@ public class Level23 {
             }
 
             // Nemesis uses move byte 3 (Scythe) with damage.get(0)
-            // But getMove() hardcodes damage value as 45 (line 168)
+            // But getMove() hardcodes damage value as 45 (lines 168, 193, 205)
             // We need to override it with the actual modified damage value
             try {
                 java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
@@ -267,8 +280,9 @@ public class Level23 {
                 if (nextMove == 3) { // Scythe attack
                     int actualDamage = __instance.damage.get(0).base;  // This is 50 after our +5 patch
                     __instance.setMove((byte)3, AbstractMonster.Intent.ATTACK, actualDamage);
-                    logger.info(String.format("Ascension 23: Nemesis getMove fixed to use damage %d", actualDamage));
+                    logger.info(String.format("Ascension 23: Nemesis Scythe getMove fixed to use damage %d", actualDamage));
                 }
+                // Move 2 (Burns) uses fireDmg field which is already fixed in constructor, no need to fix here
             } catch (Exception e) {
                 logger.error("Failed to fix Nemesis getMove", e);
             }

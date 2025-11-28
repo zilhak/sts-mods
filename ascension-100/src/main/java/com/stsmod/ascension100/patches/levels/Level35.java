@@ -201,7 +201,18 @@ public class Level35 {
                     damageInfo.base += 2;
                 }
             }
-            logger.info("Ascension 35: Nemesis damage +2");
+
+            // Also update fireDmg field (used in Burns attack - move 2)
+            try {
+                java.lang.reflect.Field fireDmgField = Nemesis.class.getDeclaredField("fireDmg");
+                fireDmgField.setAccessible(true);
+                int currentFireDmg = fireDmgField.getInt(__instance);
+                fireDmgField.setInt(__instance, currentFireDmg + 2);
+                logger.info(String.format("Ascension 35: Nemesis damage +2 (Scythe: %d, Burns: %d)",
+                    __instance.damage.get(0).base, currentFireDmg + 2));
+            } catch (Exception e) {
+                logger.error("Failed to modify Nemesis fireDmg field", e);
+            }
         }
     }
 
