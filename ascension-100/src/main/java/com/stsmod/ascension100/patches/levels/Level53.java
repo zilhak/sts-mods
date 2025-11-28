@@ -226,16 +226,25 @@ public class Level53 {
         @SpirePostfixPatch
         public static void Postfix(SlaverBlue __instance, float x, float y) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 53) {
-                // Increase Stab damage (+1)
-                if (!__instance.damage.isEmpty()) {
-                    DamageInfo stabDamage = __instance.damage.get(0); // Stab attack
-                    int originalDamage = stabDamage.base;
-                    stabDamage.base += 1;
+                try {
+                    // Increase stabDmg field (+1) - used in getMove() line 124
+                    Field stabDmgField = SlaverBlue.class.getDeclaredField("stabDmg");
+                    stabDmgField.setAccessible(true);
+                    int currentStabDmg = stabDmgField.getInt(__instance);
+                    stabDmgField.setInt(__instance, currentStabDmg + 1);
+
+                    // Also increase damage.get(0).base for consistency
+                    if (!__instance.damage.isEmpty()) {
+                        DamageInfo stabDamage = __instance.damage.get(0);
+                        stabDamage.base += 1;
+                    }
 
                     logger.info(String.format(
                         "Ascension 53: Slaver Blue Stab damage increased from %d to %d",
-                        originalDamage, stabDamage.base
+                        currentStabDmg, currentStabDmg + 1
                     ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Slaver Blue damage", e);
                 }
             }
         }
@@ -253,16 +262,25 @@ public class Level53 {
         @SpirePostfixPatch
         public static void Postfix(SlaverRed __instance, float x, float y) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 53) {
-                // Increase Stab damage (+1)
-                if (!__instance.damage.isEmpty()) {
-                    DamageInfo stabDamage = __instance.damage.get(0); // Stab attack
-                    int originalDamage = stabDamage.base;
-                    stabDamage.base += 1;
+                try {
+                    // Increase stabDmg field (+1) - used in getMove() line 155
+                    Field stabDmgField = SlaverRed.class.getDeclaredField("stabDmg");
+                    stabDmgField.setAccessible(true);
+                    int currentStabDmg = stabDmgField.getInt(__instance);
+                    stabDmgField.setInt(__instance, currentStabDmg + 1);
+
+                    // Also increase damage.get(0).base for consistency
+                    if (!__instance.damage.isEmpty()) {
+                        DamageInfo stabDamage = __instance.damage.get(0);
+                        stabDamage.base += 1;
+                    }
 
                     logger.info(String.format(
                         "Ascension 53: Slaver Red Stab damage increased from %d to %d",
-                        originalDamage, stabDamage.base
+                        currentStabDmg, currentStabDmg + 1
                     ));
+                } catch (Exception e) {
+                    logger.error("Failed to modify Slaver Red damage", e);
                 }
             }
         }

@@ -138,6 +138,30 @@ public class Level23 {
     }
 
     /**
+     * Taskmaster getMove() fix: Use actual damage.get(1).base instead of hardcoded 7
+     */
+    @SpirePatch(
+        clz = Taskmaster.class,
+        method = "getMove"
+    )
+    public static class TaskmasterGetMoveFix {
+        @SpirePostfixPatch
+        public static void Postfix(Taskmaster __instance, int num) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 23) {
+                return;
+            }
+
+            // Taskmaster always uses move byte 2 (Scouring Whip) with damage.get(1)
+            // But getMove() hardcodes damage value as 7
+            // We need to override it with the actual modified damage value
+            int actualDamage = __instance.damage.get(1).base;  // This is 10 after our +3 patch
+            __instance.setMove((byte)2, AbstractMonster.Intent.ATTACK_DEBUFF, actualDamage);
+
+            logger.info(String.format("Ascension 23: Taskmaster getMove fixed to use damage %d", actualDamage));
+        }
+    }
+
+    /**
      * Giant Head: +10 damage (It Is Time attack)
      */
     @SpirePatch(
@@ -162,6 +186,39 @@ public class Level23 {
     }
 
     /**
+     * Giant Head getMove() fix: Use actual damage.get(0).base instead of hardcoded 13
+     */
+    @SpirePatch(
+        clz = GiantHead.class,
+        method = "getMove"
+    )
+    public static class GiantHeadGetMoveFix {
+        @SpirePostfixPatch
+        public static void Postfix(GiantHead __instance, int num) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 23) {
+                return;
+            }
+
+            // GiantHead uses move byte 3 (It Is Time) with damage.get(0)
+            // But getMove() hardcodes damage value as 13 (lines 172, 178)
+            // We need to override it with the actual modified damage value
+            try {
+                java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte nextMove = nextMoveField.getByte(__instance);
+
+                if (nextMove == 3) { // It Is Time attack
+                    int actualDamage = __instance.damage.get(0).base;  // This is 23 after our +10 patch
+                    __instance.setMove((byte)3, AbstractMonster.Intent.ATTACK, actualDamage);
+                    logger.info(String.format("Ascension 23: Giant Head getMove fixed to use damage %d", actualDamage));
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fix Giant Head getMove", e);
+            }
+        }
+    }
+
+    /**
      * Nemesis: +5 damage
      */
     @SpirePatch(
@@ -182,6 +239,39 @@ public class Level23 {
                 }
             }
             logger.info("Ascension 23: Nemesis damage +5");
+        }
+    }
+
+    /**
+     * Nemesis getMove() fix: Use actual damage.get(0).base instead of hardcoded 45
+     */
+    @SpirePatch(
+        clz = Nemesis.class,
+        method = "getMove"
+    )
+    public static class NemesisGetMoveFix {
+        @SpirePostfixPatch
+        public static void Postfix(Nemesis __instance, int num) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 23) {
+                return;
+            }
+
+            // Nemesis uses move byte 3 (Scythe) with damage.get(0)
+            // But getMove() hardcodes damage value as 45 (line 168)
+            // We need to override it with the actual modified damage value
+            try {
+                java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte nextMove = nextMoveField.getByte(__instance);
+
+                if (nextMove == 3) { // Scythe attack
+                    int actualDamage = __instance.damage.get(0).base;  // This is 50 after our +5 patch
+                    __instance.setMove((byte)3, AbstractMonster.Intent.ATTACK, actualDamage);
+                    logger.info(String.format("Ascension 23: Nemesis getMove fixed to use damage %d", actualDamage));
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fix Nemesis getMove", e);
+            }
         }
     }
 
