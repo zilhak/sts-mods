@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  * 5. The Champ: 분노 패턴 체력 10% 회복
  * 6. The Collector: 횃불 머리 소환 방식 변경 (둘이 되도록 → 두마리 소환)
  * 7. Awakened One: 1페이즈 체력 +25
- * 8. Time Eater: 체력 회복 패턴 70%까지 회복
+ * 8. Time Eater: 잔물결(Ripple) 패턴에서 약화 +1, 손상 +1 (총 2턴씩)
  * 9. Donu and Deca: 데카 버프 판금 갑옷 +1
  * 10. Corrupt Heart: 금속화 +20
  */
@@ -323,13 +323,23 @@ public class Level54 {
     }
 
     /**
-     * Time Eater: 체력 회복 패턴 70%까지 회복
+     * Time Eater: Ripple 패턴에서 약화(Weak) +1, 손상(Frail) +1 추가
+     *
+     * 원본 게임 Ripple 패턴 (move 3):
+     * - 방어도 20
+     * - 취약(Vulnerable) 1턴
+     * - 약화(Weak) 1턴
+     * - (A19+) 손상(Frail) 1턴
+     *
+     * Level 54 추가 효과:
+     * - 약화(Weak) +1 (총 2턴)
+     * - 손상(Frail) +1 (총 2턴, A19+ 기준)
      */
     @SpirePatch(
         clz = TimeEater.class,
         method = "takeTurn"
     )
-    public static class TimeEaterHealIncrease {
+    public static class TimeEaterRippleDebuffIncrease {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
         @SpirePrefixPatch
@@ -355,23 +365,29 @@ public class Level54 {
             }
 
             Byte move = lastMove.get();
-            // Move 5 is heal pattern - base game heals to 50%
-            if (move != null && move == 5) {
-                // Calculate additional heal needed to reach 70% (base game heals to 50%)
-                int targetHP = (int) (__instance.maxHealth * 0.70f);
-                int currentHP = __instance.currentHealth;
-                int additionalHeal = Math.max(0, targetHP - currentHP);
+            // Move 3 is Ripple pattern
+            if (move != null && move == 3) {
+                // Add +1 Weak (base game applies 1, so total becomes 2)
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(
+                        AbstractDungeon.player,
+                        __instance,
+                        new com.megacrit.cardcrawl.powers.WeakPower(AbstractDungeon.player, 1, true),
+                        1
+                    )
+                );
 
-                if (additionalHeal > 0) {
-                    AbstractDungeon.actionManager.addToBottom(
-                        new HealAction(__instance, __instance, additionalHeal)
-                    );
+                // Add +1 Frail (base game applies 1 at A19+, so total becomes 2)
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(
+                        AbstractDungeon.player,
+                        __instance,
+                        new com.megacrit.cardcrawl.powers.FrailPower(AbstractDungeon.player, 1, true),
+                        1
+                    )
+                );
 
-                    logger.info(String.format(
-                        "Ascension 54: Time Eater heal pattern boosted by %d to reach 70%% HP",
-                        additionalHeal
-                    ));
-                }
+                logger.info("Ascension 54: Time Eater Ripple pattern added +1 Weak and +1 Frail (total 2 each)");
             }
 
             lastMove.remove();

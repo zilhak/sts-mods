@@ -45,6 +45,7 @@ import com.megacrit.cardcrawl.powers.MalleablePower;
 import com.megacrit.cardcrawl.powers.ThornsPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.vfx.combat.GoldenSlashEffect;
+import com.stsmod.ascension100.powers.LifeLinkPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -438,7 +439,31 @@ public class Level87 {
             }
 
             (AbstractDungeon.getCurrRoom()).cannotLose = true;
-            logger.info("Ascension 87: Enabled cannotLose for Donu/Deca encounter");
+
+            // Add Life Link power to both Donu and Deca
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(
+                    (AbstractCreature)__instance,
+                    (AbstractCreature)__instance,
+                    new LifeLinkPower((AbstractCreature)__instance)
+                )
+            );
+
+            // Find and add to Deca as well
+            for (AbstractMonster m : (AbstractDungeon.getMonsters()).monsters) {
+                if (m.id.equals("Deca")) {
+                    AbstractDungeon.actionManager.addToBottom(
+                        new ApplyPowerAction(
+                            (AbstractCreature)m,
+                            (AbstractCreature)m,
+                            new LifeLinkPower((AbstractCreature)m)
+                        )
+                    );
+                    break;
+                }
+            }
+
+            logger.info("Ascension 87: Enabled cannotLose and Life Link for Donu/Deca encounter");
         }
     }
 
@@ -661,74 +686,77 @@ public class Level87 {
     }
 
     /**
-     * Revive Donu at start of turn if half-dead
-     * Use Prefix to intercept BEFORE switch statement
+     * Add case 99 (death turn - do nothing) and case 98 (revival) to Donu's takeTurn()
      */
     @SpirePatch(
         clz = Donu.class,
         method = "takeTurn"
     )
-    public static class DonuRevive {
+    public static class DonuReviveTakeTurn {
         @SpirePrefixPatch
         public static SpireReturn<Void> Prefix(Donu __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
                 return SpireReturn.Continue();
             }
 
-            logger.info("Ascension 87: Donu takeTurn() called - checking halfDead status");
-            logger.info("Ascension 87: Donu halfDead = " + __instance.halfDead);
+            logger.info("Ascension 87: Donu takeTurn() called, nextMove = " + __instance.nextMove);
 
-            try {
-                if (__instance.halfDead) {
-                    // Revive with 50% HP
-                    int healAmount = __instance.maxHealth / 2;
+            // Case 99: Death turn - do nothing, just wait
+            if (__instance.nextMove == 99) {
+                logger.info("Ascension 87: Donu death turn - doing nothing");
+                // Just add RollMoveAction, which will call getMove() and set move to 98
+                AbstractDungeon.actionManager.addToBottom(
+                    new RollMoveAction(__instance)
+                );
+                return SpireReturn.Return();
+            }
 
-                    // Set currentHealth to 0 to trigger proper heal animation
-                    __instance.currentHealth = 0;
+            // Case 98: Revival turn - actually revive
+            if (__instance.nextMove == 98) {
+                logger.info("Ascension 87: Donu revival turn - reviving now");
 
-                    AbstractDungeon.actionManager.addToBottom(
-                        new HealAction((AbstractCreature)__instance, (AbstractCreature)__instance, healAmount)
-                    );
+                // Revive with 50% HP
+                int healAmount = __instance.maxHealth / 2;
+                __instance.currentHealth = 0;
 
-                    // Restore stored powers
-                    ArrayList<AbstractPower> storedPowerList = storedPowers.get(__instance);
-                    if (storedPowerList != null) {
-                        for (AbstractPower power : storedPowerList) {
-                            AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(
-                                    (AbstractCreature)__instance,
-                                    (AbstractCreature)__instance,
-                                    power,
-                                    power.amount
-                                )
-                            );
-                        }
-                        logger.info(String.format(
-                            "Ascension 87: Restored %d powers to Donu",
-                            storedPowerList.size()
-                        ));
+                AbstractDungeon.actionManager.addToBottom(
+                    new HealAction((AbstractCreature)__instance, (AbstractCreature)__instance, healAmount)
+                );
+
+                // Restore stored powers
+                ArrayList<AbstractPower> storedPowerList = storedPowers.get(__instance);
+                if (storedPowerList != null) {
+                    for (AbstractPower power : storedPowerList) {
+                        AbstractDungeon.actionManager.addToBottom(
+                            new ApplyPowerAction(
+                                (AbstractCreature)__instance,
+                                (AbstractCreature)__instance,
+                                power,
+                                power.amount
+                            )
+                        );
                     }
-
-                    // Clear halfDead state
-                    __instance.halfDead = false;
-                    storedPowers.remove(__instance);
-
-                    // Call RollMoveAction manually
-                    // This will call getMove() which now sees halfDead = false
-                    AbstractDungeon.actionManager.addToBottom(
-                        new RollMoveAction(__instance)
-                    );
-
                     logger.info(String.format(
-                        "Ascension 87: Donu revived with %d HP",
-                        healAmount
+                        "Ascension 87: Restored %d powers to Donu",
+                        storedPowerList.size()
                     ));
-
-                    // Block original takeTurn() since we handle everything here
-                    return SpireReturn.Return();
                 }
-            } catch (Exception e) {
-                logger.error("Ascension 87: Failed to revive Donu", e);
+
+                // Clear halfDead state
+                __instance.halfDead = false;
+                storedPowers.remove(__instance);
+
+                // Call RollMoveAction to determine next move
+                AbstractDungeon.actionManager.addToBottom(
+                    new RollMoveAction(__instance)
+                );
+
+                logger.info(String.format(
+                    "Ascension 87: Donu revived with %d HP",
+                    healAmount
+                ));
+
+                return SpireReturn.Return();
             }
 
             return SpireReturn.Continue();
@@ -736,74 +764,125 @@ public class Level87 {
     }
 
     /**
-     * Revive Deca at start of turn if half-dead
-     * Use Prefix to intercept BEFORE switch statement
+     * Donu getMove() patch to set revival intent when halfDead
+     */
+    @SpirePatch(
+        clz = Donu.class,
+        method = "getMove"
+    )
+    public static class DonuReviveGetMove {
+        @SpirePrefixPatch
+        public static SpireReturn<Void> Prefix(Donu __instance, int num) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
+                return SpireReturn.Continue();
+            }
+
+            if (__instance.halfDead) {
+                logger.info("Ascension 87: Donu getMove() while halfDead - setting revival intent");
+                __instance.setMove((byte)98, AbstractMonster.Intent.BUFF);
+                return SpireReturn.Return();
+            }
+
+            return SpireReturn.Continue();
+        }
+    }
+
+    /**
+     * Add case 99 (death turn - do nothing) and case 98 (revival) to Deca's takeTurn()
      */
     @SpirePatch(
         clz = Deca.class,
         method = "takeTurn"
     )
-    public static class DecaRevive {
+    public static class DecaReviveTakeTurn {
         @SpirePrefixPatch
         public static SpireReturn<Void> Prefix(Deca __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
                 return SpireReturn.Continue();
             }
 
-            logger.info("Ascension 87: Deca takeTurn() called - checking halfDead status");
-            logger.info("Ascension 87: Deca halfDead = " + __instance.halfDead);
+            logger.info("Ascension 87: Deca takeTurn() called, nextMove = " + __instance.nextMove);
 
-            try {
-                if (__instance.halfDead) {
-                    // Revive with 50% HP
-                    int healAmount = __instance.maxHealth / 2;
+            // Case 99: Death turn - do nothing, just wait
+            if (__instance.nextMove == 99) {
+                logger.info("Ascension 87: Deca death turn - doing nothing");
+                // Just add RollMoveAction, which will call getMove() and set move to 98
+                AbstractDungeon.actionManager.addToBottom(
+                    new RollMoveAction(__instance)
+                );
+                return SpireReturn.Return();
+            }
 
-                    // Set currentHealth to 0 to trigger proper heal animation
-                    __instance.currentHealth = 0;
+            // Case 98: Revival turn - actually revive
+            if (__instance.nextMove == 98) {
+                logger.info("Ascension 87: Deca revival turn - reviving now");
 
-                    AbstractDungeon.actionManager.addToBottom(
-                        new HealAction((AbstractCreature)__instance, (AbstractCreature)__instance, healAmount)
-                    );
+                // Revive with 50% HP
+                int healAmount = __instance.maxHealth / 2;
+                __instance.currentHealth = 0;
 
-                    // Restore stored powers
-                    ArrayList<AbstractPower> storedPowerList = storedPowers.get(__instance);
-                    if (storedPowerList != null) {
-                        for (AbstractPower power : storedPowerList) {
-                            AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(
-                                    (AbstractCreature)__instance,
-                                    (AbstractCreature)__instance,
-                                    power,
-                                    power.amount
-                                )
-                            );
-                        }
-                        logger.info(String.format(
-                            "Ascension 87: Restored %d powers to Deca",
-                            storedPowerList.size()
-                        ));
+                AbstractDungeon.actionManager.addToBottom(
+                    new HealAction((AbstractCreature)__instance, (AbstractCreature)__instance, healAmount)
+                );
+
+                // Restore stored powers
+                ArrayList<AbstractPower> storedPowerList = storedPowers.get(__instance);
+                if (storedPowerList != null) {
+                    for (AbstractPower power : storedPowerList) {
+                        AbstractDungeon.actionManager.addToBottom(
+                            new ApplyPowerAction(
+                                (AbstractCreature)__instance,
+                                (AbstractCreature)__instance,
+                                power,
+                                power.amount
+                            )
+                        );
                     }
-
-                    // Clear halfDead state
-                    __instance.halfDead = false;
-                    storedPowers.remove(__instance);
-
-                    // Call RollMoveAction manually
-                    // This will call getMove() which now sees halfDead = false
-                    AbstractDungeon.actionManager.addToBottom(
-                        new RollMoveAction(__instance)
-                    );
-
                     logger.info(String.format(
-                        "Ascension 87: Deca revived with %d HP",
-                        healAmount
+                        "Ascension 87: Restored %d powers to Deca",
+                        storedPowerList.size()
                     ));
-
-                    // Block original takeTurn() since we handle everything here
-                    return SpireReturn.Return();
                 }
-            } catch (Exception e) {
-                logger.error("Ascension 87: Failed to revive Deca", e);
+
+                // Clear halfDead state
+                __instance.halfDead = false;
+                storedPowers.remove(__instance);
+
+                // Call RollMoveAction to determine next move
+                AbstractDungeon.actionManager.addToBottom(
+                    new RollMoveAction(__instance)
+                );
+
+                logger.info(String.format(
+                    "Ascension 87: Deca revived with %d HP",
+                    healAmount
+                ));
+
+                return SpireReturn.Return();
+            }
+
+            return SpireReturn.Continue();
+        }
+    }
+
+    /**
+     * Deca getMove() patch to set revival intent when halfDead
+     */
+    @SpirePatch(
+        clz = Deca.class,
+        method = "getMove"
+    )
+    public static class DecaReviveGetMove {
+        @SpirePrefixPatch
+        public static SpireReturn<Void> Prefix(Deca __instance, int num) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 87) {
+                return SpireReturn.Continue();
+            }
+
+            if (__instance.halfDead) {
+                logger.info("Ascension 87: Deca getMove() while halfDead - setting revival intent");
+                __instance.setMove((byte)98, AbstractMonster.Intent.BUFF);
+                return SpireReturn.Return();
             }
 
             return SpireReturn.Continue();

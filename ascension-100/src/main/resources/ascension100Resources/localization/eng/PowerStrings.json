@@ -7,5 +7,11 @@
       " damage. This effect persists until death.",
       " turns, you will die."
     ]
+  },
+  "ascension100:LifeLink": {
+    "NAME": "Life Link",
+    "DESCRIPTIONS": [
+      "If the other enemy is still alive, revives in #b1 turn at #b50% HP."
+    ]
   }
 }

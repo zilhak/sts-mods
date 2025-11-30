@@ -15,7 +15,6 @@ import com.megacrit.cardcrawl.monsters.ending.CorruptHeart;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.common.MakeTempCardInDiscardAction;
 import com.megacrit.cardcrawl.cards.status.Slimed;
-import com.megacrit.cardcrawl.cards.status.Dazed;
 import com.megacrit.cardcrawl.powers.CuriosityPower;
 import com.megacrit.cardcrawl.powers.WeakPower;
 import com.megacrit.cardcrawl.powers.VulnerablePower;
@@ -323,46 +322,33 @@ public class Level28 {
     }
 
     /**
-     * Donu: Attack adds 1 more Dazed card
+     * Donu: Starts battle with Malleable 1
+     *
+     * 도누는 전투 시작 시 탄성(Malleable) 1을 가지고 시작합니다.
+     * Malleable: 공격받을 때 방어도를 얻고, 매 턴 종료 시 1씩 감소합니다.
      */
     @SpirePatch(
         clz = Donu.class,
-        method = "takeTurn"
+        method = "usePreBattleAction"
     )
-    public static class DonuDazedPatch {
-        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
-
-        @SpirePrefixPatch
-        public static void Prefix(Donu __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 28) {
-                return;
-            }
-
-            try {
-                java.lang.reflect.Field nextMoveField = com.megacrit.cardcrawl.monsters.AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte move = nextMoveField.getByte(__instance);
-                lastMove.set(move);
-            } catch (Exception e) {
-                logger.error("Failed to get Donu move", e);
-            }
-        }
-
+    public static class DonuMalleablePatch {
         @SpirePostfixPatch
         public static void Postfix(Donu __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 28) {
                 return;
             }
 
-            Byte move = lastMove.get();
-            if (move != null && (move == 2 || move == 3)) { // Circle of Power or attack moves
-                AbstractDungeon.actionManager.addToBottom(
-                    new MakeTempCardInDiscardAction(new Dazed(), 1)
-                );
-                logger.info("Ascension 28: Donu added 1 extra Dazed card");
-            }
+            // Apply Malleable 1 at battle start
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(
+                    __instance,
+                    __instance,
+                    new com.megacrit.cardcrawl.powers.MalleablePower(__instance, 1),
+                    1
+                )
+            );
 
-            lastMove.remove();
+            logger.info("Ascension 28: Donu starts battle with Malleable 1");
         }
     }
 
