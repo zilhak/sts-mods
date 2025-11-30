@@ -95,7 +95,8 @@ Base game ascension effects apply unchanged.
 - Snecko: Damage +2
 - Snake Plant: Malleable +1
 - Spheric Guardian: Base Block +15, Max HP -5
-- Bandit Leader: Pointy damage +1, Bear HP +6
+- Masked Bandits: Pointy damage +1, Bear HP +6
+- Repulsor: Repulse pattern adds 1 Dazed card
 - Spiker: HP +5
 - Exploder: HP +5
 - Orb Walker: HP +6
@@ -137,7 +138,7 @@ Base game ascension effects apply unchanged.
 - The Collector: Mega Debuff repeats 2 times (Weak 3, Vulnerable 3, Frail 3 × 2)
 - Awakened One: Curiosity +1
 - Time Eater: Heal up to 70%
-- Donu & Deca: Donu attack Dazed +1
+- Donu & Deca: Donu gains 1 Malleable.
 
 ---
 

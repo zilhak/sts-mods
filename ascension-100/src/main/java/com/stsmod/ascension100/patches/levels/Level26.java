@@ -329,21 +329,23 @@ public class Level26 {
     }
 
     /**
-     * Shape (AcidSlime_M): Dazed pattern adds 1 extra Dazed
+     * Repulsor: Repulse pattern adds 1 extra Dazed
+     * 현혹기(Repulsor): 어지러움(Repulse) 패턴에서 Dazed 카드 +1장 추가
      */
     @SpirePatch(
-        clz = AcidSlime_M.class,
+        clz = Repulsor.class,
         method = "takeTurn"
     )
-    public static class ShapeDazedPatch {
+    public static class RepulsorDazedPatch {
         @SpirePostfixPatch
-        public static void Postfix(AcidSlime_M __instance) {
+        public static void Postfix(Repulsor __instance) {
             if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
-                if (__instance.nextMove == 3) { // Corrosive Spit move
+                // The Repulse move is ID 2
+                if (__instance.nextMove == 2) {
                     AbstractDungeon.actionManager.addToBottom(
                         new MakeTempCardInDiscardAction(new Dazed(), 1)
                     );
-                    logger.info("Ascension 26: Shape added 1 extra Dazed card");
+                    logger.info("Ascension 26: Repulsor added 1 extra Dazed card on Repulse");
                 }
             }
         }
