@@ -232,8 +232,8 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 39: Max HP Reduction
-**Effect**: Starting max HP reduced by additional 5.
+## Level 39: Rest Site Heal Reduction
+**Effect**: When resting, HP healed is reduced by 3% (from 30% to 27%).
 
 ---
 
@@ -348,14 +348,57 @@ Base game ascension effects apply unchanged.
 ## Level 53: Enemy Pattern Additional Enhancement
 **Effect**: Enemy behavior patterns further enhanced.
 
-**Details**: Multiple enemies receive pattern enhancements. See planning document for full details.
+**Details**:
+- Louse (Normal/Defensive): Grow pattern grants +1 additional Strength.
+- Slime: Lick pattern is used less frequently by all slimes.
+- Looter: Smoke Bomb block +4.
+- Jaw Worm: Starts with 3 Block on turn 1.
+- Slavers (Blue/Red): Damage +1.
+- Fungi Beast: Spore Cloud power reduced by 1, but on-death debuff also applies Frail.
+- Gremlins:
+  - Shield Gremlin: Block amount +3.
+  - Wizard Gremlin: Damage +5.
+  - Mad Gremlin: HP +10.
+  - Fat Gremlin: HP +2.
+  - Sneaky Gremlin: Damage +2.
+- Shelled Parasite: Plated Armor +2.
+- Mugger: Thievery +5, Smoke Bomb block +3.
+- Chosen: Damage +2.
+- Centurion: HP +6.
+- Healer: Heal pattern amount +5.
+- Snecko: Damage +2.
+- Snake Plant: Base Malleable +1.
+- Spheric Guardian: Initial block +15.
+- Masked Bandits:
+  - Pointy: Damage +1.
+  - Romeo: HP +5.
+  - Bear: Bear Hug dexterity reduction +1.
+- Repulsor: Damage +2.
+- Spiker: Thorns gain +1.
+- Exploder: Explosion damage increased to 50.
+- Orb Walker: HP +10.
+- Darkling: Gains Strength +2 on revive.
+- The Maw: Roar pattern Weak and Frail +1.
+- Transient: Damage +5.
+- Spire Growth: HP +15.
+- Writhing Mass: Can use Implant pattern twice.
 
 ---
 
 ## Level 54: Boss Pattern Additional Enhancement
 **Effect**: Boss patterns further enhanced.
 
-**Details**: All bosses receive pattern enhancements. See planning document for full details.
+**Details**:
+- Slime Boss: Slam damage +17.
+- The Guardian: Gains +1 additional Sharp Hide in defensive mode.
+- Hexaghost: Inferno pattern adds 2 extra Burns to discard pile.
+- Bronze Automaton: Spawned Bronze Orbs start with +2 Artifact.
+- The Champ: Anger pattern now heals for 10% of max HP.
+- The Collector: Summons 2 Torch Heads instead of summoning up to 2.
+- Awakened One: Phase 1 HP +25.
+- Time Eater: Ripple pattern applies an additional +1 Weak and +1 Frail.
+- Donu and Deca: Deca's buff pattern also grants +1 Plated Armor.
+- Corrupt Heart: Starts with +20 Metallicize.
 
 ---
 
@@ -643,7 +686,27 @@ Base game ascension effects apply unchanged.
 ## Level 86: Enemy Pattern Major Enhancement
 **Effect**: Enemy patterns majorly enhanced.
 
-**Details**: Multiple enemies receive major pattern enhancements. See planning document for full details.
+**Details**:
+- Louse: Curl Up amount +6.
+- Looter: Thievery +10, Smoke Bomb block +5.
+- Fungi Beast: On-death debuff also applies 1 Weak. Spore Cloud power +1.
+- Gremlins:
+  - Shield Gremlin: Block amount +3.
+  - Wizard Gremlin: Damage +5.
+  - Mad Gremlin: HP +2.
+  - Fat Gremlin: HP +2.
+  - Sneaky Gremlin: Damage +1.
+- Shelled Parasite: Plated Armor +2.
+- Mugger: Thievery +15, Smoke Bomb block +3.
+- Healer: Heal amount +3.
+- Snake Plant: Base Malleable +2.
+- Spheric Guardian: Harden block +10.
+- Masked Bandits:
+  - Bear: Bear Hug dexterity loss +1.
+- Spiker: Thorns gain +1.
+- Exploder: Explosion damage increased to 60.
+- The Maw: Roar pattern Weak and Frail +1.
+- Transient: Fading +1.
 
 **Key enhancements**:
 - Louse: Curl Up +6
