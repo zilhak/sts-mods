@@ -54,12 +54,24 @@ public class Level72 {
 
             // If no Centurion, use Vampire Attack pattern
             if (!hasCenturion) {
+                // Calculate damage with powers for intent display
+                // Create temporary DamageInfo and apply powers
+                DamageInfo tempDamage = new DamageInfo(
+                    (AbstractCreature)__instance,
+                    VAMPIRE_DAMAGE,
+                    DamageInfo.DamageType.NORMAL
+                );
+                tempDamage.applyPowers(__instance, AbstractDungeon.player);
+
                 __instance.setMove(
                     VAMPIRE_ATTACK,
                     AbstractMonster.Intent.ATTACK_BUFF,
-                    VAMPIRE_DAMAGE
+                    tempDamage.output  // Use calculated damage for intent
                 );
-                logger.info("Ascension 72: Healer using Vampire Attack (no Centurion present)");
+                logger.info(String.format(
+                    "Ascension 72: Healer using Vampire Attack (no Centurion present) - Intent: %d damage",
+                    tempDamage.output
+                ));
                 return SpireReturn.Return(null);  // Skip original getMove logic
             }
 
@@ -88,12 +100,20 @@ public class Level72 {
                     new AnimateSlowAttackAction((AbstractCreature)__instance)
                 );
 
-                // Deal damage
+                // Create DamageInfo and apply all powers (Strength, Weak, Vulnerable, etc.)
+                // CRITICAL: Must call applyPowers() to apply Strength, Weak, Vulnerable, etc.
+                // The game engine normally calls this in AbstractMonster.applyPowers() for
+                // the damage[] array, but since we're creating a custom DamageInfo,
+                // we must call it manually!
                 DamageInfo vampireDamage = new DamageInfo(
                     (AbstractCreature)__instance,
                     VAMPIRE_DAMAGE,
                     DamageInfo.DamageType.NORMAL
                 );
+
+                // Apply all powers: Strength, Weak, Vulnerable, etc.
+                vampireDamage.applyPowers(__instance, AbstractDungeon.player);
+
                 AbstractDungeon.actionManager.addToBottom(
                     new DamageAction(
                         (AbstractCreature)AbstractDungeon.player,
@@ -117,8 +137,10 @@ public class Level72 {
                 );
 
                 logger.info(String.format(
-                    "Ascension 72: Healer executed Vampire Attack (%d damage, heal %d HP)",
-                    VAMPIRE_DAMAGE, VAMPIRE_HEAL
+                    "Ascension 72: Healer executed Vampire Attack (%d base damage → %d after powers, heal %d HP)",
+                    VAMPIRE_DAMAGE,
+                    vampireDamage.output,
+                    VAMPIRE_HEAL
                 ));
 
                 // Skip original takeTurn logic

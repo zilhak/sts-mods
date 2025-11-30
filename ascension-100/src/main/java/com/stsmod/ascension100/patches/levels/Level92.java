@@ -267,18 +267,11 @@ public class Level92 {
                 logger.info("Ascension 92: Transient gained Invincible 200 (천하무적)");
             }
 
-            // Looter: Increase Thievery by 10 and escapeDef by 3
-            if (id.equals("Looter")) {
-                AbstractPower thieveryPower = __instance.getPower("Thievery");
-                if (thieveryPower != null) {
-                    thieveryPower.amount += 10;
-                    thieveryPower.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 92: Looter Thievery increased by 10 to %d",
-                        thieveryPower.amount
-                    ));
-                }
+            // NOTE: Looter and Mugger Thievery increases moved to separate Prefix/Postfix patches
+            // to properly modify goldAmt BEFORE ThieveryPower is created
 
+            // Looter: Increase escapeDef by 3
+            if (id.equals("Looter")) {
                 try {
                     Field escapeDefField = __instance.getClass().getDeclaredField("escapeDef");
                     escapeDefField.setAccessible(true);
@@ -291,19 +284,6 @@ public class Level92 {
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify Looter escapeDef", e);
-                }
-            }
-
-            // Mugger: Increase Thievery by 20
-            if (id.equals("Mugger")) {
-                AbstractPower thieveryPower = __instance.getPower("Thievery");
-                if (thieveryPower != null) {
-                    thieveryPower.amount += 20;
-                    thieveryPower.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 92: Mugger Thievery increased by 20 to %d",
-                        thieveryPower.amount
-                    ));
                 }
             }
 
@@ -1785,6 +1765,112 @@ public class Level92 {
                 }
             } catch (Exception e) {
                 logger.error("Failed to modify Mugger Smoke Bomb block", e);
+            }
+        }
+    }
+
+    /**
+     * Looter: Thievery +10
+     *
+     * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates ThieveryPower
+     * Separate patch required because ShelledParasiteAndOthers runs in Postfix
+     */
+    @SpirePatch(
+        clz = com.megacrit.cardcrawl.monsters.exordium.Looter.class,
+        method = "usePreBattleAction"
+    )
+    public static class LooterThieveryIncrease {
+        @SpirePrefixPatch
+        public static void Prefix(com.megacrit.cardcrawl.monsters.exordium.Looter __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Increase goldAmt BEFORE ThieveryPower is created
+                Field goldAmtField = com.megacrit.cardcrawl.monsters.exordium.Looter.class.getDeclaredField("goldAmt");
+                goldAmtField.setAccessible(true);
+                int currentGoldAmt = goldAmtField.getInt(__instance);
+                goldAmtField.setInt(__instance, currentGoldAmt + 10);
+
+                logger.info(String.format(
+                    "Ascension 92: Looter goldAmt increased from %d to %d (Thievery will be %d)",
+                    currentGoldAmt, currentGoldAmt + 10, currentGoldAmt + 10
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify Looter goldAmt", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(com.megacrit.cardcrawl.monsters.exordium.Looter __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Reset goldAmt back to original after ThieveryPower is created
+                Field goldAmtField = com.megacrit.cardcrawl.monsters.exordium.Looter.class.getDeclaredField("goldAmt");
+                goldAmtField.setAccessible(true);
+                int currentGoldAmt = goldAmtField.getInt(__instance);
+                goldAmtField.setInt(__instance, currentGoldAmt - 10);
+
+                logger.info("Ascension 92: Looter goldAmt reset to original (Thievery amount remains increased)");
+            } catch (Exception e) {
+                logger.error("Failed to reset Looter goldAmt", e);
+            }
+        }
+    }
+
+    /**
+     * Mugger: Thievery +20
+     *
+     * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates ThieveryPower
+     * Separate patch required because ShelledParasiteAndOthers runs in Postfix
+     */
+    @SpirePatch(
+        clz = com.megacrit.cardcrawl.monsters.city.Mugger.class,
+        method = "usePreBattleAction"
+    )
+    public static class MuggerThieveryIncrease {
+        @SpirePrefixPatch
+        public static void Prefix(com.megacrit.cardcrawl.monsters.city.Mugger __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Increase goldAmt BEFORE ThieveryPower is created
+                Field goldAmtField = com.megacrit.cardcrawl.monsters.city.Mugger.class.getDeclaredField("goldAmt");
+                goldAmtField.setAccessible(true);
+                int currentGoldAmt = goldAmtField.getInt(__instance);
+                goldAmtField.setInt(__instance, currentGoldAmt + 20);
+
+                logger.info(String.format(
+                    "Ascension 92: Mugger goldAmt increased from %d to %d (Thievery will be %d)",
+                    currentGoldAmt, currentGoldAmt + 20, currentGoldAmt + 20
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify Mugger goldAmt", e);
+            }
+        }
+
+        @SpirePostfixPatch
+        public static void Postfix(com.megacrit.cardcrawl.monsters.city.Mugger __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Reset goldAmt back to original after ThieveryPower is created
+                Field goldAmtField = com.megacrit.cardcrawl.monsters.city.Mugger.class.getDeclaredField("goldAmt");
+                goldAmtField.setAccessible(true);
+                int currentGoldAmt = goldAmtField.getInt(__instance);
+                goldAmtField.setInt(__instance, currentGoldAmt - 20);
+
+                logger.info("Ascension 92: Mugger goldAmt reset to original (Thievery amount remains increased)");
+            } catch (Exception e) {
+                logger.error("Failed to reset Mugger goldAmt", e);
             }
         }
     }
