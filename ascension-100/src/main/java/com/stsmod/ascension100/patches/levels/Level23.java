@@ -162,7 +162,16 @@ public class Level23 {
     }
 
     /**
-     * Giant Head: +10 damage (It Is Time attack)
+     * Giant Head: +10 damage (It Is Time attack only)
+     *
+     * Pattern bytes:
+     * - GLARE = 1 (debuff only)
+     * - IT_IS_TIME = 2 (uses damage[1~7])
+     * - COUNT = 3 (uses damage[0])
+     *
+     * damage array:
+     * - damage[0] = 13 (COUNT attack) - NOT modified
+     * - damage[1~7] = startingDeathDmg + (0~30) (IT IS TIME) - +10 to all
      */
     @SpirePatch(
         clz = GiantHead.class,
@@ -176,17 +185,26 @@ public class Level23 {
                 return;
             }
 
-            for (DamageInfo damageInfo : __instance.damage) {
+            // Only modify IT IS TIME attacks (damage indices 1~7)
+            // Skip damage[0] which is COUNT attack
+            for (int i = 1; i < __instance.damage.size(); i++) {
+                DamageInfo damageInfo = __instance.damage.get(i);
                 if (damageInfo != null && damageInfo.base > 0) {
                     damageInfo.base += 10;
                 }
             }
-            logger.info("Ascension 23: Giant Head damage +10");
+            logger.info("Ascension 23: Giant Head IT IS TIME damage +10 (damage[1-7])");
         }
     }
 
     /**
-     * Giant Head getMove() fix: Use actual damage.get(0).base instead of hardcoded 13
+     * Giant Head getMove() fix: IT IS TIME damage display
+     *
+     * Original getMove() line 161:
+     * setMove((byte)2, Intent.ATTACK, startingDeathDmg - count * 5)
+     *
+     * This hardcodes the damage calculation instead of using damage array.
+     * We intercept after getMove() and recalculate using modified damage[index].
      */
     @SpirePatch(
         clz = GiantHead.class,
@@ -199,21 +217,33 @@ public class Level23 {
                 return;
             }
 
-            // GiantHead uses move byte 3 (It Is Time) with damage.get(0)
-            // But getMove() hardcodes damage value as 13 (lines 172, 178)
-            // We need to override it with the actual modified damage value
             try {
+                // Check if IT IS TIME move was set
                 java.lang.reflect.Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
                 nextMoveField.setAccessible(true);
                 byte nextMove = nextMoveField.getByte(__instance);
 
-                if (nextMove == 3) { // It Is Time attack
-                    int actualDamage = __instance.damage.get(0).base;  // This is 23 after our +10 patch
-                    __instance.setMove((byte)3, AbstractMonster.Intent.ATTACK, actualDamage);
-                    logger.info(String.format("Ascension 23: Giant Head getMove fixed to use damage %d", actualDamage));
+                if (nextMove == 2) { // IT_IS_TIME
+                    // Get count to calculate damage index
+                    java.lang.reflect.Field countField = GiantHead.class.getDeclaredField("count");
+                    countField.setAccessible(true);
+                    int count = countField.getInt(__instance);
+
+                    // takeTurn() uses: index = 1 - count
+                    int index = 1 - count;
+                    if (index > 7) {
+                        index = 7;
+                    }
+
+                    // Use modified damage array value
+                    int actualDamage = __instance.damage.get(index).base;
+                    __instance.setMove((byte)2, AbstractMonster.Intent.ATTACK, actualDamage);
+
+                    logger.info(String.format("Ascension 23: Giant Head IT IS TIME Intent updated to %d (count=%d, index=%d)",
+                        actualDamage, count, index));
                 }
             } catch (Exception e) {
-                logger.error("Failed to fix Giant Head getMove", e);
+                logger.error("Failed to fix Giant Head IT IS TIME Intent", e);
             }
         }
     }
