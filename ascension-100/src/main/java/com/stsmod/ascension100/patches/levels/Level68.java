@@ -160,9 +160,82 @@ public class Level68 {
     }
 
     /**
+     * GiantHead: Fix Count attack Intent in createIntent()
+     *
+     * PROBLEM: createIntent() is called after rollMove() and recalculates intentDmg
+     * using this.move.baseDamage which is hardcoded to 13 in getMove()
+     *
+     * CALL SEQUENCE:
+     * 1. rollMove() → getMove() → setMove((byte)3, ATTACK, 13)
+     *    → this.move.baseDamage = 13
+     * 2. createIntent()
+     *    → calculateDamage(this.move.baseDamage=13)
+     *    → this.intentDmg = 13 (WRONG!)
+     *
+     * FIX: Patch createIntent() Postfix to correct intentDmg using damage[0].base
+     *
+     * Patches AbstractMonster.createIntent() since GiantHead doesn't override it
+     */
+    @SpirePatch(
+        clz = AbstractMonster.class,
+        method = "createIntent"
+    )
+    public static class GiantHeadCreateIntentFix {
+        @SpirePostfixPatch
+        public static void Postfix(AbstractMonster __instance) {
+            // Only apply to GiantHead
+            if (!(__instance instanceof GiantHead)) {
+                return;
+            }
+
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
+                return;
+            }
+
+            try {
+                // Check if current move is COUNT (byte 3)
+                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
+                nextMoveField.setAccessible(true);
+                byte nextMove = nextMoveField.getByte(__instance);
+
+                if (nextMove == 3) {
+                    // createIntent() just called calculateDamage(this.move.baseDamage=13)
+                    // Fix it to use damage[0].base instead
+                    int actualDamage = __instance.damage.get(0).base;  // Use base (14)
+
+                    // Update intentDmg field (this is what displays in the Intent)
+                    Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
+                    intentDmgField.setAccessible(true);
+                    int currentIntentDmg = intentDmgField.getInt(__instance);
+
+                    if (currentIntentDmg != actualDamage) {
+                        intentDmgField.setInt(__instance, actualDamage);
+                        logger.info(String.format(
+                            "Ascension 68: GiantHead Count Intent fixed in createIntent from %d to %d",
+                            currentIntentDmg, actualDamage
+                        ));
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fix GiantHead Count Intent in createIntent", e);
+            }
+        }
+    }
+
+    /**
      * GiantHead: Fix Count attack Intent in applyPowers()
-     * applyPowers() recalculates Intent damage using this.move.baseDamage every turn,
-     * so we must fix it after applyPowers() completes
+     *
+     * PROBLEM: applyPowers() also recalculates intentDmg using this.move.baseDamage
+     * This is called every turn after player ends turn
+     *
+     * CALL SEQUENCE:
+     * 1. Player ends turn
+     * 2. applyPowers()
+     *    → calculateDamage(this.move.baseDamage=13)
+     *    → this.intentDmg = 13 (WRONG!)
+     *
+     * FIX: Patch applyPowers() Postfix to correct intentDmg using damage[0].output
+     * (use .output instead of .base because powers have already been applied)
      *
      * Patches AbstractMonster.applyPowers() since GiantHead doesn't override it
      */
@@ -189,17 +262,17 @@ public class Level68 {
                 byte nextMove = nextMoveField.getByte(__instance);
 
                 if (nextMove == 3) {
-                    // applyPowers() just recalculated Intent using this.move.baseDamage (13)
-                    // We need to fix it to use damage.get(0).output instead
-                    int actualDamage = __instance.damage.get(0).output;  // Use output after applyPowers
+                    // applyPowers() just called calculateDamage(this.move.baseDamage=13)
+                    // Fix it to use damage[0].output (after powers applied)
+                    int actualDamage = __instance.damage.get(0).output;  // Use output after powers
 
-                    // Update intentBaseDmg field directly since calculateDamage was just called
-                    Field intentBaseDmgField = AbstractMonster.class.getDeclaredField("intentBaseDmg");
-                    intentBaseDmgField.setAccessible(true);
-                    int currentIntentDmg = intentBaseDmgField.getInt(__instance);
+                    // Update intentDmg field (this is what displays in the Intent)
+                    Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
+                    intentDmgField.setAccessible(true);
+                    int currentIntentDmg = intentDmgField.getInt(__instance);
 
                     if (currentIntentDmg != actualDamage) {
-                        intentBaseDmgField.setInt(__instance, actualDamage);
+                        intentDmgField.setInt(__instance, actualDamage);
                         logger.info(String.format(
                             "Ascension 68: GiantHead Count Intent fixed in applyPowers from %d to %d",
                             currentIntentDmg, actualDamage
