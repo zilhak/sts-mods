@@ -1275,8 +1275,8 @@ public class Level92 {
 
     /**
      * Lagavulin's Soul Sap (DEBUFF) pattern has enhanced debuffs at A92+
-     * Base game: Dexterity -1/-2, Strength -1/-2
-     * A92+: Additional Dexterity -3, Strength -3, Metallicize -2
+     * Base game: Dexterity -1/-2, Strength -1/-2 (A18+: -2/-2)
+     * A92+: Additional Dexterity -1, Strength -1, Focus -2
      */
     @SpirePatch(
         clz = Lagavulin.class,
@@ -1308,7 +1308,7 @@ public class Level92 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 3) { // DEBUFF move (Soul Sap) is case 3, not 1
+            if (move != null && move == 1) { // DEBUFF move (Soul Sap) is case 1
                 // Find and modify the last ApplyPowerAction with DexterityPower and StrengthPower
                 try {
                     boolean foundDex = false;
@@ -1323,28 +1323,28 @@ public class Level92 {
                             AbstractPower power = (AbstractPower) powerToApplyField.get(action);
 
                             if (!foundDex && power instanceof DexterityPower && power.owner == AbstractDungeon.player) {
-                                power.amount -= 3; // Make it more negative
+                                power.amount -= 1; // Make it more negative
 
                                 Field amountField = ApplyPowerAction.class.getDeclaredField("amount");
                                 amountField.setAccessible(true);
                                 int currentAmount = amountField.getInt(action);
-                                amountField.setInt(action, currentAmount - 3);
+                                amountField.setInt(action, currentAmount - 1);
 
                                 logger.info(String.format(
-                                    "Ascension 92: Lagavulin Dexterity debuff increased by -3 (total: %d)",
+                                    "Ascension 92: Lagavulin Dexterity debuff increased by -1 (total: %d)",
                                     power.amount
                                 ));
                                 foundDex = true;
                             } else if (!foundStr && power instanceof StrengthPower && power.owner == AbstractDungeon.player) {
-                                power.amount -= 3; // Make it more negative
+                                power.amount -= 1; // Make it more negative
 
                                 Field amountField = ApplyPowerAction.class.getDeclaredField("amount");
                                 amountField.setAccessible(true);
                                 int currentAmount = amountField.getInt(action);
-                                amountField.setInt(action, currentAmount - 3);
+                                amountField.setInt(action, currentAmount - 1);
 
                                 logger.info(String.format(
-                                    "Ascension 92: Lagavulin Strength debuff increased by -3 (total: %d)",
+                                    "Ascension 92: Lagavulin Strength debuff increased by -1 (total: %d)",
                                     power.amount
                                 ));
                                 foundStr = true;
@@ -1352,18 +1352,16 @@ public class Level92 {
                         }
                     }
 
-                    // Reduce Lagavulin's Metallicize by 2
-                    if (__instance.hasPower("Metallicize")) {
-                        AbstractDungeon.actionManager.addToBottom(
-                            new ReducePowerAction(
-                                (AbstractCreature)__instance,
-                                (AbstractCreature)__instance,
-                                "Metallicize",
-                                2
-                            )
-                        );
-                        logger.info("Ascension 92: Lagavulin Metallicize reduced by 2");
-                    }
+                    // Apply Focus -2 to player
+                    AbstractDungeon.actionManager.addToBottom(
+                        new ApplyPowerAction(
+                            (AbstractCreature)AbstractDungeon.player,
+                            (AbstractCreature)__instance,
+                            new FocusPower((AbstractCreature)AbstractDungeon.player, -2),
+                            -2
+                        )
+                    );
+                    logger.info("Ascension 92: Lagavulin applied Focus -2 to player");
                 } catch (Exception e) {
                     logger.error("Failed to modify Lagavulin debuff amount", e);
                 }

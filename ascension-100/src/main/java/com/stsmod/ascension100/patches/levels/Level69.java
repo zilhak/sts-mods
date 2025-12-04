@@ -3,6 +3,7 @@ package com.stsmod.ascension100.patches.levels;
 import com.badlogic.gdx.math.MathUtils;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -72,8 +73,8 @@ public class Level69 {
         method = "usePreBattleAction"
     )
     public static class BossDamageByActIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 69) {
                 return;
             }
@@ -107,7 +108,7 @@ public class Level69 {
                     }
 
                     logger.info(String.format(
-                        "Ascension 69: Boss %s damage increased by %d (Act %d)",
+                        "Ascension 69: Boss %s damage increased by %d (Act %d) [init prefix]",
                         __instance.name, damageIncrease, actNum
                     ));
                 }

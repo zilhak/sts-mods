@@ -26,11 +26,12 @@ public class Level58 {
      */
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init",
+        paramtypez = {}
     )
     public static class NormalDamageIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 58) {
                 return;
             }
@@ -46,7 +47,7 @@ public class Level58 {
                 }
 
                 logger.info(String.format(
-                    "Ascension 58: Normal %s damage increased by %d",
+                    "Ascension 58: Normal %s damage increased by %d [init prefix]",
                     __instance.name, damageIncrease
                 ));
             }

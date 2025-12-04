@@ -2,11 +2,16 @@ package com.stsmod.ascension100.patches.levels;
 
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Ascension Level 68: Enemy damage increased by act
@@ -21,17 +26,29 @@ public class Level68 {
 
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class DamageByActIncrease {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
+        // Track which monsters have already been patched to prevent duplicate application
+        private static final Set<AbstractMonster> patchedMonsters = Collections.newSetFromMap(new WeakHashMap<>());
+
+        @SpirePrefixPatch
+        public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
                 return;
             }
 
             // Skip byrd in Act 2 (handled by special Level 62 logic)
             if (AbstractDungeon.actNum == 2 && __instance.id != null && __instance.id.equals("Byrd")) {
+                return;
+            }
+
+            // Check if already patched
+            if (patchedMonsters.contains(__instance)) {
+                logger.warn(String.format(
+                    "Ascension 68: Skipping duplicate damage increase for %s (already patched)",
+                    __instance.name
+                ));
                 return;
             }
 
@@ -49,14 +66,18 @@ public class Level68 {
             if (damageIncrease > 0) {
                 for (DamageInfo damageInfo : __instance.damage) {
                     if (damageInfo != null && damageInfo.base > 0) {
+                        int originalDamage = damageInfo.base;
                         damageInfo.base += damageIncrease;
+
+                        logger.info(String.format(
+                            "Ascension 68: %s (%s) damage increased from %d to %d (Act %d)",
+                            __instance.name, __instance.type, originalDamage, damageInfo.base, actNum
+                        ));
                     }
                 }
 
-                logger.info(String.format(
-                    "Ascension 68: %s (%s) damage increased by %d (Act %d)",
-                    __instance.name, __instance.type, damageIncrease, actNum
-                ));
+                // Mark as patched
+                patchedMonsters.add(__instance);
             }
         }
     }

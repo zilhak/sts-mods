@@ -675,11 +675,11 @@ Base game ascension effects apply unchanged.
 **Effect**: Some events changed to be more hostile.
 
 **Details**:
-- "Match and Keep!" event: Card composition changed (includes paired character color cards, special character color cards, rare cards, special colorless cards, and curse cards)
-- "Face Trader" event: "Touch" option now reduces max HP by 15%
-- "Bonfire Elementals" event: Special card offering now heals only 80% of missing HP instead of full heal
-- "N'loth" event: All options cost 10 more gold
-- "Shining Light" event: HP loss increased by 1, relic acquisition probability increased by 10%
+- "Match and Keep!" event: Card composition changed (includes 1 pair each of: Common character card, Uncommon character card, Rare character card, Uncommon colorless card, and 2 pairs of Curse cards)
+- "Face Trader" event: "Touch" option now reduces max HP by 15% (increased from 10%)
+- "Bonfire Spirits" event: Special card offering now heals only 80% of missing HP instead of full heal
+- "The Woman in Blue" event: All option costs increased by 10 gold
+- "Scrap Ooze" event: Initial damage increased by 1, relic acquisition probability increased by 10%
 
 ---
 
@@ -811,7 +811,7 @@ Base game ascension effects apply unchanged.
 
 **Elites**:
 - Gremlin Nob: Bellow pattern gains +2 additional Enrage
-- Lagavulin: Siphon Soul reduces Dexterity/Strength by 3, Focus by 2
+- Lagavulin: Siphon Soul reduces Dexterity/Strength by additional 1, applies Focus -2
 - Sentry: Bolt pattern shuffles 1 additional Dazed
 - Book of Stabbing: Multi-Stab count +1
 - Gremlin Leader: Rally pattern Strength +4

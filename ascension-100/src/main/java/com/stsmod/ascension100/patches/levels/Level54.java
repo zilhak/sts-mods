@@ -164,7 +164,8 @@ public class Level54 {
      */
     @SpirePatch(
         clz = SlimeBoss.class,
-        method = "usePreBattleAction"
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = {}
     )
     public static class SlimeBossSlamDamageIncrease {
         @SpirePostfixPatch
