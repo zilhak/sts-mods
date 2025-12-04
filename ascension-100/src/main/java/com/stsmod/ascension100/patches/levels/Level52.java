@@ -74,6 +74,7 @@ public class Level52 {
                 for (DamageInfo damageInfo : __instance.damage) {
                     if (damageInfo != null && damageInfo.base > 0) {
                         damageInfo.base += damageIncrease;
+                        damageInfo.output = damageInfo.base;  // Update output to match base
                     }
                 }
 

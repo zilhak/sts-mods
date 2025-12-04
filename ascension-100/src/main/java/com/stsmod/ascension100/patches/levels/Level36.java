@@ -41,6 +41,7 @@ public class Level36 {
                 for (int i = 0; i < __instance.damage.size(); i++) {
                     if (__instance.damage.get(i) != null && __instance.damage.get(i).base > 0) {
                         __instance.damage.get(i).base += damageIncrease;
+                        __instance.damage.get(i).output = __instance.damage.get(i).base;  // Update output to match base
                     }
                 }
 

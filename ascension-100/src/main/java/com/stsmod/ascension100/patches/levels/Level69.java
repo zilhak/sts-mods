@@ -10,6 +10,10 @@ import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 /**
  * Ascension Level 69: Bosses enhanced by act
  *
@@ -70,9 +74,12 @@ public class Level69 {
 
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class BossDamageByActIncrease {
+        // Track which monsters have already been patched to prevent duplicate application
+        private static final Set<AbstractMonster> patchedMonsters = Collections.newSetFromMap(new WeakHashMap<>());
+
         @SpirePrefixPatch
         public static void Prefix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 69) {
@@ -80,6 +87,15 @@ public class Level69 {
             }
 
             if (__instance.type == AbstractMonster.EnemyType.BOSS) {
+                // Check if already patched
+                if (patchedMonsters.contains(__instance)) {
+                    logger.warn(String.format(
+                        "Ascension 69: Skipping duplicate damage increase for %s (already patched)",
+                        __instance.name
+                    ));
+                    return;
+                }
+
                 int actNum = AbstractDungeon.actNum;
                 int damageIncrease = 0;
 
@@ -104,13 +120,17 @@ public class Level69 {
                     for (DamageInfo damageInfo : __instance.damage) {
                         if (damageInfo != null && damageInfo.base > 0) {
                             damageInfo.base += damageIncrease;
+                            damageInfo.output = damageInfo.base;  // Update output to match base
                         }
                     }
 
                     logger.info(String.format(
-                        "Ascension 69: Boss %s damage increased by %d (Act %d) [init prefix]",
+                        "Ascension 69: Boss %s damage increased by %d (Act %d)",
                         __instance.name, damageIncrease, actNum
                     ));
+
+                    // Mark as patched
+                    patchedMonsters.add(__instance);
                 }
             }
         }

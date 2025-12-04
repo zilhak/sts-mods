@@ -4,6 +4,10 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 import com.megacrit.cardcrawl.monsters.ending.CorruptHeart;
 import com.megacrit.cardcrawl.monsters.exordium.SlimeBoss;
 import com.megacrit.cardcrawl.monsters.exordium.TheGuardian;
@@ -88,9 +92,12 @@ public class Level37 {
 
     @SpirePatch(
         clz = AbstractMonster.class,
-        method = "usePreBattleAction"
+        method = "init"
     )
     public static class BossDamageAdjustment {
+        // Track which monsters have already been patched to prevent duplicate application
+        private static final Set<AbstractMonster> patchedMonsters = Collections.newSetFromMap(new WeakHashMap<>());
+
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 37) {
@@ -100,6 +107,15 @@ public class Level37 {
             // Only apply to Act 1-3 bosses, exclude Corrupt Heart
             if (__instance.type != AbstractMonster.EnemyType.BOSS ||
                 __instance instanceof CorruptHeart) {
+                return;
+            }
+
+            // Check if already patched
+            if (patchedMonsters.contains(__instance)) {
+                logger.warn(String.format(
+                    "Ascension 37: Skipping duplicate damage adjustment for %s (already patched)",
+                    __instance.name
+                ));
                 return;
             }
 
@@ -124,9 +140,11 @@ public class Level37 {
                 for (int i = 0; i < __instance.damage.size(); i++) {
                     if (__instance.damage.get(i) != null && __instance.damage.get(i).base > 0) {
                         __instance.damage.get(i).base += damageChange;
+                        __instance.damage.get(i).output = __instance.damage.get(i).base;  // Update output to match base
                         // Prevent negative damage
                         if (__instance.damage.get(i).base < 0) {
                             __instance.damage.get(i).base = 0;
+                            __instance.damage.get(i).output = 0;
                         }
                     }
                 }
@@ -135,6 +153,9 @@ public class Level37 {
                     "Ascension 37: Boss %s damage adjusted by %d",
                     __instance.name, damageChange
                 ));
+
+                // Mark as patched
+                patchedMonsters.add(__instance);
             }
         }
     }

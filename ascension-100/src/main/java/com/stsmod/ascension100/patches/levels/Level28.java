@@ -159,11 +159,11 @@ public class Level28 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 1) { // Slime attack move ID
+            if (move != null && move == 4) { // STICKY (Goop Spray) move ID
                 AbstractDungeon.actionManager.addToBottom(
                     new MakeTempCardInDiscardAction(new Slimed(), 1)
                 );
-                logger.info("Ascension 28: SlimeBoss added 1 extra Slimed card");
+                logger.info("Ascension 28: SlimeBoss Goop Spray added 1 extra Slimed card");
             }
 
             lastMove.remove();
@@ -203,7 +203,7 @@ public class Level28 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 4) { // Vent move ID
+            if (move != null && move == 7) { // VENT_STEAM move ID
                 AbstractDungeon.actionManager.addToBottom(
                     new ApplyPowerAction(AbstractDungeon.player, __instance,
                         new WeakPower(AbstractDungeon.player, 1, true), 1)
@@ -252,12 +252,12 @@ public class Level28 {
             }
 
             Byte move = lastMove.get();
-            if (move != null && move == 2) { // Buff move ID (gains Strength)
+            if (move != null && move == 5) { // GLOAT move ID (Strength gain pattern)
                 AbstractDungeon.actionManager.addToBottom(
                     new ApplyPowerAction(__instance, __instance,
                         new StrengthPower(__instance, 1), 1)
                 );
-                logger.info("Ascension 28: Champ gained +1 additional Strength");
+                logger.info("Ascension 28: Champ Gloat gained +1 additional Strength");
             }
 
             lastMove.remove();
