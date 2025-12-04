@@ -30,7 +30,7 @@ import java.lang.reflect.Field;
  */
 public class Level26 {
     private static final Logger logger = LogManager.getLogger(Level26.class.getName());
-    private static final float COMPOUND_RATE = 1.25f;  // 25% compound interest for Slow (Giant Head)
+    private static final float COMPOUND_RATE = 1.20f;  // 20% compound interest for Slow (Giant Head)
 
     // ========================================
     // 1막 적들
@@ -1016,8 +1016,8 @@ public class Level26 {
     // ========================================
 
     /**
-     * Giant Head: Slow debuff uses compound calculation (25% per card played)
-     * 거인의 머리(Giant Head): 둔화 디버프의 효과가 "카드 사용시마다 데미지 25% 증가"로 변경
+     * Giant Head: Slow debuff uses compound calculation (20% per card played)
+     * 거인의 머리(Giant Head): 둔화 디버프의 효과가 "카드 사용시마다 데미지 20% 증가"로 변경
      */
     @SpirePatch(
         clz = SlowPower.class,

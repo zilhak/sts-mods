@@ -105,7 +105,7 @@ Base game ascension effects apply unchanged.
 - Transient: Fading +1 (fade delay +1 turn)
 - Spire Growth: Damage +5
 - Writhing Mass: Parasite pattern probability increased (10% → 25%)
-- Giant Head: HP +100%, Slow effect changed (25% damage increase per card played, compounded each time).
+- Giant Head: HP +100%, Slow effect changed (20% damage increase per card played, compounded each time).
 
 ---
 
