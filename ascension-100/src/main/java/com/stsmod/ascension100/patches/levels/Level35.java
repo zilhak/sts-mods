@@ -189,7 +189,17 @@ public class Level35 {
                     damageInfo.base += 5;
                 }
             }
-            logger.info("Ascension 35: Giant Head IT IS TIME damage +5 (damage[1-7])");
+
+            // Update startingDeathDmg field for getMove() Intent calculation
+            try {
+                java.lang.reflect.Field startingDeathDmgField = GiantHead.class.getDeclaredField("startingDeathDmg");
+                startingDeathDmgField.setAccessible(true);
+                int currentDeathDmg = startingDeathDmgField.getInt(__instance);
+                startingDeathDmgField.setInt(__instance, currentDeathDmg + 5);
+                logger.info("Ascension 35: Giant Head IT IS TIME damage +5 (damage[1-7] + startingDeathDmg)");
+            } catch (Exception e) {
+                logger.error("Failed to update GiantHead startingDeathDmg field", e);
+            }
         }
     }
 

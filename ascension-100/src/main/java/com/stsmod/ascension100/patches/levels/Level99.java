@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
+import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import javassist.CtBehavior;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -170,31 +171,37 @@ public class Level99 {
             }
         }
     }
-
     /**
-     * Effect 4: 50% chance to remove potion rewards from combat
+     * Effects 4 & 5: Modify combat rewards after they are generated
+     * Effect 4 (30~39): 50% chance to remove potion rewards
+     * Effect 5 (40~49): 10% chance to remove elite relic
      */
     @SpirePatch(
-        clz = AbstractDungeon.class,
-        method = "getCurrRoom"
+        clz = com.megacrit.cardcrawl.screens.CombatRewardScreen.class,
+        method = "setupItemReward"
     )
-    public static class RemovePotionReward {
+    public static class ModifyRewards {
         @SpirePostfixPatch
-        public static void Postfix() {
+        public static void Postfix(com.megacrit.cardcrawl.screens.CombatRewardScreen __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 99) {
                 return;
             }
 
-            // Effect 4 (30~39): 50% chance to remove potion from rewards
-            if (UnfairEventTracker.isEffect4Active() && AbstractDungeon.getCurrRoom() != null) {
-                if (AbstractDungeon.getCurrRoom().rewards != null) {
-                    // Check after combat rewards are generated
-                    for (int i = AbstractDungeon.getCurrRoom().rewards.size() - 1; i >= 0; i--) {
-                        RewardItem reward = AbstractDungeon.getCurrRoom().rewards.get(i);
+            try {
+                // Access rewards list via reflection
+                java.lang.reflect.Field rewardsField = com.megacrit.cardcrawl.screens.CombatRewardScreen.class.getDeclaredField("rewards");
+                rewardsField.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                java.util.ArrayList<RewardItem> rewards = (java.util.ArrayList<RewardItem>) rewardsField.get(__instance);
+
+                // Effect 4 (30~39): 50% chance to remove potion from rewards
+                if (UnfairEventTracker.isEffect4Active()) {
+                    for (int i = rewards.size() - 1; i >= 0; i--) {
+                        RewardItem reward = rewards.get(i);
                         if (reward.type == RewardItem.RewardType.POTION) {
                             int roll = AbstractDungeon.miscRng.random(0, 99);
                             if (roll < 50) {
-                                AbstractDungeon.getCurrRoom().rewards.remove(i);
+                                rewards.remove(i);
                                 logger.info(String.format(
                                     "Ascension 99 (Effect 4): Potion reward removed (Roll: %d < 50)",
                                     roll
@@ -203,34 +210,15 @@ public class Level99 {
                         }
                     }
                 }
-            }
-        }
-    }
 
-    /**
-     * Effect 5: 10% chance for elites to not give relic
-     */
-    @SpirePatch(
-        clz = AbstractDungeon.class,
-        method = "getCurrRoom"
-    )
-    public static class BlockEliteRelic {
-        @SpirePostfixPatch
-        public static void Postfix() {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 99) {
-                return;
-            }
-
-            // Effect 5 (40~49): 10% chance for elite to not give relic
-            if (UnfairEventTracker.isEffect5Active() && AbstractDungeon.getCurrRoom() != null) {
-                if (AbstractDungeon.getCurrRoom().rewards != null) {
-                    // Check after combat rewards are generated
-                    for (int i = AbstractDungeon.getCurrRoom().rewards.size() - 1; i >= 0; i--) {
-                        RewardItem reward = AbstractDungeon.getCurrRoom().rewards.get(i);
+                // Effect 5 (40~49): 10% chance for elite to not give relic
+                if (UnfairEventTracker.isEffect5Active()) {
+                    for (int i = rewards.size() - 1; i >= 0; i--) {
+                        RewardItem reward = rewards.get(i);
                         if (reward.type == RewardItem.RewardType.RELIC) {
                             int roll = AbstractDungeon.miscRng.random(0, 99);
                             if (roll < 10) {
-                                AbstractDungeon.getCurrRoom().rewards.remove(i);
+                                rewards.remove(i);
                                 logger.info(String.format(
                                     "Ascension 99 (Effect 5): Elite relic reward removed (Roll: %d < 10)",
                                     roll
@@ -239,6 +227,8 @@ public class Level99 {
                         }
                     }
                 }
+            } catch (Exception e) {
+                logger.error("Ascension 99: Failed to modify combat rewards", e);
             }
         }
     }
