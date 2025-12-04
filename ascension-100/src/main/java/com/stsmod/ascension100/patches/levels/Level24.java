@@ -55,6 +55,7 @@ public class Level24 {
                     if (damageInfo != null && damageInfo.base > 0) {
                         int originalDamage = damageInfo.base;
                         damageInfo.base = MathUtils.ceil(damageInfo.base * multiplier);
+                        damageInfo.output = damageInfo.base;  // Update output to match base
 
                         logger.info(String.format(
                             "Ascension 24: Normal %s damage increased from %d to %d",

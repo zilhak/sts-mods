@@ -64,6 +64,7 @@ public class Level62 {
                 if (damageInfo != null && damageInfo.base > 0) {
                     int originalDamage = damageInfo.base;
                     damageInfo.base += damageIncrease;
+                    damageInfo.output = damageInfo.base;  // Update output to match base
 
                     logger.info(String.format(
                         "Ascension 62: %s (%s) damage increased from %d to %d",
