@@ -6,9 +6,11 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -74,6 +76,22 @@ public class Level68 {
                             "Ascension 68: %s (%s) damage increased from %d to %d (Act %d)",
                             __instance.name, __instance.type, originalDamage, damageInfo.base, actNum
                         ));
+                    }
+                }
+
+                // Special handling for SlaverRed: update stabDmg field for first turn Intent
+                if (__instance instanceof SlaverRed) {
+                    try {
+                        Field stabDmgField = SlaverRed.class.getDeclaredField("stabDmg");
+                        stabDmgField.setAccessible(true);
+                        int currentStabDmg = stabDmgField.getInt(__instance);
+                        stabDmgField.setInt(__instance, currentStabDmg + damageIncrease);
+                        logger.info(String.format(
+                            "Ascension 68: SlaverRed stabDmg field updated from %d to %d (Act %d)",
+                            currentStabDmg, currentStabDmg + damageIncrease, actNum
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update SlaverRed stabDmg field", e);
                     }
                 }
 

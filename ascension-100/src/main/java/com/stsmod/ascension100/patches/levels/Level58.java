@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.city.Byrd;
+import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,6 +45,22 @@ public class Level58 {
                     if (damageInfo != null && damageInfo.base > 0) {
                         damageInfo.base += damageIncrease;
                         damageInfo.output = damageInfo.base;  // Update output to match base
+                    }
+                }
+
+                // Special handling for SlaverRed: update stabDmg field for first turn Intent
+                if (__instance instanceof SlaverRed) {
+                    try {
+                        Field stabDmgField = SlaverRed.class.getDeclaredField("stabDmg");
+                        stabDmgField.setAccessible(true);
+                        int currentStabDmg = stabDmgField.getInt(__instance);
+                        stabDmgField.setInt(__instance, currentStabDmg + damageIncrease);
+                        logger.info(String.format(
+                            "Ascension 58: SlaverRed stabDmg field updated from %d to %d",
+                            currentStabDmg, currentStabDmg + damageIncrease
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update SlaverRed stabDmg field", e);
                     }
                 }
 

@@ -9,8 +9,11 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.city.Byrd;
+import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.lang.reflect.Field;
 
 import java.util.Collections;
 import java.util.Set;
@@ -61,6 +64,23 @@ public class Level24 {
                             "Ascension 24: Normal %s damage increased from %d to %d",
                             __instance.name, originalDamage, damageInfo.base
                         ));
+                    }
+                }
+
+                // Special handling for SlaverRed: update stabDmg field for first turn Intent
+                if (__instance instanceof SlaverRed) {
+                    try {
+                        Field stabDmgField = SlaverRed.class.getDeclaredField("stabDmg");
+                        stabDmgField.setAccessible(true);
+                        int currentStabDmg = stabDmgField.getInt(__instance);
+                        int newStabDmg = MathUtils.ceil(currentStabDmg * multiplier);
+                        stabDmgField.setInt(__instance, newStabDmg);
+                        logger.info(String.format(
+                            "Ascension 24: SlaverRed stabDmg field updated from %d to %d",
+                            currentStabDmg, newStabDmg
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update SlaverRed stabDmg field", e);
                     }
                 }
 
