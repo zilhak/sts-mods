@@ -180,19 +180,19 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 33: Elite HP Additional Increase
-**Effect**: Elite enemy HP increased.
+## Level 33: Burning Elites Major Enhancement
+**Effect**: Burning Elites (Emerald Key Elites) become significantly stronger.
 
 **Details**:
-- Gremlin Nob: HP +2
-- Lagavulin: HP +3
-- Sentry: HP +1
-- Book of Stabbing: HP +6
-- Gremlin Leader: HP +5
-- Taskmaster: HP +3
-- Giant Head: HP +75
-- Nemesis: HP +10
-- Reptomancer: HP +10
+- **Gremlin Nob**: Bellow pattern grants +2 additional Anger.
+- **Lagavulin**: When asleep, Metallicize reduced to 3. Siphon Soul additionally reduces Strength and Dexterity by 1, and reduces Plated Armor by 1.
+- **Sentry**: Artifact increased by 3.
+- **Book of Stabbing**: Single Stab pattern applies Weak 1.
+- **Gremlin Leader**: Encourage pattern grants +2 Regeneration to all minions.
+- **Taskmaster**: All Slavers have +5% HP.
+- **Giant Head**: Gains 2 Metallicize every turn.
+- **Nemesis**: Debuff pattern adds Burn+ cards instead of regular Burn.
+- **Reptomancer**: Daggers do not die from Explode pattern.
 
 ---
 
@@ -200,23 +200,16 @@ Base game ascension effects apply unchanged.
 **Effect**: Normal enemies have increased HP.
 
 **Details**:
-- Strong Enemy encounters have +2% HP.
+- Weak Enemy encounters have +1 HP.
+- Strong Enemy encounters have +3% HP.
 
 ---
 
-## Level 35: Elite Attack Additional Enhancement
-**Effect**: Elite enemy attacks further enhanced.
+## Level 35: Ascender's Bane Enhancement
+**Effect**: Ascender's Bane is enhanced.
 
 **Details**:
-- Gremlin Nob: Damage +1
-- Lagavulin: Damage +1
-- Sentry: Damage +1
-- Book of Stabbing: Damage +1
-- Gremlin Leader: Encourage Strength +1
-- Taskmaster: Damage +2
-- Giant Head: "It Is Time" damage +5
-- Nemesis: Damage +2
-- Reptomancer: Damage +2
+- At the end of your turn, Ascender's Bane adds one Clumsy to your discard pile.
 
 ---
 

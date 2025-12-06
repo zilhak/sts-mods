@@ -10,8 +10,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Ascension Level 34: Strong enemies have additional 5% more HP
- * Strong Enemies 전투에서 적들의 체력이 추가로 5% 증가합니다.
+ * Ascension Level 34: Normal enemy HP increase
+ * 일반 적들의 체력이 증가합니다.
+ * - Weak Enemies: HP +1
+ * - Strong Enemies: HP +3%
  */
 public class Level34 {
     private static final Logger logger = LogManager.getLogger(Level34.class.getName());
@@ -33,19 +35,28 @@ public class Level34 {
                 return;
             }
 
-            // Check if this is a Strong Enemy encounter
-            if (!EncounterHelper.isStrongEncounter()) {
-                return;
-            }
-
             int originalMaxHP = __instance.maxHealth;
-            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.02f);
-            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.02f);
 
-            logger.info(String.format(
-                "Ascension 34: Strong Enemy %s HP increased from %d to %d (+2%%)",
-                __instance.name, originalMaxHP, __instance.maxHealth
-            ));
+            // Check if this is a Strong Enemy encounter
+            if (EncounterHelper.isStrongEncounter()) {
+                // Strong Enemies: +3% HP
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.03f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.03f);
+
+                logger.info(String.format(
+                    "Ascension 34: Strong Enemy %s HP increased from %d to %d (+3%%)",
+                    __instance.name, originalMaxHP, __instance.maxHealth
+                ));
+            } else {
+                // Weak Enemies: +1 HP
+                __instance.maxHealth += 1;
+                __instance.currentHealth += 1;
+
+                logger.info(String.format(
+                    "Ascension 34: Weak Enemy %s HP increased from %d to %d (+1)",
+                    __instance.name, originalMaxHP, __instance.maxHealth
+                ));
+            }
         }
     }
 }

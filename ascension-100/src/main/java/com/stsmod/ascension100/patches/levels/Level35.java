@@ -1,5 +1,6 @@
 package com.stsmod.ascension100.patches.levels;
 
+import com.evacipated.cardcrawl.modthespire.lib.SpireInsertPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.actions.common.MakeTempCardInDiscardAction;
@@ -14,9 +15,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * Ascension Level 35: Starting curse card modification
  *
- * 시작시 얻는 저주카드가 변경됩니다 (Level 35-79):
+ * 등반자의 골칫거리가 강화됩니다 (Level 35-79):
  * - 등반자의 골칫거리 (AscendersBane) 원래 속성 유지 (휘발성)
- * - 소멸시 버린 카드더미에 서투름 (Clumsy) 을 한장 넣습니다
+ * - 턴 종료시 버린 카드더미에 서투름 (Clumsy) 을 한장 넣습니다
  *
  * NOTE: Level 80에서 AscendersBane이 다시 변경됨 (소멸 속성으로)
  */
@@ -44,7 +45,7 @@ public class Level35 {
             if (cardStrings != null && cardStrings.DESCRIPTION != null) {
                 __instance.rawDescription = cardStrings.DESCRIPTION;
                 __instance.initializeDescription();
-                logger.info("Ascension 35: AscendersBane description updated (adds Clumsy on exhaust)");
+                logger.info("Ascension 35: AscendersBane description updated (adds Clumsy at end of turn)");
             } else {
                 logger.error("Failed to load CardStrings for AscendersBane Level 35");
             }
@@ -52,26 +53,41 @@ public class Level35 {
     }
 
     /**
-     * AscendersBane: Add Clumsy to discard pile on exhaust
+     * GameActionManager: Add Clumsy to discard pile when AscendersBane is in hand at end of turn
      * Applied from Level 35-79 (Level 80+ changes AscendersBane differently)
+     *
+     * This patches GameActionManager.callEndOfTurnActions() which calls
+     * triggerOnEndOfTurnForPlayingCard() for each card in hand (line 483-485)
      */
     @SpirePatch(
-        clz = AscendersBane.class,
-        method = "triggerOnExhaust"
+        clz = com.megacrit.cardcrawl.actions.GameActionManager.class,
+        method = "callEndOfTurnActions"
     )
-    public static class AddClumsyOnExhaust {
+    public static class AddClumsyOnEndOfTurn {
         @SpirePostfixPatch
-        public static void Postfix(AscendersBane __instance) {
+        public static void Postfix(com.megacrit.cardcrawl.actions.GameActionManager __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 35 || AbstractDungeon.ascensionLevel >= 80) {
                 return;
             }
 
-            // Add one Clumsy to discard pile
-            AbstractDungeon.actionManager.addToBottom(
-                new MakeTempCardInDiscardAction(new Clumsy(), 1)
-            );
+            // Check if AscendersBane is in hand
+            // This happens after triggerOnEndOfTurnForPlayingCard is called for all cards
+            boolean hasAscendersBane = false;
+            for (com.megacrit.cardcrawl.cards.AbstractCard card : AbstractDungeon.player.hand.group) {
+                if (card.cardID != null && card.cardID.equals(AscendersBane.ID)) {
+                    hasAscendersBane = true;
+                    break;
+                }
+            }
 
-            logger.info("Ascension 35: Added Clumsy to discard pile (AscendersBane exhausted)");
+            // If AscendersBane is in hand, add Clumsy to discard pile
+            if (hasAscendersBane) {
+                AbstractDungeon.actionManager.addToBottom(
+                    new MakeTempCardInDiscardAction(new Clumsy(), 1)
+                );
+
+                logger.info("Ascension 35: Added Clumsy to discard pile (AscendersBane in hand at end of turn)");
+            }
         }
     }
 }
