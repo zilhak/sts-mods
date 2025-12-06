@@ -8,12 +8,18 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 21: Elite HP Increase
-**Effect**: Elite enemies have 4% more HP.
+**Effect**: Elite enemies have increased HP.
+
+**Details**:
+- Elite enemies have 4% more HP.
 
 ---
 
 ## Level 22: Normal Enemy HP Increase
-**Effect**: Normal enemies have 4% more HP.
+**Effect**: Normal enemies have increased HP.
+
+**Details**:
+- Normal enemies have 4% more HP.
 
 ---
 
@@ -34,7 +40,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 24: Normal Enemy Attack Enhancement
-**Effect**: Normal enemies' damage increased by 3%.
+**Effect**: Normal enemies' attacks are enhanced.
+
+**Details**:
+- Normal enemies' damage increased by 3%.
 
 ---
 
@@ -105,7 +114,7 @@ Base game ascension effects apply unchanged.
 - Transient: Fading +1 (fade delay +1 turn)
 - Spire Growth: Damage +5
 - Writhing Mass: Parasite pattern probability increased (10% → 25%)
-- Giant Head: HP +100%, Slow effect changed (20% damage increase per card played, compounded each time).
+- Giant Head: HP +100%, Slow effect changed (24% damage increase per card played, compounded each time).
 
 ---
 
@@ -143,12 +152,18 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 29: Gold Gain Reduction
-**Effect**: Gold gained from combat reduced by 10%.
+**Effect**: Gold gained from combat is reduced.
+
+**Details**:
+- Gold gained from combat reduced by 10%.
 
 ---
 
 ## Level 30: Luck Reduction
-**Effect**: Relic probability adjusted (Common 50%, Uncommon 35%, Rare 15%)
+**Effect**: Luck decreases.
+
+**Details**:
+- Relic probability adjusted (Common 50%, Uncommon 35%, Rare 15%)
 
 ---
 
@@ -158,7 +173,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 32: Starting Damage Increase
-**Effect**: Starting HP reduced by additional 5.
+**Effect**: Start with more damage taken.
+
+**Details**:
+- Starting HP reduced by additional 5.
 
 ---
 
@@ -179,7 +197,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 34: Normal Enemy HP Additional Increase
-**Effect**: Strong Enemy encounters have +2% HP.
+**Effect**: Normal enemies have increased HP.
+
+**Details**:
+- Strong Enemy encounters have +2% HP.
 
 ---
 
@@ -221,9 +242,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 38: Boss Heal Reduction
-**Effect**: Post-boss heal reduced by 10%.
+**Effect**: Post-boss heal is reduced.
 
 **Details**:
+- Post-boss heal reduced by 10%.
 - Vanilla A5+: Heal 75% of missing HP
 - Level 38+: Heal 65% of missing HP (additional -10%)
 - Example: Max HP 80, Current HP 5 (75 missing)
@@ -233,7 +255,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 39: Rest Site Heal Reduction
-**Effect**: When resting, HP healed is reduced by 3% (from 30% to 27%).
+**Effect**: Rest healing is reduced.
+
+**Details**:
+- When resting, HP healed is reduced by 3% (from 30% to 27%).
 
 ---
 
@@ -248,7 +273,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 41: Elite Increase
-**Effect**: More elites generated on map.
+**Effect**: Elites appear more often.
 
 **Details**:
 - During map generation, ? rooms have 10% chance to be converted to elite encounters
@@ -273,7 +298,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 44: Thievery Enhancement
-**Effect**: Thieves' Thievery amount increased.
+**Effect**: Thieves steal more gold.
 
 **Details**:
 - All thief enemies' Thievery amount increased by 10
@@ -291,12 +316,18 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 46: Relic Price Increase
-**Effect**: Shop relic prices increased by 10%.
+**Effect**: Shop relic prices increase.
+
+**Details**:
+- Shop relic prices increased by 10%.
 
 ---
 
 ## Level 47: Rest Penalty
-**Effect**: Max HP -2 each time resting at rest site
+**Effect**: Resting at campsites reduces max HP.
+
+**Details**:
+- Max HP -2 each time resting at rest site
 
 ---
 
@@ -312,7 +343,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 49: Card Price Increase
-**Effect**: Shop card prices increased by 10%.
+**Effect**: Shop card prices increase.
+
+**Details**:
+- Shop card prices increased by 10%.
 
 ---
 
@@ -443,7 +477,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 59: Elite HP Increase
-**Effect**: All elite HP increased.
+**Effect**: Elite HP increases.
 
 **Details**:
 - All elite HP increased by 5
@@ -478,7 +512,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 63: Boss HP Increase
-**Effect**: All boss HP increased.
+**Effect**: Boss HP increases.
 
 **Details**:
 - All boss HP increased by 8%
@@ -486,7 +520,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 64: Boss Damage Increase
-**Effect**: All boss damage increased.
+**Effect**: Boss damage increases.
 
 **Details**:
 - All boss damage increased by 8%
@@ -567,7 +601,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 73: Shop Increase
-**Effect**: Normal enemy symbols on map reduced, replaced with shops
+**Effect**: Shops appear more often.
 
 **Details**:
 - During map generation, normal enemy symbols have 10% chance to be replaced with shops
@@ -592,9 +626,10 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 76: Special Combat Occurrence
-**Effect**: 15% chance for special combat in Strong Enemy battles above floor 10
+**Effect**: Special combats occur.
 
 **Details**:
+- 15% chance for special combat in Strong Enemy battles
 - Special combats provide elite-level rewards
 - Enemies start with buffs and initial block:
   - Act 1: Metallicize 2, Regen 2, and 6 starting block
@@ -614,7 +649,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 78: Special Combat Probability Increase
-**Effect**: Special combat probability increased to 20%.
+**Effect**: Special combat probability increases.
 
 **Details**:
 - Special combat occurrence probability increased from 15% to 20%
@@ -638,7 +673,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 81: Enemy Starting Buff Addition
-**Effect**: All normal enemies have low chance to spawn with Strength 1, Metallicize 2, or Regen 1.
+**Effect**: Some enemies start with buffs.
 
 **Details**:
 - All normal enemies have 15% chance to spawn with one random buff: Strength 1, Metallicize 2, or Regen 1
@@ -656,7 +691,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 83: Enemy Defense Pattern Enhancement
-**Effect**: Block-gaining enemies' pattern block amounts increased.
+**Effect**: Enemies' defensive patterns are enhanced.
 
 **Details**:
 - Block amounts in enemy patterns that gain block are increased by 10%
@@ -664,7 +699,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 84: Potion Drop Probability Reduction
-**Effect**: Potion drop probability reduced.
+**Effect**: Potions drop less often.
 
 **Details**:
 - Potion drop probability decreased by 10%
@@ -744,7 +779,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 88: Max HP Reduction
-**Effect**: Starting max HP reduced.
+**Effect**: Max HP is reduced.
 
 **Details**:
 - Starting max HP reduced by 10%
@@ -760,7 +795,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 90: Enemy Composition Addition
-**Effect**: Enemy compositions added.
+**Effect**: Enemy composition is added.
 
 **Details**:
 - Act 2: 10% chance to add GremlinFat to combats
@@ -834,7 +869,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 93: Relic Price Increase
-**Effect**: Shop relic prices increased.
+**Effect**: Relic prices increase.
 
 **Details**:
 - Shop relic prices increased by 10%
@@ -877,7 +912,7 @@ Base game ascension effects apply unchanged.
 ---
 
 ## Level 98: Campfire Heal Reduction
-**Effect**: Heal amount reduced when resting at campfire.
+**Effect**: Campfire healing is reduced.
 
 **Details**:
 - Heal amount reduced by 5 when resting at campfire

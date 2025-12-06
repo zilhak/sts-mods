@@ -63,6 +63,7 @@ public class Ascension100Mod implements
     // Localization paths
     private static final String UI_STRINGS = "localization/eng/UIStrings.json";
     private static final String POWER_STRINGS = "localization/eng/PowerStrings.json";
+    private static final String CARD_STRINGS = "localization/eng/CardStrings.json";
 
     /**
      * Required by @SpireInitializer
@@ -367,6 +368,19 @@ public class Ascension100Mod implements
         BaseMod.loadCustomStringsFile(
                 PowerStrings.class,
                 powerStringsPath
+        );
+
+        // Load Card strings
+        String cardStringsPath = getModPath(CARD_STRINGS.replace("eng", language));
+        if (!Gdx.files.internal(cardStringsPath).exists()) {
+            logger.warn("Card strings file not found: " + cardStringsPath);
+            logger.info("Falling back to English card strings");
+            cardStringsPath = getModPath(CARD_STRINGS);
+        }
+
+        BaseMod.loadCustomStringsFile(
+                CardStrings.class,
+                cardStringsPath
         );
 
         logger.info("Localization strings loaded for language: " + language);
