@@ -343,7 +343,7 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 50: ??? Act Forced
+## Level 50: Ending Act Forced
 **Effect**: Death when entering Act 3 boss without three keys.
 
 **Details**:
