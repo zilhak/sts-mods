@@ -4,10 +4,13 @@ import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePostfixPatch;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.ending.SpireShield;
 import com.megacrit.cardcrawl.monsters.ending.SpireSpear;
 import com.megacrit.cardcrawl.monsters.exordium.Sentry;
+import com.megacrit.cardcrawl.monsters.city.SphericGuardian;
+import com.megacrit.cardcrawl.monsters.city.BronzeAutomaton;
+import com.megacrit.cardcrawl.monsters.beyond.Donu;
+import com.megacrit.cardcrawl.monsters.beyond.Deca;
 import com.megacrit.cardcrawl.powers.ArtifactPower;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,37 +26,7 @@ public class Level31 {
     private static final Logger logger = LogManager.getLogger(Level31.class.getName());
 
     /**
-     * Patch monster pre-battle action to add extra artifact
-     */
-    @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "usePreBattleAction"
-    )
-    public static class ExtraArtifactPatch {
-        @SpirePostfixPatch
-        public static void Postfix(AbstractMonster __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 31) {
-                return;
-            }
-
-            // Check if monster already has Artifact power
-            if (__instance.hasPower("Artifact")) {
-                // Add 1 more Artifact
-                AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new ArtifactPower(__instance, 1), 1)
-                );
-
-                logger.info(String.format(
-                    "Ascension 31: %s gained +1 Artifact",
-                    __instance.name
-                ));
-            }
-        }
-    }
-
-    /**
-     * Sentry: Direct usePreBattleAction patch to ensure +1 Artifact
+     * Sentry: +1 Artifact
      */
     @SpirePatch(
         clz = Sentry.class,
@@ -122,6 +95,103 @@ public class Level31 {
             );
 
             logger.info("Ascension 31: Spire Shield gained +1 Artifact");
+        }
+    }
+
+    /**
+     * Spheric Guardian: +1 Artifact
+     */
+    @SpirePatch(
+        clz = SphericGuardian.class,
+        method = "usePreBattleAction"
+    )
+    public static class SphericGuardianArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(SphericGuardian __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 31) {
+                return;
+            }
+
+            // Add +1 Artifact to Spheric Guardian
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 31: Spheric Guardian gained +1 Artifact (total: 4)");
+        }
+    }
+
+    /**
+     * Bronze Automaton: +1 Artifact
+     */
+    @SpirePatch(
+        clz = BronzeAutomaton.class,
+        method = "usePreBattleAction"
+    )
+    public static class BronzeAutomatonArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(BronzeAutomaton __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 31) {
+                return;
+            }
+
+            // Add +1 Artifact to Bronze Automaton
+            // Note: Level 27 already adds +1, so this makes total 5 (base 3 + L27:1 + L31:1)
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 31: Bronze Automaton gained +1 Artifact (total: 5 at A31+)");
+        }
+    }
+
+    /**
+     * Donu: +1 Artifact
+     */
+    @SpirePatch(
+        clz = Donu.class,
+        method = "usePreBattleAction"
+    )
+    public static class DonuArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(Donu __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 31) {
+                return;
+            }
+
+            // Add +1 Artifact to Donu
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 31: Donu gained +1 Artifact (total: 3 at A19-30, 4 at A31+)");
+        }
+    }
+
+    /**
+     * Deca: +1 Artifact
+     */
+    @SpirePatch(
+        clz = Deca.class,
+        method = "usePreBattleAction"
+    )
+    public static class DecaArtifactPatch {
+        @SpirePostfixPatch
+        public static void Postfix(Deca __instance) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 31) {
+                return;
+            }
+
+            // Add +1 Artifact to Deca
+            AbstractDungeon.actionManager.addToBottom(
+                new ApplyPowerAction(__instance, __instance,
+                    new ArtifactPower(__instance, 1), 1)
+            );
+
+            logger.info("Ascension 31: Deca gained +1 Artifact (total: 3 at A19-30, 4 at A31+)");
         }
     }
 }
