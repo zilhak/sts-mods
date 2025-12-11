@@ -185,7 +185,7 @@ Base game ascension effects apply unchanged.
 
 **Details**:
 - **Gremlin Nob**: Bellow pattern grants +2 additional Anger.
-- **Lagavulin**: When asleep, Metallicize reduced to 3. Siphon Soul additionally reduces Strength and Dexterity by 1, and reduces Plated Armor by 1.
+- **Lagavulin**: When asleep, Metallicize reduced to 3. Siphon Soul additionally reduces Strength and Dexterity by 1, and Focus by 1.
 - **Sentry**: Artifact increased by 3.
 - **Book of Stabbing**: Single Stab pattern applies Weak 1.
 - **Gremlin Leader**: Encourage pattern grants +2 Regeneration to all minions.
