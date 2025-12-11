@@ -191,7 +191,7 @@ Base game ascension effects apply unchanged.
 - **Gremlin Leader**: Encourage pattern grants +2 Regeneration to all minions.
 - **Taskmaster**: All Slavers have +5% HP.
 - **Giant Head**: Gains 2 Metallicize every turn.
-- **Nemesis**: Debuff pattern adds Burn+ cards instead of regular Burn.
+- **Nemesis**: Debuff pattern adds 5 Burn cards to draw pile (instead of 5 to discard pile).
 - **Reptomancer**: Daggers do not die from Explode pattern.
 
 ---

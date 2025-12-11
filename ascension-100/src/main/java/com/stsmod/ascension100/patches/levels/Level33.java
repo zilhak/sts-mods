@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.common.DamageAction;
 import com.megacrit.cardcrawl.actions.common.MakeTempCardInDiscardAction;
+import com.megacrit.cardcrawl.actions.common.MakeTempCardInDrawPileAction;
 import com.megacrit.cardcrawl.actions.common.RollMoveAction;
 import com.megacrit.cardcrawl.actions.utility.SFXAction;
 import com.megacrit.cardcrawl.actions.animations.VFXAction;
@@ -433,14 +434,13 @@ public class Level33 {
                         1.5F)
                 );
 
-                // Add upgraded Burn+ cards instead of regular Burn
+                // Add regular Burn cards to draw pile
                 int burnCount = (AbstractDungeon.ascensionLevel >= 18) ? 5 : 3;
 
-                // Create one Burn+ card and add all at once (not in a loop to avoid sequential animation)
-                com.megacrit.cardcrawl.cards.status.Burn burnPlus = new com.megacrit.cardcrawl.cards.status.Burn();
-                burnPlus.upgrade();
+                // Create one Burn card and add to draw pile (not upgraded, and in draw pile instead of discard)
+                com.megacrit.cardcrawl.cards.status.Burn burn = new com.megacrit.cardcrawl.cards.status.Burn();
                 AbstractDungeon.actionManager.addToBottom(
-                    new MakeTempCardInDiscardAction(burnPlus, burnCount)
+                    new MakeTempCardInDrawPileAction(burn, burnCount, true, true)
                 );
 
                 // Add Intangible if not already present (from base game logic)
@@ -454,7 +454,7 @@ public class Level33 {
                 // Roll next move
                 AbstractDungeon.actionManager.addToBottom(new RollMoveAction(__instance));
 
-                logger.info("Ascension 33: Burning Elite Nemesis added " + burnCount + " Burn+ cards");
+                logger.info("Ascension 33: Burning Elite Nemesis added " + burnCount + " Burn cards to draw pile");
 
                 // Return early to skip the base game's takeTurn logic for this move
                 return SpireReturn.Return(null);
