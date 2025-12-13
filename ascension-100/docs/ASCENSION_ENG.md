@@ -196,20 +196,22 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 34: Normal Enemy HP Additional Increase
+## Level 34: Ascender's Bane Enhancement
+**Effect**: Ascender's Bane is enhanced.
+
+**Details**:
+- At the end of your turn, Ascender's Bane adds one Clumsy to your discard pile.
+
+---
+
+## Level 35: Normal Enemy HP Additional Increase
 **Effect**: Normal enemies have increased HP.
 
 **Details**:
 - Weak Enemy encounters have +1 HP.
 - Strong Enemy encounters have +3% HP.
-
----
-
-## Level 35: Ascender's Bane Enhancement
-**Effect**: Ascender's Bane is enhanced.
-
-**Details**:
-- At the end of your turn, Ascender's Bane adds one Clumsy to your discard pile.
+- Act 2 enemies have an additional +2% HP.
+- Act 3 enemies have an additional +5% HP.
 
 ---
 
