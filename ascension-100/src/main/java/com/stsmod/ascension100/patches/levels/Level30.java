@@ -19,10 +19,41 @@ import org.apache.logging.log4j.Logger;
  * - 일반 50% (변화 없음)
  * - 고급 35% (33% → 35%)
  * - 희귀 15% (17% → 15%)
+ *
+ * 숨겨진 효과:
+ * - 와처의 "추월(Rushdown)" 카드가 카드풀에서 제거됩니다.
  */
 public class Level30 {
 
     private static final Logger logger = LogManager.getLogger(Level30.class.getName());
+    // Rushdown card's actual ID in the game code is "Adaptation" (not "Rushdown")
+    private static final String RUSHDOWN_CARD_ID = "Adaptation";
+
+    /**
+     * Remove Rushdown card from card pools
+     * This is a hidden change not documented publicly
+     *
+     * Note: The card's display name is "Rushdown", but the internal ID is "Adaptation"
+     */
+    private static void removeRushdownFromCardPools() {
+        if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 30) {
+            return;
+        }
+
+        try {
+            // Remove from both source and current uncommon card pools
+            boolean removedFromSrc = AbstractDungeon.srcUncommonCardPool.removeCard(RUSHDOWN_CARD_ID);
+            boolean removedFromCurrent = AbstractDungeon.uncommonCardPool.removeCard(RUSHDOWN_CARD_ID);
+
+            if (removedFromSrc || removedFromCurrent) {
+                logger.info("Ascension 30: Rushdown card (ID: " + RUSHDOWN_CARD_ID + ") removed from card pools (hidden change)");
+            } else {
+                logger.warn("Ascension 30: Rushdown card not found in pools");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to remove Rushdown card from pools", e);
+        }
+    }
 
     /**
      * Adjust relic probabilities for all dungeons
@@ -53,6 +84,20 @@ public class Level30 {
             logger.info("Ascension 30: Relic probabilities adjusted to Common 50%, Uncommon 35%, Rare 15%");
         } catch (Exception e) {
             logger.error("Failed to adjust relic probabilities", e);
+        }
+    }
+
+    /**
+     * Patch AbstractDungeon.initializeCardPools() to remove Rushdown card
+     */
+    @SpirePatch(
+        clz = AbstractDungeon.class,
+        method = "initializeCardPools"
+    )
+    public static class RemoveRushdownPatch {
+        @SpirePostfixPatch
+        public static void Postfix() {
+            removeRushdownFromCardPools();
         }
     }
 
