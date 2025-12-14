@@ -37,6 +37,16 @@ public class Level35 {
                 return;
             }
 
+            // Skip minions in elite encounters (Gremlin Leader minions, Reptomancer daggers, etc.)
+            if (AbstractDungeon.getMonsters() != null) {
+                for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
+                    if (m.type == AbstractMonster.EnemyType.ELITE) {
+                        // Elite encounter detected, skip all normal monsters
+                        return;
+                    }
+                }
+            }
+
             int originalMaxHP = __instance.maxHealth;
             float totalMultiplier = 1.0f;
             String logDetails = "";

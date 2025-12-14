@@ -188,10 +188,10 @@ Base game ascension effects apply unchanged.
 - **Lagavulin**: When asleep, Metallicize reduced to 3. Siphon Soul additionally reduces Strength and Dexterity by 1, and Focus by 1.
 - **Sentry**: Artifact increased by 3.
 - **Book of Stabbing**: Single Stab pattern applies Weak 1.
-- **Gremlin Leader**: Encourage pattern grants +2 Regeneration to all minions.
+- **Gremlin Leader**: Encourage pattern grants +2 Regeneration to all allies.
 - **Taskmaster**: All Slavers have +5% HP.
 - **Giant Head**: Gains 2 Metallicize every turn.
-- **Nemesis**: Debuff pattern adds 5 Burn cards to draw pile (instead of 5 to discard pile).
+- **Nemesis**: Debuff pattern places Burn cards into draw pile.
 - **Reptomancer**: Daggers do not die from Explode pattern.
 
 ---
@@ -215,24 +215,75 @@ Base game ascension effects apply unchanged.
 
 ---
 
-## Level 36: Normal Enemy Attack Additional Enhancement
-**Effect**: Normal enemy damage +1 (except Byrd, Byrd Headbutt +2)
+## Level 36: Elite Enemy Adjustments
+**Effect**: Elite enemies are adjusted.
+
+**Details**:
+- **Gremlin Nob**:
+  - Skull Bash damage decreased by 5.
+  - Rush damage increased by 3.
+  - Bellow applies Vulnerable 1 to Gremlin Nob himself.
+  - HP increased by 10%.
+- **Lagavulin**:
+  - Sleep duration increased by 1 turn.
+  - HP increased by 8%.
+- **Sentry**:
+  - Only the middle Sentry has the following changes:
+  - HP increased by 15.
+  - Damage increased by 3.
+- **Book of Stabbing**:
+  - Multi-Stab pattern damage decreased by 1, but hit count increased by 1.
+  - Single Stab pattern grants Strength 1.
+- **Gremlin Leader**:
+  - Encourage pattern grants additional 5 Block, and targets all allies instead of all minions.
+  - Gremlin Leader HP increased by 5%.
+  - Gremlin minion HP decreased by 15%.
+  - Rally! pattern summons Gremlins to make 3 total.
+- **Taskmaster**:
+  - Scouring Whip pattern shuffles 1 additional Wound.
+- **Giant Head**:
+  - HP increased by 20.1%.
+- **Nemesis**:
+  - Debuff pattern shuffles 1 additional Burn into draw pile.
+- **Reptomancer**:
+  - Snake Strike additionally applies Weak 1.
 
 ---
 
-## Level 37: Boss Stat Adjustment
-**Effect**: Boss stats adjusted.
+## Level 37: Boss Stat Adjustments
+**Effect**: Boss stats are adjusted.
 
 **Details**:
-- Slime Boss: HP +25, Damage -10
-- The Guardian: HP +20, Damage -1
-- Hexaghost: HP +40
-- Bronze Automaton: HP +25
-- The Champ: Damage +3
-- The Collector: HP +60, Damage -2
-- Awakened One: HP +30
-- Time Eater: HP +60, Damage -2
-- Donu & Deca: Donu HP +50, Deca Damage +2
+- **Slime Boss**:
+  - HP increased by 20.
+  - Damage decreased by 12.
+  - Goop Spray pattern applies Vulnerable 2.
+- **The Guardian**:
+  - HP increased by 30.
+  - Mode Shift buff increases by 3 additional when exiting defensive mode.
+  - Gains Barricade buff.
+- **Hexaghost**:
+  - HP increased by 16.
+  - Inferno pattern damage increased by 1.
+- **Bronze Automaton**:
+  - Boost pattern grants 1 additional Strength.
+  - HYPER BEAM pattern damage increased by 5.
+  - Bronze Orbs gain Artifact 2 when summoned.
+  - Bronze Orb HP increased by 30%.
+  - Bronze Orb damage decreased by 2.
+- **The Champ**:
+  - Anger pattern threshold changed to 60%.
+- **The Collector**:
+  - Torch Head Tackle pattern damage increased by 2.
+  - Torch Head HP increased by 5.
+- **Awakened One**:
+  - Cultists do not die completely. When they die, their intent changes to ??? pattern (does nothing), and they revive the next turn.
+  - Cultists revive without any buffs/debuffs and restart from the Incantation pattern.
+- **Time Eater**:
+  - HP increased by 30.
+- **Donu & Deca**:
+  - Donu gains 2 additional Malleable.
+  - Deca's Square of Protection pattern grants 2 additional Plated Armor.
 
 ---
 

@@ -10,6 +10,8 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.city.Byrd;
 import com.megacrit.cardcrawl.monsters.exordium.SlaverRed;
+import com.megacrit.cardcrawl.rooms.MonsterRoomBoss;
+import com.megacrit.cardcrawl.rooms.MonsterRoomElite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,8 +43,18 @@ public class Level24 {
                 return;
             }
 
-            // Exclude Byrd from damage increase
-            if (__instance.type == AbstractMonster.EnemyType.NORMAL && !(__instance instanceof Byrd)) {
+            // Exclude Byrd, boss minions, and elite minions
+            // Byrd: excluded from all levels
+            // Boss/Elite minions: Bronze Orb, Torch Head, Dagger, Repulsor, Book of Stabbing, etc.
+            boolean isBossOrEliteRoom = false;
+            if (AbstractDungeon.getCurrRoom() != null) {
+                isBossOrEliteRoom = (AbstractDungeon.getCurrRoom() instanceof MonsterRoomBoss) ||
+                                    (AbstractDungeon.getCurrRoom() instanceof MonsterRoomElite);
+            }
+
+            if (__instance.type == AbstractMonster.EnemyType.NORMAL &&
+                !(__instance instanceof Byrd) &&
+                !isBossOrEliteRoom) {
                 // Check if already patched
                 if (patchedMonsters.contains(__instance)) {
                     logger.warn(String.format(
