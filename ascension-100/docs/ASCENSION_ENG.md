@@ -232,12 +232,12 @@ Base game ascension effects apply unchanged.
   - HP increased by 15.
   - Damage increased by 3.
 - **Book of Stabbing**:
-  - Multi-Stab pattern damage decreased by 1, but hit count increased by 1.
+  - Multi-Stab pattern damage decreased by 2, but hit count increased by 1.
   - Single Stab pattern grants Strength 1.
 - **Gremlin Leader**:
   - Encourage pattern grants additional 5 Block, and targets all allies instead of all minions.
   - Gremlin Leader HP increased by 5%.
-  - Gremlin minion HP decreased by 15%.
+  - Gremlin minion HP decreased by 25%.
   - Rally! pattern summons Gremlins to make 3 total.
 - **Taskmaster**:
   - Scouring Whip pattern shuffles 1 additional Wound.

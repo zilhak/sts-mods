@@ -50,8 +50,8 @@ import java.lang.reflect.Field;
  * - Gremlin Nob: Skull Bash -5 dmg, Rush +3 dmg, Bellow applies Vulnerable 1 to self, +10% HP
  * - Lagavulin: Sleep +1 turn (3→4), +8% HP
  * - Sentry (CENTER ONLY): +15 HP, +3 attack
- * - Book of Stabbing: Multi-stab -1 dmg per hit, +1 hit count; Single Stab gains Strength 1
- * - Gremlin Leader: Rally gives +5 block to all allies, HP +5%, minion HP -15%, Rally summons to total of 3
+ * - Book of Stabbing: Multi-stab -2 dmg per hit, +1 hit count; Single Stab gains Strength 1
+ * - Gremlin Leader: Rally gives +5 block to all allies, HP +5%, minion HP -25%, Rally summons to total of 3
  * - Taskmaster: Scouring Whip adds 1 extra Wound
  * - Giant Head: HP +20.1%, It Is Time damage has no limit
  * - Nemesis: Debuff pattern adds 1 extra Burn to draw pile
@@ -264,11 +264,11 @@ public class Level36 {
     }
 
     // ========================================
-    // Book of Stabbing: Multi-stab -1 dmg per hit, +1 hit count, Single Stab gains Strength 1
+    // Book of Stabbing: Multi-stab -2 dmg per hit, +1 hit count, Single Stab gains Strength 1
     // ========================================
 
     /**
-     * Book of Stabbing: Stab damage -1, initial stab count +1
+     * Book of Stabbing: Stab damage -2, initial stab count +1
      */
     @SpirePatch(
         clz = BookOfStabbing.class,
@@ -282,15 +282,15 @@ public class Level36 {
             }
 
             try {
-                // Reduce stab damage by 1 (damage[0] is multi-stab)
+                // Reduce stab damage by 2 (damage[0] is multi-stab)
                 if (!__instance.damage.isEmpty()) {
                     DamageInfo stabDmg = __instance.damage.get(0);
                     int originalDmg = stabDmg.base;
-                    stabDmg.base = Math.max(1, stabDmg.base - 1);
+                    stabDmg.base = Math.max(1, stabDmg.base - 2);
                     stabDmg.output = stabDmg.base; // Update output too
 
                     logger.info(String.format(
-                        "Ascension 36: Book of Stabbing stab damage reduced from %d to %d (-1)",
+                        "Ascension 36: Book of Stabbing stab damage reduced from %d to %d (-2)",
                         originalDmg, stabDmg.base
                     ));
                 }
@@ -464,7 +464,7 @@ public class Level36 {
     }
 
     /**
-     * Gremlin minions: HP -15%
+     * Gremlin minions: HP -25%
      */
     @SpirePatch(
         clz = AbstractMonster.class,
@@ -485,11 +485,11 @@ public class Level36 {
                 __instance instanceof GremlinTsundere) {
 
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 0.85f);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 0.85f);
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 0.75f);
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 0.75f);
 
                 logger.info(String.format(
-                    "Ascension 36: Gremlin minion %s HP decreased from %d to %d (-15%%)",
+                    "Ascension 36: Gremlin minion %s HP decreased from %d to %d (-25%%)",
                     __instance.name, originalHP, __instance.maxHealth
                 ));
             }
