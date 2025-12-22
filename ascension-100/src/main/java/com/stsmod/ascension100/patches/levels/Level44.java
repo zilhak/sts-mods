@@ -16,15 +16,15 @@ import java.lang.reflect.Field;
  * Ascension Level 44: Thieves steal more gold
  *
  * 도둑들이 더 많은 돈을 강탈합니다.
- * 도둑들의 도둑질 수치가 10 증가합니다.
+ * 도둑들의 도둑질 수치가 25 증가합니다.
  *
- * Both Looter and Mugger's Thievery power increases by 10.
+ * Both Looter and Mugger's Thievery power increases by 25.
  */
 public class Level44 {
     private static final Logger logger = LogManager.getLogger(Level44.class.getName());
 
     /**
-     * Looter: Thievery +10
+     * Looter: Thievery +25
      *
      * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates ThieveryPower
      * Original code: ApplyPowerAction(new ThieveryPower(this, this.goldAmt))
@@ -46,11 +46,11 @@ public class Level44 {
                 java.lang.reflect.Field goldAmtField = Looter.class.getDeclaredField("goldAmt");
                 goldAmtField.setAccessible(true);
                 int currentGoldAmt = goldAmtField.getInt(__instance);
-                goldAmtField.setInt(__instance, currentGoldAmt + 10);
+                goldAmtField.setInt(__instance, currentGoldAmt + 25);
 
                 logger.info(String.format(
                     "Ascension 44: Looter goldAmt increased from %d to %d (Thievery will be %d)",
-                    currentGoldAmt, currentGoldAmt + 10, currentGoldAmt + 10
+                    currentGoldAmt, currentGoldAmt + 25, currentGoldAmt + 25
                 ));
             } catch (Exception e) {
                 logger.error("Failed to modify Looter goldAmt", e);
@@ -68,7 +68,7 @@ public class Level44 {
                 java.lang.reflect.Field goldAmtField = Looter.class.getDeclaredField("goldAmt");
                 goldAmtField.setAccessible(true);
                 int currentGoldAmt = goldAmtField.getInt(__instance);
-                goldAmtField.setInt(__instance, currentGoldAmt - 10);
+                goldAmtField.setInt(__instance, currentGoldAmt - 25);
 
                 logger.info("Ascension 44: Looter goldAmt reset to original (Thievery amount remains increased)");
             } catch (Exception e) {
@@ -78,7 +78,7 @@ public class Level44 {
     }
 
     /**
-     * Mugger: Thievery +10
+     * Mugger: Thievery +25
      *
      * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates ThieveryPower
      */
@@ -98,11 +98,11 @@ public class Level44 {
                 java.lang.reflect.Field goldAmtField = Mugger.class.getDeclaredField("goldAmt");
                 goldAmtField.setAccessible(true);
                 int currentGoldAmt = goldAmtField.getInt(__instance);
-                goldAmtField.setInt(__instance, currentGoldAmt + 10);
+                goldAmtField.setInt(__instance, currentGoldAmt + 25);
 
                 logger.info(String.format(
                     "Ascension 44: Mugger goldAmt increased from %d to %d (Thievery will be %d)",
-                    currentGoldAmt, currentGoldAmt + 10, currentGoldAmt + 10
+                    currentGoldAmt, currentGoldAmt + 25, currentGoldAmt + 25
                 ));
             } catch (Exception e) {
                 logger.error("Failed to modify Mugger goldAmt", e);
@@ -120,7 +120,7 @@ public class Level44 {
                 java.lang.reflect.Field goldAmtField = Mugger.class.getDeclaredField("goldAmt");
                 goldAmtField.setAccessible(true);
                 int currentGoldAmt = goldAmtField.getInt(__instance);
-                goldAmtField.setInt(__instance, currentGoldAmt - 10);
+                goldAmtField.setInt(__instance, currentGoldAmt - 25);
 
                 logger.info("Ascension 44: Mugger goldAmt reset to original (Thievery amount remains increased)");
             } catch (Exception e) {

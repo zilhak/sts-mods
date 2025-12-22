@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * 보스 전투 이후에 회복량이 감소합니다.
  *
  * Vanilla: Ascension 5+ heals 75% of missing HP after boss
- * Level 38: Reduces heal multiplier from 0.75 to 0.65 (65% of missing HP)
+ * Level 38: Reduces heal multiplier from 0.75 to 0.70 (70% of missing HP)
  *
  * Implementation: Patches AbstractDungeon.dungeonTransitionSetup() where boss heal occurs
  */
@@ -23,7 +23,7 @@ public class Level38 {
     private static final Logger logger = LogManager.getLogger(Level38.class.getName());
 
     /**
-     * Reduce boss victory heal from 75% to 65% (additional -10%)
+     * Reduce boss victory heal from 75% to 70% (additional -5%)
      *
      * Vanilla code at AbstractDungeon.dungeonTransitionSetup():
      * if (ascensionLevel >= 5) {
@@ -45,15 +45,15 @@ public class Level38 {
                 return;
             }
 
-            // Calculate the additional -10% reduction
+            // Calculate the additional -5% reduction
             // Vanilla: 75% heal
-            // Level 38: 65% heal (multiply by 0.65/0.75 = 0.8666...)
+            // Level 38: 70% heal (multiply by 0.70/0.75 = 0.9333...)
             int vanillaHeal = MathUtils.round(
                 (AbstractDungeon.player.maxHealth - AbstractDungeon.player.currentHealth) * 0.75F
             );
 
             int reducedHeal = MathUtils.round(
-                (AbstractDungeon.player.maxHealth - AbstractDungeon.player.currentHealth) * 0.65F
+                (AbstractDungeon.player.maxHealth - AbstractDungeon.player.currentHealth) * 0.70F
             );
 
             int reduction = vanillaHeal - reducedHeal;
@@ -67,7 +67,7 @@ public class Level38 {
                 }
 
                 logger.info(String.format(
-                    "Ascension 38: Boss heal reduced by %d HP (75%% → 65%%). Will heal %d instead of %d",
+                    "Ascension 38: Boss heal reduced by %d HP (75%% → 70%%). Will heal %d instead of %d",
                     reduction, reducedHeal, vanillaHeal
                 ));
             }

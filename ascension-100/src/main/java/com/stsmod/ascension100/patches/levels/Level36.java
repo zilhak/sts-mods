@@ -48,8 +48,8 @@ import java.lang.reflect.Field;
  *
  * 엘리트 몬스터들이 강화됩니다.
  * - Gremlin Nob: Skull Bash -5 dmg, Rush +3 dmg, Bellow applies Vulnerable 1 to self, +10% HP
- * - Lagavulin: Sleep +1 turn (3→4), +8% HP
- * - Sentry (CENTER ONLY): +15 HP, +3 attack
+ * - Lagavulin: Sleep +1 turn (3→4), +5% HP
+ * - Sentry (CENTER ONLY): +10 HP, +1 attack
  * - Book of Stabbing: Multi-stab -2 dmg per hit, +1 hit count; Single Stab gains Strength 1
  * - Gremlin Leader: Rally gives +5 block to all allies, HP +5%, minion HP -25%, Rally summons to total of 3
  * - Taskmaster: Scouring Whip adds 1 extra Wound
@@ -153,11 +153,11 @@ public class Level36 {
     }
 
     // ========================================
-    // Lagavulin: Sleep +1 turn, HP +8%
+    // Lagavulin: Sleep +1 turn, HP +5%
     // ========================================
 
     /**
-     * Lagavulin: HP +8%
+     * Lagavulin: HP +5%
      */
     @SpirePatch(
         clz = Lagavulin.class,
@@ -172,11 +172,11 @@ public class Level36 {
             }
 
             int originalHP = __instance.maxHealth;
-            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.08f);
-            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.08f);
+            __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+            __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
 
             logger.info(String.format(
-                "Ascension 36: Lagavulin HP increased from %d to %d (+8%%)",
+                "Ascension 36: Lagavulin HP increased from %d to %d (+5%%)",
                 originalHP, __instance.maxHealth
             ));
         }
@@ -222,11 +222,11 @@ public class Level36 {
     }
 
     // ========================================
-    // Sentry (CENTER ONLY): HP +15, attack +3
+    // Sentry (CENTER ONLY): HP +10, attack +1
     // ========================================
 
     /**
-     * Sentry: Center sentry gets +15 HP and +3 attack damage
+     * Sentry: Center sentry gets +10 HP and +1 attack damage
      */
     @SpirePatch(
         clz = Sentry.class,
@@ -243,19 +243,19 @@ public class Level36 {
             // Check if this is the center Sentry by x coordinate
             // Center Sentry spawns at x = -85.0F
             if (Math.abs(x - (-85.0F)) < 1.0F) {
-                // HP +15
+                // HP +10
                 int originalHP = __instance.maxHealth;
-                __instance.maxHealth += 15;
-                __instance.currentHealth += 15;
+                __instance.maxHealth += 10;
+                __instance.currentHealth += 10;
 
-                // Attack +3 (BEAM attack uses damage[0])
+                // Attack +1 (BEAM attack uses damage[0])
                 if (!__instance.damage.isEmpty()) {
                     DamageInfo beamDmg = __instance.damage.get(0);
                     int originalDmg = beamDmg.base;
-                    beamDmg.base += 3;
+                    beamDmg.base += 1;
 
                     logger.info(String.format(
-                        "Ascension 36: Center Sentry enhanced - HP: %d→%d (+15), Beam attack: %d→%d (+3)",
+                        "Ascension 36: Center Sentry enhanced - HP: %d→%d (+10), Beam attack: %d→%d (+1)",
                         originalHP, __instance.maxHealth, originalDmg, beamDmg.base
                     ));
                 }

@@ -226,11 +226,11 @@ Base game ascension effects apply unchanged.
   - HP increased by 10%.
 - **Lagavulin**:
   - Sleep duration increased by 1 turn.
-  - HP increased by 8%.
+  - HP increased by 5%.
 - **Sentry**:
   - Only the middle Sentry has the following changes:
-  - HP increased by 15.
-  - Damage increased by 3.
+  - HP increased by 10.
+  - Damage increased by 1.
 - **Book of Stabbing**:
   - Multi-Stab pattern damage decreased by 2, but hit count increased by 1.
   - Single Stab pattern grants Strength 1.
@@ -255,19 +255,17 @@ Base game ascension effects apply unchanged.
 
 **Details**:
 - **Slime Boss**:
-  - HP increased by 20.
+  - HP increased by 10.
   - Damage decreased by 12.
   - Goop Spray pattern applies Vulnerable 2.
 - **The Guardian**:
-  - HP increased by 30.
-  - Mode Shift buff increases by 3 additional when exiting defensive mode.
+  - HP increased by 10.
+  - Mode Shift buff increases by 5 additional when exiting defensive mode.
   - Gains Barricade buff.
 - **Hexaghost**:
   - HP increased by 16.
   - Inferno pattern damage increased by 1.
 - **Bronze Automaton**:
-  - Boost pattern grants 1 additional Strength.
-  - HYPER BEAM pattern damage increased by 5.
   - Bronze Orbs gain Artifact 2 when summoned.
   - Bronze Orb HP increased by 30%.
   - Bronze Orb damage decreased by 2.
@@ -291,12 +289,12 @@ Base game ascension effects apply unchanged.
 **Effect**: Post-boss heal is reduced.
 
 **Details**:
-- Post-boss heal reduced by 10%.
+- Post-boss heal reduced by 5%.
 - Vanilla A5+: Heal 75% of missing HP
-- Level 38+: Heal 65% of missing HP (additional -10%)
+- Level 38+: Heal 70% of missing HP (additional -5%)
 - Example: Max HP 80, Current HP 5 (75 missing)
   - A5-37: Heal 56 → Final 61 HP
-  - A38+: Heal 48 → Final 53 HP
+  - A38+: Heal 52 → Final 57 HP
 
 ---
 
@@ -347,7 +345,7 @@ Base game ascension effects apply unchanged.
 **Effect**: Thieves steal more gold.
 
 **Details**:
-- All thief enemies' Thievery amount increased by 10
+- All thief enemies' Thievery amount increased by 25
 
 ---
 
@@ -402,6 +400,14 @@ Base game ascension effects apply unchanged.
 **Details**:
 - In Act 3 boss combat, if three keys not collected, HP is locked to 1 and Energy locked to 0
 - At start of Act 3 boss combat without three keys, take 100 damage 5 times
+
+---
+
+**⚠️ WARNING**
+
+From this level onward, the difficulty is not designed for clearing with vanilla characters.
+
+If you enjoy suffering, feel free to challenge yourself, but it is recommended to play with OP mods and OP characters.
 
 ---
 

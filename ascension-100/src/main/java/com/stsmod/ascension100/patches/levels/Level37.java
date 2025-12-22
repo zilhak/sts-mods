@@ -51,13 +51,13 @@ public class Level37 {
                 return;
             }
 
-            // HP +20
+            // HP +10
             int originalMaxHP = __instance.maxHealth;
-            __instance.maxHealth += 20;
-            __instance.currentHealth += 20;
+            __instance.maxHealth += 10;
+            __instance.currentHealth += 10;
 
             logger.info(String.format(
-                "Ascension 37: Slime Boss HP increased from %d to %d (+20)",
+                "Ascension 37: Slime Boss HP increased from %d to %d (+10)",
                 originalMaxHP, __instance.maxHealth
             ));
 
@@ -111,22 +111,22 @@ public class Level37 {
                 return;
             }
 
-            // HP +30
+            // HP +10
             int originalMaxHP = __instance.maxHealth;
-            __instance.maxHealth += 30;
-            __instance.currentHealth += 30;
+            __instance.maxHealth += 10;
+            __instance.currentHealth += 10;
 
             logger.info(String.format(
-                "Ascension 37: Guardian HP increased from %d to %d (+30)",
+                "Ascension 37: Guardian HP increased from %d to %d (+10)",
                 originalMaxHP, __instance.maxHealth
             ));
 
-            // Mode shift increase: 10 → 13
+            // Mode shift increase: 10 → 15
             Field dmgThresholdIncreaseField = TheGuardian.class.getDeclaredField("dmgThresholdIncrease");
             dmgThresholdIncreaseField.setAccessible(true);
-            dmgThresholdIncreaseField.setInt(__instance, 13);
+            dmgThresholdIncreaseField.setInt(__instance, 15);
 
-            logger.info("Ascension 37: Guardian mode shift increase changed from 10 to 13");
+            logger.info("Ascension 37: Guardian mode shift increase changed from 10 to 15");
         }
     }
 
@@ -179,56 +179,6 @@ public class Level37 {
             }
 
             logger.info("Ascension 37: Hexaghost Inferno damage +1");
-        }
-    }
-
-    // ============= BRONZE AUTOMATON =============
-
-    @SpirePatch(clz = BronzeAutomaton.class, method = SpirePatch.CONSTRUCTOR)
-    public static class BronzeAutomatonDamagePatch {
-        @SpirePostfixPatch
-        public static void Postfix(BronzeAutomaton __instance) throws Exception {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 37) {
-                return;
-            }
-
-            // HYPER BEAM damage +5
-            Field beamDmgField = BronzeAutomaton.class.getDeclaredField("beamDmg");
-            beamDmgField.setAccessible(true);
-            int originalBeamDmg = beamDmgField.getInt(__instance);
-            beamDmgField.setInt(__instance, originalBeamDmg + 5);
-
-            // Update damage info (critical: must update both base AND output)
-            if (__instance.damage.size() >= 2) {
-                int currentBeamBase = __instance.damage.get(1).base;
-
-                __instance.damage.get(1).base = currentBeamBase + 5;
-                __instance.damage.get(1).output = __instance.damage.get(1).base;
-
-                logger.info(String.format(
-                    "Ascension 37: Bronze Automaton - HYPER BEAM: %d→%d (+5)",
-                    currentBeamBase, __instance.damage.get(1).base
-                ));
-            }
-        }
-    }
-
-    @SpirePatch(clz = BronzeAutomaton.class, method = "takeTurn")
-    public static class BronzeAutomatonBoostPatch {
-        @SpirePostfixPatch
-        public static void Postfix(BronzeAutomaton __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 37) {
-                return;
-            }
-
-            if (__instance.nextMove == 5) { // BOOST = byte 5
-                AbstractDungeon.actionManager.addToBottom(new ApplyPowerAction(
-                    __instance, __instance,
-                    new StrengthPower(__instance, 1), 1
-                ));
-
-                logger.info("Ascension 37: Bronze Automaton Boost grants +1 extra Strength");
-            }
         }
     }
 
