@@ -411,27 +411,7 @@ If you enjoy suffering, feel free to challenge yourself, but it is recommended t
 
 ---
 
-## Level 51: Stage-Based Enemy HP Growth
-**Effect**: Enemy HP increases by act and difficulty.
-
-**Details**:
-- Act 1: Strong Enemies combats have +4% HP increase
-- Act 2: Weak Enemies combats have +3% HP increase, Strong Enemies combats have +5% HP increase
-- Act 3: Weak Enemies combats have +5% HP increase, Strong Enemies combats have +8% HP increase
-
----
-
-## Level 52: Stage-Based Enemy Attack Growth
-**Effect**: Enemy damage increases by act and difficulty.
-
-**Details**:
-- Act 1: Strong Enemies combats have +1 damage increase
-- Act 2: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +2 damage increase
-- Act 3: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +5 damage increase
-
----
-
-## Level 53: Enemy Pattern Additional Enhancement
+## Level 51: Enemy Pattern Additional Enhancement
 **Effect**: Enemy behavior patterns further enhanced.
 
 **Details**:
@@ -468,6 +448,26 @@ If you enjoy suffering, feel free to challenge yourself, but it is recommended t
 - Transient: Damage +5.
 - Spire Growth: HP +15.
 - Writhing Mass: Can use Implant pattern twice.
+
+---
+
+## Level 52: Stage-Based Enemy Attack Growth
+**Effect**: Enemy damage increases by act and difficulty.
+
+**Details**:
+- Act 1: Strong Enemies combats have +1 damage increase
+- Act 2: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +2 damage increase
+- Act 3: Weak Enemies combats have +1 damage increase, Strong Enemies combats have +5 damage increase
+
+---
+
+## Level 53: Stage-Based Enemy HP Growth
+**Effect**: Enemy HP increases by act and difficulty.
+
+**Details**:
+- Act 1: Strong Enemies combats have +4% HP increase
+- Act 2: Weak Enemies combats have +3% HP increase, Strong Enemies combats have +5% HP increase
+- Act 3: Weak Enemies combats have +4% HP increase, Strong Enemies combats have +6% HP increase
 
 ---
 

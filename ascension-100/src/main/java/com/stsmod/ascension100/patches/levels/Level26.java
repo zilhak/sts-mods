@@ -561,25 +561,37 @@ public class Level26 {
 
     /**
      * Snake Plant: Base Malleable +1
+     * Intercepts MalleablePower creation to increase both amount and basePower
      */
     @SpirePatch(
-        clz = SnakePlant.class,
-        method = "usePreBattleAction"
+        clz = com.megacrit.cardcrawl.powers.MalleablePower.class,
+        method = SpirePatch.CONSTRUCTOR,
+        paramtypez = { AbstractCreature.class }
     )
     public static class SnakePlantMalleablePatch {
         @SpirePostfixPatch
-        public static void Postfix(SnakePlant __instance) {
-            if (AbstractDungeon.isAscensionMode && AbstractDungeon.ascensionLevel >= 26) {
-                // Increase existing Malleable power by 1
-                AbstractPower malleablePower = __instance.getPower("Malleable");
-                if (malleablePower != null) {
-                    malleablePower.amount += 1;
-                    malleablePower.updateDescription();
-                    logger.info(String.format(
-                        "Ascension 26: SnakePlant Malleable increased by 1 to %d",
-                        malleablePower.amount
-                    ));
+        public static void Postfix(com.megacrit.cardcrawl.powers.MalleablePower __instance, AbstractCreature owner) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 26) {
+                return;
+            }
+
+            // Check if owner is SnakePlant
+            if (owner instanceof SnakePlant) {
+                // Increase both amount and basePower by 1
+                __instance.amount += 1;
+                try {
+                    java.lang.reflect.Field basePowerField = com.megacrit.cardcrawl.powers.MalleablePower.class.getDeclaredField("basePower");
+                    basePowerField.setAccessible(true);
+                    int currentBasePower = basePowerField.getInt(__instance);
+                    basePowerField.setInt(__instance, currentBasePower + 1);
+                } catch (Exception e) {
+                    logger.error("Failed to modify MalleablePower basePower", e);
                 }
+                __instance.updateDescription();
+                logger.info(String.format(
+                    "Ascension 26: SnakePlant Malleable increased to %d (base: %d)",
+                    __instance.amount, __instance.amount
+                ));
             }
         }
     }
