@@ -20,10 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class Level35 {
     private static final Logger logger = LogManager.getLogger(Level35.class.getName());
 
-    @SpirePatch(
-        clz = AbstractMonster.class,
-        method = "init"
-    )
+    @SpirePatch(clz = AbstractMonster.class, method = "init")
     public static class NormalHealthIncrease {
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
@@ -33,62 +30,68 @@ public class Level35 {
 
             // Skip bosses and elites
             if (__instance.type == AbstractMonster.EnemyType.BOSS ||
-                __instance.type == AbstractMonster.EnemyType.ELITE) {
+                    __instance.type == AbstractMonster.EnemyType.ELITE) {
                 return;
             }
 
-            // Skip minions in elite encounters (Gremlin Leader minions, Reptomancer daggers, etc.)
-            if (AbstractDungeon.getMonsters() != null) {
-                for (AbstractMonster m : AbstractDungeon.getMonsters().monsters) {
-                    if (m.type == AbstractMonster.EnemyType.ELITE) {
-                        // Elite encounter detected, skip all normal monsters
-                        return;
-                    }
-                }
+            // Skip event combats (Colosseum, Masked Bandits, etc.)
+            if (AbstractDungeon.getCurrRoom().combatEvent) {
+                return;
+            }
+
+            // Only apply to normal monster rooms
+            if (!(AbstractDungeon.getCurrRoom() instanceof com.megacrit.cardcrawl.rooms.MonsterRoom)) {
+                return;
             }
 
             int originalMaxHP = __instance.maxHealth;
-            float totalMultiplier = 1.0f;
+            int currentAct = AbstractDungeon.actNum;
             String logDetails = "";
 
-            // Check if this is a Strong Enemy encounter
-            if (EncounterHelper.isStrongEncounter()) {
-                // Strong Enemies: +3% HP
-                totalMultiplier *= 1.03f;
-                logDetails = "+3% (Strong)";
-            } else {
-                // Weak Enemies: +1 HP (apply flat increase after multipliers)
-                logDetails = "+1 (Weak)";
-            }
+            boolean isWeak = EncounterHelper.isWeakEncounter();
+            boolean isStrong = EncounterHelper.isStrongEncounter();
 
-            // Act-based additional HP increase
-            int currentAct = AbstractDungeon.actNum;
-            if (currentAct == 2) {
-                // Act 2: Additional +2% HP
-                totalMultiplier *= 1.02f;
-                logDetails += " +2% (Act 2)";
-            } else if (currentAct == 3) {
-                // Act 3: Additional +5% HP
-                totalMultiplier *= 1.05f;
-                logDetails += " +5% (Act 3)";
-            }
-
-            // Apply multipliers first
-            if (totalMultiplier > 1.0f) {
-                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * totalMultiplier);
-                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * totalMultiplier);
-            }
-
-            // Apply flat increase for Weak Enemies
-            if (!EncounterHelper.isStrongEncounter()) {
+            if (isWeak) {
+                // Weak Enemies: +1 HP first, then apply act-based percentage
                 __instance.maxHealth += 1;
                 __instance.currentHealth += 1;
+                logDetails = "+1 (Weak)";
+
+                if (currentAct == 2) {
+                    // Act 2: Additional +2% HP
+                    __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.02f);
+                    __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.02f);
+                    logDetails += " +2% (Act 2)";
+                } else if (currentAct == 3) {
+                    // Act 3: Additional +5% HP
+                    __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * 1.05f);
+                    __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * 1.05f);
+                    logDetails += " +5% (Act 3)";
+                }
+            } else if (isStrong) {
+                // Strong Enemies: Add percentages together, not multiply
+                float totalPercent = 0.03f; // Base 3%
+                logDetails = "+3% (Strong)";
+
+                if (currentAct == 2) {
+                    // Act 2: +3% +2% = +5% total
+                    totalPercent += 0.02f;
+                    logDetails += " +2% (Act 2) = +5%";
+                } else if (currentAct == 3) {
+                    // Act 3: +3% +5% = +8% total
+                    totalPercent += 0.05f;
+                    logDetails += " +5% (Act 3) = +8%";
+                }
+
+                __instance.maxHealth = MathUtils.ceil(__instance.maxHealth * (1.0f + totalPercent));
+                __instance.currentHealth = MathUtils.ceil(__instance.currentHealth * (1.0f + totalPercent));
             }
 
-            logger.info(String.format(
-                "Ascension 35: %s HP increased from %d to %d (%s)",
-                __instance.name, originalMaxHP, __instance.maxHealth, logDetails
-            ));
+            if (isWeak || isStrong) {
+                logger.info(String.format(
+                        "Ascension 35: %s HP increased from %d to %d (%s)",
+                        __instance.name, originalMaxHP, __instance.maxHealth, logDetails));
+            }
         }
     }
 }
