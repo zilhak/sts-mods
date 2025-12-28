@@ -3,7 +3,6 @@ package com.stsmod.ascension100.patches.levels;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePrefixPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
-import com.megacrit.cardcrawl.actions.AbstractGameAction;
 import com.megacrit.cardcrawl.actions.common.ApplyPowerAction;
 import com.megacrit.cardcrawl.actions.unique.IncreaseMaxHpAction;
 import com.megacrit.cardcrawl.core.Settings;
@@ -32,10 +31,7 @@ public class Level55 {
     /**
      * Patch Burning Elite buff application to enhance the bonuses
      */
-    @SpirePatch(
-        clz = MonsterRoomElite.class,
-        method = "applyEmeraldEliteBuff"
-    )
+    @SpirePatch(clz = MonsterRoomElite.class, method = "applyEmeraldEliteBuff")
     public static class EnhancedBurningElite {
         @SpirePrefixPatch
         public static SpireReturn<Void> Prefix(MonsterRoomElite __instance) {
@@ -45,15 +41,14 @@ public class Level55 {
 
             // Only apply if this is a Burning Elite room
             if (Settings.isFinalActAvailable &&
-                AbstractDungeon.getCurrMapNode().hasEmeraldKey) {
+                    AbstractDungeon.getCurrMapNode().hasEmeraldKey) {
 
                 int randomBuff = AbstractDungeon.mapRng.random(0, 3);
                 int actNum = AbstractDungeon.actNum;
 
                 logger.info(String.format(
-                    "[Asc55] Applying enhanced Burning Elite buff %d in Act %d",
-                    randomBuff, actNum
-                ));
+                        "[Asc55] Applying enhanced Burning Elite buff %d in Act %d",
+                        randomBuff, actNum));
 
                 for (AbstractMonster m : __instance.monsters.monsters) {
                     switch (randomBuff) {
@@ -62,24 +57,20 @@ public class Level55 {
                             int baseStr = actNum + 1;
                             int enhancedStr = baseStr + 2;
                             AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(m, m,
-                                    new StrengthPower(m, enhancedStr), enhancedStr)
-                            );
+                                    new ApplyPowerAction(m, m,
+                                            new StrengthPower(m, enhancedStr), enhancedStr));
                             logger.info(String.format(
-                                "[Asc55] %s gained Strength %d (base: %d, +2 bonus)",
-                                m.name, enhancedStr, baseStr
-                            ));
+                                    "[Asc55] %s gained Strength %d (base: %d, +2 bonus)",
+                                    m.name, enhancedStr, baseStr));
                             break;
 
                         case 1:
                             // Max HP: 25% → 40% (15% additional)
                             AbstractDungeon.actionManager.addToBottom(
-                                new IncreaseMaxHpAction(m, 0.40F, true)
-                            );
+                                    new IncreaseMaxHpAction(m, 0.40F, true));
                             logger.info(String.format(
-                                "[Asc55] %s max HP increased by 40%% (base: 25%%, +15%% bonus)",
-                                m.name
-                            ));
+                                    "[Asc55] %s max HP increased by 40%% (base: 25%%, +15%% bonus)",
+                                    m.name));
                             break;
 
                         case 2:
@@ -87,14 +78,12 @@ public class Level55 {
                             int baseMetallicize = actNum * 2 + 2;
                             int enhancedMetallicize = baseMetallicize + 4;
                             AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(m, m,
-                                    new MetallicizePower(m, enhancedMetallicize),
-                                    enhancedMetallicize)
-                            );
+                                    new ApplyPowerAction(m, m,
+                                            new MetallicizePower(m, enhancedMetallicize),
+                                            enhancedMetallicize));
                             logger.info(String.format(
-                                "[Asc55] %s gained Metallicize %d (base: %d, +4 bonus)",
-                                m.name, enhancedMetallicize, baseMetallicize
-                            ));
+                                    "[Asc55] %s gained Metallicize %d (base: %d, +4 bonus)",
+                                    m.name, enhancedMetallicize, baseMetallicize));
                             break;
 
                         case 3:
@@ -102,14 +91,12 @@ public class Level55 {
                             int baseRegen = 1 + actNum * 2;
                             int enhancedRegen = baseRegen + 3;
                             AbstractDungeon.actionManager.addToBottom(
-                                new ApplyPowerAction(m, m,
-                                    new RegenerateMonsterPower(m, enhancedRegen),
-                                    enhancedRegen)
-                            );
+                                    new ApplyPowerAction(m, m,
+                                            new RegenerateMonsterPower(m, enhancedRegen),
+                                            enhancedRegen));
                             logger.info(String.format(
-                                "[Asc55] %s gained Regeneration %d (base: %d, +3 bonus)",
-                                m.name, enhancedRegen, baseRegen
-                            ));
+                                    "[Asc55] %s gained Regeneration %d (base: %d, +3 bonus)",
+                                    m.name, enhancedRegen, baseRegen));
                             break;
                     }
                 }

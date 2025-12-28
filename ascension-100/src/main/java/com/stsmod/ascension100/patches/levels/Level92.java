@@ -18,6 +18,7 @@ import com.megacrit.cardcrawl.powers.*;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinTsundere;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinFat;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinWarrior;
+import com.megacrit.cardcrawl.monsters.exordium.GremlinThief;
 import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
 import com.megacrit.cardcrawl.monsters.exordium.FungiBeast;
 import com.megacrit.cardcrawl.monsters.exordium.TheGuardian;
@@ -301,28 +302,6 @@ public class Level92 {
                     ));
                 } catch (Exception e) {
                     logger.error("Failed to modify Shield Gremlin stats", e);
-                }
-            }
-
-            // Sneaky Gremlin (GremlinThief): Increase thiefDamage by 7
-            if (id.equals("GremlinThief")) {
-                try {
-                    Field thiefDamageField = __instance.getClass().getDeclaredField("thiefDamage");
-                    thiefDamageField.setAccessible(true);
-                    int originalDamage = thiefDamageField.getInt(__instance);
-                    thiefDamageField.setInt(__instance, originalDamage + 7);
-
-                    // Update damage info
-                    if (!__instance.damage.isEmpty()) {
-                        __instance.damage.get(0).base += 7;
-                    }
-
-                    logger.info(String.format(
-                        "Ascension 92: Sneaky Gremlin damage increased from %d to %d (+7)",
-                        originalDamage, originalDamage + 7
-                    ));
-                } catch (Exception e) {
-                    logger.error("Failed to modify Sneaky Gremlin stats", e);
                 }
             }
 
@@ -1196,80 +1175,40 @@ public class Level92 {
         }
     }
 
+
     /**
      * Gremlin Leader adds +4 extra Strength on ENCOURAGE pattern at A92+
      * Base game: Strength 3 (A3: 4, A18: 5) to all gremlins
-     * A92+: Additional Strength 4 to all gremlins on ENCOURAGE move
+     * A92+: Increase strAmt field by 4 → total Strength 9 (A18+)
+     *
+     * IMPORTANT: Modify strAmt field in constructor, not action queue
+     * The original game uses this.strAmt in takeTurn() case 3 (ENCOURAGE)
      */
     @SpirePatch(
         clz = GremlinLeader.class,
-        method = "takeTurn"
+        method = SpirePatch.CONSTRUCTOR
     )
     public static class GremlinLeaderExtraStrength {
-        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
-
-        @SpirePrefixPatch
-        public static void Prefix(GremlinLeader __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
-                return;
-            }
-
-            try {
-                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte move = nextMoveField.getByte(__instance);
-                lastMove.set(move);
-            } catch (Exception e) {
-                logger.error("Failed to get Gremlin Leader move", e);
-            }
-        }
-
         @SpirePostfixPatch
         public static void Postfix(GremlinLeader __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
                 return;
             }
 
-            Byte move = lastMove.get();
-            if (move != null && move == 3) { // ENCOURAGE move
-                // Find and modify the last ApplyPowerAction with StrengthPower for each monster
-                try {
-                    // We need to modify strength for each gremlin
-                    for (AbstractMonster m : (AbstractDungeon.getMonsters()).monsters) {
-                        if (m.isDying) continue;
+            try {
+                // Increase strAmt field by 4
+                Field strAmtField = GremlinLeader.class.getDeclaredField("strAmt");
+                strAmtField.setAccessible(true);
+                int currentStrAmt = strAmtField.getInt(__instance);
+                strAmtField.setInt(__instance, currentStrAmt + 4);
 
-                        // Find the last StrengthPower action for this specific monster
-                        for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
-                            AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
-
-                            if (action instanceof ApplyPowerAction) {
-                                Field powerToApplyField = ApplyPowerAction.class.getDeclaredField("powerToApply");
-                                powerToApplyField.setAccessible(true);
-                                AbstractPower power = (AbstractPower) powerToApplyField.get(action);
-
-                                if (power instanceof StrengthPower && power.owner == m) {
-                                    power.amount += 4;
-
-                                    Field amountField = ApplyPowerAction.class.getDeclaredField("amount");
-                                    amountField.setAccessible(true);
-                                    int currentAmount = amountField.getInt(action);
-                                    amountField.setInt(action, currentAmount + 4);
-
-                                    logger.info(String.format(
-                                        "Ascension 92: Gremlin Leader - %s Strength increased by +4 (total: %d)",
-                                        m.name, power.amount
-                                    ));
-                                    break; // Found this monster's strength action, move to next monster
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Failed to modify Gremlin Leader Strength amount", e);
-                }
+                logger.info(String.format(
+                    "Ascension 92: Gremlin Leader strAmt increased from %d to %d (+4)",
+                    currentStrAmt, currentStrAmt + 4
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify Gremlin Leader strAmt", e);
             }
-
-            lastMove.remove();
         }
     }
 
@@ -1869,6 +1808,42 @@ public class Level92 {
                 logger.info("Ascension 92: Mugger goldAmt reset to original (Thievery amount remains increased)");
             } catch (Exception e) {
                 logger.error("Failed to reset Mugger goldAmt", e);
+            }
+        }
+    }
+
+    /**
+     * GremlinThief (교활한 그렘린): Damage +7
+     */
+    @SpirePatch(
+        clz = GremlinThief.class,
+        method = SpirePatch.CONSTRUCTOR
+    )
+    public static class GremlinThiefDamagePatch92 {
+        @SpirePostfixPatch
+        public static void Postfix(GremlinThief __instance, float x, float y) {
+            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
+                return;
+            }
+
+            try {
+                // Increase thiefDamage field by 7
+                Field thiefDamageField = GremlinThief.class.getDeclaredField("thiefDamage");
+                thiefDamageField.setAccessible(true);
+                int currentDamage = thiefDamageField.getInt(__instance);
+                thiefDamageField.setInt(__instance, currentDamage + 7);
+
+                // Update damage info
+                if (!__instance.damage.isEmpty()) {
+                    __instance.damage.get(0).base += 7;
+                }
+
+                logger.info(String.format(
+                    "Ascension 92: GremlinThief damage increased from %d to %d (+7)",
+                    currentDamage, currentDamage + 7
+                ));
+            } catch (Exception e) {
+                logger.error("Failed to modify GremlinThief damage", e);
             }
         }
     }

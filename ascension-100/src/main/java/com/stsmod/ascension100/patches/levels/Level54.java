@@ -8,13 +8,11 @@ import com.megacrit.cardcrawl.actions.common.HealAction;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.DamageInfo;
 import com.megacrit.cardcrawl.cards.status.Burn;
-import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.monsters.exordium.Hexaghost;
 import com.megacrit.cardcrawl.monsters.exordium.SlimeBoss;
 import com.megacrit.cardcrawl.monsters.exordium.TheGuardian;
-import com.megacrit.cardcrawl.monsters.city.BronzeAutomaton;
 import com.megacrit.cardcrawl.monsters.city.BronzeOrb;
 import com.megacrit.cardcrawl.monsters.city.Champ;
 import com.megacrit.cardcrawl.monsters.city.TheCollector;
@@ -22,7 +20,6 @@ import com.megacrit.cardcrawl.monsters.beyond.AwakenedOne;
 import com.megacrit.cardcrawl.monsters.beyond.Deca;
 import com.megacrit.cardcrawl.monsters.beyond.TimeEater;
 import com.megacrit.cardcrawl.monsters.ending.CorruptHeart;
-import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.powers.ArtifactPower;
 import com.megacrit.cardcrawl.powers.MetallicizePower;
 import com.megacrit.cardcrawl.powers.PlatedArmorPower;
@@ -55,10 +52,7 @@ public class Level54 {
      * Patch Guardian's defensive mode Sharp Hide power
      * Increase by 1 when ascension level >= 54
      */
-    @SpirePatch(
-        clz = TheGuardian.class,
-        method = "useCloseUp"
-    )
+    @SpirePatch(clz = TheGuardian.class, method = "useCloseUp")
     public static class GuardianSharpHideIncrease {
         @SpirePostfixPatch
         public static void Postfix(TheGuardian __instance) {
@@ -68,9 +62,8 @@ public class Level54 {
 
             // Add +1 Sharp Hide after useCloseUp applies base Sharp Hide
             AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new SharpHidePower(__instance, 1), 1)
-            );
+                    new ApplyPowerAction(__instance, __instance,
+                            new SharpHidePower(__instance, 1), 1));
 
             logger.info("Ascension 54: Guardian gained +1 additional Sharp Hide in defensive mode");
         }
@@ -81,10 +74,7 @@ public class Level54 {
      * Base game: INFERNO move (6) adds 3 upgraded Burns via BurnIncreaseAction
      * A54+: Additional 2 upgraded Burns to discard pile
      */
-    @SpirePatch(
-        clz = Hexaghost.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = Hexaghost.class, method = "takeTurn")
     public static class HexaghostInfernoExtraBurns {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -116,14 +106,12 @@ public class Level54 {
                 Burn burn1 = new Burn();
                 burn1.upgrade();
                 AbstractDungeon.actionManager.addToBottom(
-                    new MakeTempCardInDiscardAction((AbstractCard) burn1, 1)
-                );
+                        new MakeTempCardInDiscardAction((AbstractCard) burn1, 1));
 
                 Burn burn2 = new Burn();
                 burn2.upgrade();
                 AbstractDungeon.actionManager.addToBottom(
-                    new MakeTempCardInDiscardAction((AbstractCard) burn2, 1)
-                );
+                        new MakeTempCardInDiscardAction((AbstractCard) burn2, 1));
 
                 logger.info("Ascension 54: Hexaghost Inferno added 2 extra Burns to discard pile");
             }
@@ -135,10 +123,7 @@ public class Level54 {
     /**
      * Awakened One: Phase 1 HP +25
      */
-    @SpirePatch(
-        clz = AwakenedOne.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
+    @SpirePatch(clz = AwakenedOne.class, method = SpirePatch.CONSTRUCTOR)
     public static class AwakenedOnePhase1HPIncrease {
         @SpirePostfixPatch
         public static void Postfix(AwakenedOne __instance) {
@@ -152,21 +137,16 @@ public class Level54 {
             __instance.currentHealth += 25;
 
             logger.info(String.format(
-                "Ascension 54: AwakenedOne Phase 1 HP increased from %d to %d (+25)",
-                originalHP,
-                __instance.maxHealth
-            ));
+                    "Ascension 54: AwakenedOne Phase 1 HP increased from %d to %d (+25)",
+                    originalHP,
+                    __instance.maxHealth));
         }
     }
 
     /**
      * Slime Boss: 강타(Slam) 패턴 데미지 +17
      */
-    @SpirePatch(
-        clz = SlimeBoss.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {}
-    )
+    @SpirePatch(clz = SlimeBoss.class, method = SpirePatch.CONSTRUCTOR, paramtypez = {})
     public static class SlimeBossSlamDamageIncrease {
         @SpirePostfixPatch
         public static void Postfix(SlimeBoss __instance) {
@@ -188,10 +168,7 @@ public class Level54 {
     /**
      * Bronze Automaton: 청동 구체 소환시 인공물 +2
      */
-    @SpirePatch(
-        clz = BronzeOrb.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
+    @SpirePatch(clz = BronzeOrb.class, method = SpirePatch.CONSTRUCTOR)
     public static class BronzeOrbArtifactBonus {
         @SpirePostfixPatch
         public static void Postfix(BronzeOrb __instance, float x, float y, int count) {
@@ -201,9 +178,8 @@ public class Level54 {
 
             // Add 2 Artifact to Bronze Orb
             AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new ArtifactPower(__instance, 2), 2)
-            );
+                    new ApplyPowerAction(__instance, __instance,
+                            new ArtifactPower(__instance, 2), 2));
 
             logger.info("Ascension 54: Bronze Orb spawned with +2 Artifact");
         }
@@ -212,10 +188,7 @@ public class Level54 {
     /**
      * The Champ: 분노(Anger) 패턴 체력 10% 회복
      */
-    @SpirePatch(
-        clz = Champ.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = Champ.class, method = "takeTurn")
     public static class ChampAngerHeal {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -246,13 +219,11 @@ public class Level54 {
             if (move != null && move == 3) {
                 int healAmount = (int) (__instance.maxHealth * 0.10f);
                 AbstractDungeon.actionManager.addToBottom(
-                    new HealAction(__instance, __instance, healAmount)
-                );
+                        new HealAction(__instance, __instance, healAmount));
 
                 logger.info(String.format(
-                    "Ascension 54: Champ Anger pattern healed for %d (10%% max HP)",
-                    healAmount
-                ));
+                        "Ascension 54: Champ Anger pattern healed for %d (10%% max HP)",
+                        healAmount));
             }
 
             lastMove.remove();
@@ -262,10 +233,7 @@ public class Level54 {
     /**
      * The Collector: 횃불 머리 소환 패턴 변경 (둘이 되도록 → 두마리 소환)
      */
-    @SpirePatch(
-        clz = TheCollector.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = TheCollector.class, method = "takeTurn")
     public static class CollectorTorchHeadSpawn {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
         private static final ThreadLocal<Integer> torchCount = new ThreadLocal<>();
@@ -309,11 +277,9 @@ public class Level54 {
                 // Spawn one additional TorchHead (base game spawns 1, we add 1 more)
                 float xPos = -370.0f;
                 AbstractDungeon.actionManager.addToBottom(
-                    new SpawnMonsterAction(
-                        new com.megacrit.cardcrawl.monsters.city.TorchHead(xPos, 0.0f),
-                        true
-                    )
-                );
+                        new SpawnMonsterAction(
+                                new com.megacrit.cardcrawl.monsters.city.TorchHead(xPos, 0.0f),
+                                true));
 
                 logger.info("Ascension 54: Collector spawned additional TorchHead (2 total instead of making it 2)");
             }
@@ -336,10 +302,7 @@ public class Level54 {
      * - 약화(Weak) +1 (총 2턴)
      * - 손상(Frail) +1 (총 2턴, A19+ 기준)
      */
-    @SpirePatch(
-        clz = TimeEater.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = TimeEater.class, method = "takeTurn")
     public static class TimeEaterRippleDebuffIncrease {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -370,23 +333,19 @@ public class Level54 {
             if (move != null && move == 3) {
                 // Add +1 Weak (base game applies 1, so total becomes 2)
                 AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(
-                        AbstractDungeon.player,
-                        __instance,
-                        new com.megacrit.cardcrawl.powers.WeakPower(AbstractDungeon.player, 1, true),
-                        1
-                    )
-                );
+                        new ApplyPowerAction(
+                                AbstractDungeon.player,
+                                __instance,
+                                new com.megacrit.cardcrawl.powers.WeakPower(AbstractDungeon.player, 1, true),
+                                1));
 
                 // Add +1 Frail (base game applies 1 at A19+, so total becomes 2)
                 AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(
-                        AbstractDungeon.player,
-                        __instance,
-                        new com.megacrit.cardcrawl.powers.FrailPower(AbstractDungeon.player, 1, true),
-                        1
-                    )
-                );
+                        new ApplyPowerAction(
+                                AbstractDungeon.player,
+                                __instance,
+                                new com.megacrit.cardcrawl.powers.FrailPower(AbstractDungeon.player, 1, true),
+                                1));
 
                 logger.info("Ascension 54: Time Eater Ripple pattern added +1 Weak and +1 Frail (total 2 each)");
             }
@@ -398,10 +357,7 @@ public class Level54 {
     /**
      * Deca: 버프 패턴에서 판금 갑옷 +1
      */
-    @SpirePatch(
-        clz = Deca.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = Deca.class, method = "takeTurn")
     public static class DecaPlatedArmorBonus {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -431,9 +387,8 @@ public class Level54 {
             // Move 1 is buff pattern
             if (move != null && move == 1) {
                 AbstractDungeon.actionManager.addToBottom(
-                    new ApplyPowerAction(__instance, __instance,
-                        new PlatedArmorPower(__instance, 1), 1)
-                );
+                        new ApplyPowerAction(__instance, __instance,
+                                new PlatedArmorPower(__instance, 1), 1));
 
                 logger.info("Ascension 54: Deca buff pattern added +1 Plated Armor");
             }
@@ -445,10 +400,7 @@ public class Level54 {
     /**
      * Corrupt Heart: 금속화 +20
      */
-    @SpirePatch(
-        clz = CorruptHeart.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = CorruptHeart.class, method = "usePreBattleAction")
     public static class CorruptHeartMetallicize {
         @SpirePostfixPatch
         public static void Postfix(CorruptHeart __instance) {
@@ -457,9 +409,8 @@ public class Level54 {
             }
 
             AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new MetallicizePower(__instance, 20), 20)
-            );
+                    new ApplyPowerAction(__instance, __instance,
+                            new MetallicizePower(__instance, 20), 20));
 
             logger.info("Ascension 54: Corrupt Heart gained +20 Metallicize");
         }

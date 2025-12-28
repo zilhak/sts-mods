@@ -41,13 +41,13 @@ public class Level68 {
                 return;
             }
 
-            // Skip byrd in Act 2 (handled by special Level 62 logic)
-            if (AbstractDungeon.actNum == 2 && __instance.id != null && __instance.id.equals("Byrd")) {
+            // Skip bosses (Level 68 is for normal enemies only, not bosses)
+            if (__instance.type == AbstractMonster.EnemyType.BOSS) {
                 return;
             }
 
-            // Skip GiantHead (handled by separate Constructor patch for early timing)
-            if (__instance instanceof GiantHead) {
+            // Skip byrd in Act 2 (handled by special Level 62 logic)
+            if (AbstractDungeon.actNum == 2 && __instance.id != null && __instance.id.equals("Byrd")) {
                 return;
             }
 
@@ -101,6 +101,38 @@ public class Level68 {
                     }
                 }
 
+                // Special handling for GremlinThief: update thiefDamage field for SetMoveAction
+                if (__instance.id != null && __instance.id.equals("GremlinThief")) {
+                    try {
+                        Field thiefDamageField = __instance.getClass().getDeclaredField("thiefDamage");
+                        thiefDamageField.setAccessible(true);
+                        int currentThiefDamage = thiefDamageField.getInt(__instance);
+                        thiefDamageField.setInt(__instance, currentThiefDamage + damageIncrease);
+                        logger.info(String.format(
+                            "Ascension 68: GremlinThief thiefDamage field updated from %d to %d (Act %d)",
+                            currentThiefDamage, currentThiefDamage + damageIncrease, actNum
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update GremlinThief thiefDamage field", e);
+                    }
+                }
+
+                // Special handling for GremlinLeader: update STAB_DMG field for getMove() intent calculation
+                if (__instance.id != null && __instance.id.equals("GremlinLeader")) {
+                    try {
+                        Field stabDmgField = __instance.getClass().getDeclaredField("STAB_DMG");
+                        stabDmgField.setAccessible(true);
+                        int currentStabDmg = stabDmgField.getInt(__instance);
+                        stabDmgField.setInt(__instance, currentStabDmg + damageIncrease);
+                        logger.info(String.format(
+                            "Ascension 68: GremlinLeader STAB_DMG field updated from %d to %d (Act %d)",
+                            currentStabDmg, currentStabDmg + damageIncrease, actNum
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update GremlinLeader STAB_DMG field", e);
+                    }
+                }
+
                 // Mark as patched
                 patchedMonsters.add(__instance);
             }
@@ -108,180 +140,178 @@ public class Level68 {
     }
 
     /**
-     * GiantHead: Special handling in Constructor to ensure damage modification happens before first getMove()
-     * GiantHead's first getMove() is called very early, so we need Constructor-level patching
-     */
-    @SpirePatch(
-        clz = GiantHead.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
-    public static class GiantHeadConstructorPatch {
-        @SpirePostfixPatch
-        public static void Postfix(GiantHead __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
-                return;
-            }
-
-            int actNum = AbstractDungeon.actNum;
-            int damageIncrease = 0;
-
-            if (actNum == 1) {
-                damageIncrease = 1;
-            } else if (actNum == 2) {
-                damageIncrease = 2;
-            } else if (actNum >= 3) {
-                damageIncrease = 5;
-            }
-
-            if (damageIncrease > 0) {
-                // Update all damage array entries (including COUNT at index 0)
-                for (DamageInfo damageInfo : __instance.damage) {
-                    if (damageInfo != null && damageInfo.base > 0) {
-                        damageInfo.base += damageIncrease;
-                        damageInfo.output = damageInfo.base;
-                    }
-                }
-
-                // Update startingDeathDmg field for IT_IS_TIME Intent calculation
-                try {
-                    Field startingDeathDmgField = GiantHead.class.getDeclaredField("startingDeathDmg");
-                    startingDeathDmgField.setAccessible(true);
-                    int currentDeathDmg = startingDeathDmgField.getInt(__instance);
-                    startingDeathDmgField.setInt(__instance, currentDeathDmg + damageIncrease);
-                    logger.info(String.format(
-                        "Ascension 68: GiantHead damage increased by %d (Act %d) - COUNT and IT_IS_TIME both updated",
-                        damageIncrease, actNum
-                    ));
-                } catch (Exception e) {
-                    logger.error("Failed to update GiantHead startingDeathDmg field", e);
-                }
-            }
-        }
-    }
-
-    /**
-     * GiantHead: Fix Count attack Intent in createIntent()
+     * Generic Intent Fix for all monsters using hardcoded damage in setMove()
      *
-     * PROBLEM: createIntent() is called after rollMove() and recalculates intentDmg
-     * using this.move.baseDamage which is hardcoded to 13 in getMove()
+     * This fixes Intent for normal enemies (not bosses) that use hardcoded damage values
+     * in getMove()/setMove() instead of reading from damage array.
      *
-     * CALL SEQUENCE:
-     * 1. rollMove() → getMove() → setMove((byte)3, ATTACK, 13)
-     *    → this.move.baseDamage = 13
-     * 2. createIntent()
-     *    → calculateDamage(this.move.baseDamage=13)
-     *    → this.intentDmg = 13 (WRONG!)
-     *
-     * FIX: Patch createIntent() Postfix to correct intentDmg using damage[0].base
-     *
-     * Patches AbstractMonster.createIntent() since GiantHead doesn't override it
+     * Level 68 applies to normal enemies only, not bosses.
      */
     @SpirePatch(
         clz = AbstractMonster.class,
         method = "createIntent"
     )
-    public static class GiantHeadCreateIntentFix {
+    public static class GenericCreateIntentFix {
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
-            // Only apply to GiantHead
-            if (!(__instance instanceof GiantHead)) {
-                return;
-            }
-
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
                 return;
             }
 
+            // Skip bosses (Level 68 applies to normal enemies only)
+            if (__instance.type == AbstractMonster.EnemyType.BOSS) {
+                return;
+            }
+
             try {
-                // Check if current move is COUNT (byte 3)
-                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte nextMove = nextMoveField.getByte(__instance);
+                // Only fix attack intents
+                Field intentField = AbstractMonster.class.getDeclaredField("intent");
+                intentField.setAccessible(true);
+                AbstractMonster.Intent intent = (AbstractMonster.Intent) intentField.get(__instance);
 
-                if (nextMove == 3) {
-                    // createIntent() just called calculateDamage(this.move.baseDamage=13)
-                    // Fix it to use damage[0].base instead
-                    int actualDamage = __instance.damage.get(0).base;  // Use base (14)
+                if (intent != AbstractMonster.Intent.ATTACK &&
+                    intent != AbstractMonster.Intent.ATTACK_BUFF &&
+                    intent != AbstractMonster.Intent.ATTACK_DEFEND &&
+                    intent != AbstractMonster.Intent.ATTACK_DEBUFF) {
+                    return;
+                }
 
-                    // Update intentDmg field (this is what displays in the Intent)
-                    Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
-                    intentDmgField.setAccessible(true);
-                    int currentIntentDmg = intentDmgField.getInt(__instance);
+                // Get intentBaseDmg (what setMove() hardcoded)
+                Field intentBaseDmgField = AbstractMonster.class.getDeclaredField("intentBaseDmg");
+                intentBaseDmgField.setAccessible(true);
+                int intentBaseDmg = intentBaseDmgField.getInt(__instance);
 
-                    if (currentIntentDmg != actualDamage) {
-                        intentDmgField.setInt(__instance, actualDamage);
-                        logger.info(String.format(
-                            "Ascension 68: GiantHead Count Intent fixed in createIntent from %d to %d",
-                            currentIntentDmg, actualDamage
-                        ));
+                if (intentBaseDmg <= 0) {
+                    return;  // No damage intent
+                }
+
+                // Find matching damage in damage array
+                for (int i = 0; i < __instance.damage.size(); i++) {
+                    DamageInfo dmg = __instance.damage.get(i);
+                    if (dmg != null && dmg.base > 0) {
+                        // Check if this damage matches the hardcoded base
+                        // Level 68: normal enemies only (+1/+2/+5)
+                        // This patch only applies to normal enemies (bosses are excluded above)
+                        int actNum = AbstractDungeon.actNum;
+                        int expectedIncrease = 0;
+                        if (actNum == 1) {
+                            expectedIncrease = 1;
+                        } else if (actNum == 2) {
+                            expectedIncrease = 2;
+                        } else if (actNum >= 3) {
+                            expectedIncrease = 5;
+                        }
+
+                        // If dmg.base - expectedIncrease == intentBaseDmg, this is the right damage
+                        if (dmg.base - expectedIncrease == intentBaseDmg) {
+                            // Update intentDmg to use actual damage
+                            Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
+                            intentDmgField.setAccessible(true);
+                            intentDmgField.setInt(__instance, dmg.base);
+
+                            logger.info(String.format(
+                                "Ascension 68: %s Intent fixed in createIntent from %d to %d (index %d)",
+                                __instance.name, intentBaseDmg, dmg.base, i
+                            ));
+                            break;  // Found the match, stop
+                        }
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to fix GiantHead Count Intent in createIntent", e);
+                logger.error("Failed to fix generic Intent in createIntent", e);
             }
         }
     }
 
     /**
-     * GiantHead: Fix Count attack Intent in applyPowers()
+     * Generic Intent Fix for applyPowers() - all monsters using hardcoded damage
      *
-     * PROBLEM: applyPowers() also recalculates intentDmg using this.move.baseDamage
      * This is called every turn after player ends turn
-     *
-     * CALL SEQUENCE:
-     * 1. Player ends turn
-     * 2. applyPowers()
-     *    → calculateDamage(this.move.baseDamage=13)
-     *    → this.intentDmg = 13 (WRONG!)
-     *
-     * FIX: Patch applyPowers() Postfix to correct intentDmg using damage[0].output
-     * (use .output instead of .base because powers have already been applied)
-     *
-     * Patches AbstractMonster.applyPowers() since GiantHead doesn't override it
+     * Level 68 applies to normal enemies only, not bosses.
      */
     @SpirePatch(
         clz = AbstractMonster.class,
         method = "applyPowers"
     )
-    public static class GiantHeadApplyPowersFix {
+    public static class GenericApplyPowersFix {
         @SpirePostfixPatch
         public static void Postfix(AbstractMonster __instance) {
-            // Only apply to GiantHead
-            if (!(__instance instanceof GiantHead)) {
-                return;
-            }
-
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 68) {
                 return;
             }
 
+            // Skip bosses (Level 68 applies to normal enemies only)
+            if (__instance.type == AbstractMonster.EnemyType.BOSS) {
+                return;
+            }
+
             try {
-                // Check if current move is COUNT (byte 3)
-                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte nextMove = nextMoveField.getByte(__instance);
+                // Only fix attack intents
+                Field intentField = AbstractMonster.class.getDeclaredField("intent");
+                intentField.setAccessible(true);
+                AbstractMonster.Intent intent = (AbstractMonster.Intent) intentField.get(__instance);
 
-                if (nextMove == 3) {
-                    // applyPowers() just called calculateDamage(this.move.baseDamage=13)
-                    // Fix it to use damage[0].output (after powers applied)
-                    int actualDamage = __instance.damage.get(0).output;  // Use output after powers
+                if (intent != AbstractMonster.Intent.ATTACK &&
+                    intent != AbstractMonster.Intent.ATTACK_BUFF &&
+                    intent != AbstractMonster.Intent.ATTACK_DEFEND &&
+                    intent != AbstractMonster.Intent.ATTACK_DEBUFF) {
+                    return;
+                }
 
-                    // Update intentDmg field (this is what displays in the Intent)
-                    Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
-                    intentDmgField.setAccessible(true);
-                    int currentIntentDmg = intentDmgField.getInt(__instance);
+                // Get intentBaseDmg (what setMove() hardcoded)
+                Field intentBaseDmgField = AbstractMonster.class.getDeclaredField("intentBaseDmg");
+                intentBaseDmgField.setAccessible(true);
+                int intentBaseDmg = intentBaseDmgField.getInt(__instance);
 
-                    if (currentIntentDmg != actualDamage) {
-                        intentDmgField.setInt(__instance, actualDamage);
-                        logger.info(String.format(
-                            "Ascension 68: GiantHead Count Intent fixed in applyPowers from %d to %d",
-                            currentIntentDmg, actualDamage
-                        ));
+                if (intentBaseDmg <= 0) {
+                    return;  // No damage intent
+                }
+
+                // Find matching damage in damage array
+                for (int i = 0; i < __instance.damage.size(); i++) {
+                    DamageInfo dmg = __instance.damage.get(i);
+                    if (dmg != null && dmg.base > 0) {
+                        // Check if this damage matches the hardcoded base
+                        int actNum = AbstractDungeon.actNum;
+                        int expectedIncrease = 0;
+                        if (actNum == 1) {
+                            expectedIncrease = 1;
+                        } else if (actNum == 2) {
+                            expectedIncrease = 2;
+                        } else if (actNum >= 3) {
+                            expectedIncrease = 5;
+                        }
+
+                        // Add Level 69 boss damage increase if applicable
+                        if (AbstractDungeon.ascensionLevel >= 69 && __instance.type == AbstractMonster.EnemyType.BOSS) {
+                            if (actNum == 1) {
+                                expectedIncrease += 1;  // Level 69: +1 for Act 1 bosses
+                            } else if (actNum == 2) {
+                                expectedIncrease += 3;  // Level 69: +3 for Act 2 bosses
+                            } else if (actNum == 3) {
+                                expectedIncrease += 6;  // Level 69: +6 for Act 3 bosses
+                            }
+                        }
+
+                        // If dmg.base - expectedIncrease == intentBaseDmg, this is the right damage
+                        if (dmg.base - expectedIncrease == intentBaseDmg) {
+                            // Update intentDmg to use actual damage (after powers)
+                            Field intentDmgField = AbstractMonster.class.getDeclaredField("intentDmg");
+                            intentDmgField.setAccessible(true);
+                            intentDmgField.setInt(__instance, dmg.output);
+
+                            logger.info(String.format(
+                                "Ascension 68: %s Intent fixed in applyPowers from %d to %d (index %d)",
+                                __instance.name, intentBaseDmg, dmg.output, i
+                            ));
+                            break;  // Found the match, stop
+                        }
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to fix GiantHead Count Intent in applyPowers", e);
+                logger.error("Failed to fix generic Intent in applyPowers", e);
             }
         }
     }
+
 }

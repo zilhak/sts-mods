@@ -316,16 +316,25 @@ public class Level86 {
                 return;
             }
 
-            // Increase damage by 1
-            if (!__instance.damage.isEmpty()) {
-                com.megacrit.cardcrawl.cards.DamageInfo damageInfo = __instance.damage.get(0);
-                damageInfo.base += 1;
-                damageInfo.output += 1;
+            try {
+                // Increase thiefDamage field by 1
+                java.lang.reflect.Field thiefDamageField = com.megacrit.cardcrawl.monsters.exordium.GremlinThief.class.getDeclaredField("thiefDamage");
+                thiefDamageField.setAccessible(true);
+                int currentDamage = thiefDamageField.getInt(__instance);
+                thiefDamageField.setInt(__instance, currentDamage + 1);
+
+                // Update damage info
+                if (!__instance.damage.isEmpty()) {
+                    com.megacrit.cardcrawl.cards.DamageInfo damageInfo = __instance.damage.get(0);
+                    damageInfo.base += 1;
+                }
 
                 logger.info(String.format(
-                    "Ascension 86: GremlinThief damage increased by 1 to %d",
-                    damageInfo.base
+                    "Ascension 86: GremlinThief damage increased from %d to %d (+1)",
+                    currentDamage, currentDamage + 1
                 ));
+            } catch (Exception e) {
+                logger.error("Failed to modify GremlinThief damage", e);
             }
         }
     }

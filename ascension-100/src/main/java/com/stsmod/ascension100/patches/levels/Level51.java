@@ -17,7 +17,6 @@ import com.megacrit.cardcrawl.monsters.exordium.GremlinWizard;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinWarrior;
 import com.megacrit.cardcrawl.monsters.exordium.GremlinFat;
 import com.megacrit.cardcrawl.monsters.exordium.JawWorm;
-import com.megacrit.cardcrawl.monsters.exordium.FungiBeast;
 import com.megacrit.cardcrawl.monsters.city.ShelledParasite;
 import com.megacrit.cardcrawl.monsters.city.Chosen;
 import com.megacrit.cardcrawl.monsters.city.Centurion;
@@ -36,11 +35,8 @@ import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.powers.ExplosivePower;
 import com.megacrit.cardcrawl.powers.StrengthPower;
-import com.megacrit.cardcrawl.powers.VulnerablePower;
-import com.megacrit.cardcrawl.powers.WeakPower;
 import com.megacrit.cardcrawl.powers.PlatedArmorPower;
 import com.megacrit.cardcrawl.powers.SporeCloudPower;
-import javassist.CtBehavior;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,10 +59,7 @@ public class Level51 {
     /**
      * Allow WrithingMass to use IMPLANT pattern twice instead of once
      */
-    @SpirePatch(
-        clz = WrithingMass.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = WrithingMass.class, method = "takeTurn")
     public static class AllowTwoImplants {
         private static boolean hasResetOnce = false;
 
@@ -81,7 +74,7 @@ public class Level51 {
                 try {
                     // usedMegaDebuff 필드 접근
                     Field usedMegaDebuff = WrithingMass.class
-                        .getDeclaredField("usedMegaDebuff");
+                            .getDeclaredField("usedMegaDebuff");
                     usedMegaDebuff.setAccessible(true);
 
                     // 플래그 리셋 (재사용 허용)
@@ -90,8 +83,7 @@ public class Level51 {
                     hasResetOnce = true;
 
                     logger.info(String.format(
-                        "[Asc51] WrithingMass IMPLANT flag reset - can use one more time (1/2 used)"
-                    ));
+                            "[Asc51] WrithingMass IMPLANT flag reset - can use one more time (1/2 used)"));
                 } catch (Exception e) {
                     logger.error("[Asc51] Failed to reset usedMegaDebuff flag: " + e.getMessage());
                 }
@@ -104,10 +96,7 @@ public class Level51 {
     /**
      * Reset the flag counter at the start of each battle
      */
-    @SpirePatch(
-        clz = WrithingMass.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = WrithingMass.class, method = "usePreBattleAction")
     public static class ResetBattleCounter {
         @SpirePostfixPatch
         public static void Postfix(WrithingMass __instance) {
@@ -128,34 +117,30 @@ public class Level51 {
      * - Level 51-85: 30 → 50
      * - Level 86+: 30 → 60
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.actions.common.DamageAction.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {
+    @SpirePatch(clz = com.megacrit.cardcrawl.actions.common.DamageAction.class, method = SpirePatch.CONSTRUCTOR, paramtypez = {
             com.megacrit.cardcrawl.core.AbstractCreature.class,
             DamageInfo.class,
             com.megacrit.cardcrawl.actions.AbstractGameAction.AttackEffect.class,
             boolean.class
-        }
-    )
+    })
     public static class ExploderExplosionDamage {
         @SpirePostfixPatch
         public static void Postfix(
-            com.megacrit.cardcrawl.actions.common.DamageAction __instance,
-            com.megacrit.cardcrawl.core.AbstractCreature target,
-            DamageInfo info,
-            com.megacrit.cardcrawl.actions.AbstractGameAction.AttackEffect effect,
-            boolean superFast
-        ) {
+                com.megacrit.cardcrawl.actions.common.DamageAction __instance,
+                com.megacrit.cardcrawl.core.AbstractCreature target,
+                DamageInfo info,
+                com.megacrit.cardcrawl.actions.AbstractGameAction.AttackEffect effect,
+                boolean superFast) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 51) {
                 return;
             }
 
-            // Only modify ExplosivePower explosion damage (THORNS type, 30 base damage, target is player)
+            // Only modify ExplosivePower explosion damage (THORNS type, 30 base damage,
+            // target is player)
             if (info.type == DamageInfo.DamageType.THORNS &&
-                info.base == 30 &&
-                target != null && target.isPlayer &&
-                info.owner != null && !info.owner.isPlayer) {
+                    info.base == 30 &&
+                    target != null && target.isPlayer &&
+                    info.owner != null && !info.owner.isPlayer) {
 
                 if (AbstractDungeon.ascensionLevel >= 86) {
                     // Level 86+: 60 damage
@@ -173,15 +158,13 @@ public class Level51 {
     }
 
     /**
-     * ExplosivePower: Update tooltip to show correct damage based on ascension level
+     * ExplosivePower: Update tooltip to show correct damage based on ascension
+     * level
      * 폭발성 파워: 승천 레벨에 맞는 데미지를 툴팁에 표시
      * - Level 51-85: 50 damage
      * - Level 86+: 60 damage
      */
-    @SpirePatch(
-        clz = ExplosivePower.class,
-        method = "updateDescription"
-    )
+    @SpirePatch(clz = ExplosivePower.class, method = "updateDescription")
     public static class ExplosivePowerTooltipFix {
         @SpirePostfixPatch
         public static void Postfix(ExplosivePower __instance) {
@@ -217,11 +200,7 @@ public class Level51 {
     /**
      * Slaver Blue (푸른색 노예 상인): Damage +1
      */
-    @SpirePatch(
-        clz = SlaverBlue.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = SlaverBlue.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class SlaverBlueDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(SlaverBlue __instance, float x, float y) {
@@ -240,9 +219,8 @@ public class Level51 {
                     }
 
                     logger.info(String.format(
-                        "Ascension 51: Slaver Blue Stab damage increased from %d to %d",
-                        currentStabDmg, currentStabDmg + 1
-                    ));
+                            "Ascension 51: Slaver Blue Stab damage increased from %d to %d",
+                            currentStabDmg, currentStabDmg + 1));
                 } catch (Exception e) {
                     logger.error("Failed to modify Slaver Blue damage", e);
                 }
@@ -253,11 +231,7 @@ public class Level51 {
     /**
      * Slaver Red (붉은색 노예 상인): Damage +1
      */
-    @SpirePatch(
-        clz = SlaverRed.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = SlaverRed.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class SlaverRedDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(SlaverRed __instance, float x, float y) {
@@ -276,9 +250,8 @@ public class Level51 {
                     }
 
                     logger.info(String.format(
-                        "Ascension 51: Slaver Red Stab damage increased from %d to %d",
-                        currentStabDmg, currentStabDmg + 1
-                    ));
+                            "Ascension 51: Slaver Red Stab damage increased from %d to %d",
+                            currentStabDmg, currentStabDmg + 1));
                 } catch (Exception e) {
                     logger.error("Failed to modify Slaver Red damage", e);
                 }
@@ -289,12 +262,10 @@ public class Level51 {
     /**
      * Mugger (강도): Thievery +5
      *
-     * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates ThieveryPower
+     * IMPORTANT: Must modify goldAmt field BEFORE usePreBattleAction creates
+     * ThieveryPower
      */
-    @SpirePatch(
-        clz = Mugger.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = Mugger.class, method = "usePreBattleAction")
     public static class MuggerThieveryIncrease {
         @SpirePrefixPatch
         public static void Prefix(Mugger __instance) {
@@ -310,9 +281,8 @@ public class Level51 {
                 goldAmtField.setInt(__instance, currentGoldAmt + 5);
 
                 logger.info(String.format(
-                    "Ascension 51: Mugger goldAmt increased from %d to %d (Thievery will be %d)",
-                    currentGoldAmt, currentGoldAmt + 5, currentGoldAmt + 5
-                ));
+                        "Ascension 51: Mugger goldAmt increased from %d to %d (Thievery will be %d)",
+                        currentGoldAmt, currentGoldAmt + 5, currentGoldAmt + 5));
             } catch (Exception e) {
                 logger.error("Failed to modify Mugger goldAmt", e);
             }
@@ -342,14 +312,12 @@ public class Level51 {
      * Snake Plant (뱀 식물): Malleable +1
      * Intercepts MalleablePower creation to increase both amount and basePower
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.powers.MalleablePower.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = { com.megacrit.cardcrawl.core.AbstractCreature.class }
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.powers.MalleablePower.class, method = SpirePatch.CONSTRUCTOR, paramtypez = {
+            com.megacrit.cardcrawl.core.AbstractCreature.class })
     public static class SnakePlantMalleableIncrease {
         @SpirePostfixPatch
-        public static void Postfix(com.megacrit.cardcrawl.powers.MalleablePower __instance, com.megacrit.cardcrawl.core.AbstractCreature owner) {
+        public static void Postfix(com.megacrit.cardcrawl.powers.MalleablePower __instance,
+                com.megacrit.cardcrawl.core.AbstractCreature owner) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 51) {
                 return;
             }
@@ -359,7 +327,8 @@ public class Level51 {
                 // Increase both amount and basePower by 1
                 __instance.amount += 1;
                 try {
-                    java.lang.reflect.Field basePowerField = com.megacrit.cardcrawl.powers.MalleablePower.class.getDeclaredField("basePower");
+                    java.lang.reflect.Field basePowerField = com.megacrit.cardcrawl.powers.MalleablePower.class
+                            .getDeclaredField("basePower");
                     basePowerField.setAccessible(true);
                     int currentBasePower = basePowerField.getInt(__instance);
                     basePowerField.setInt(__instance, currentBasePower + 1);
@@ -368,9 +337,8 @@ public class Level51 {
                 }
                 __instance.updateDescription();
                 logger.info(String.format(
-                    "Ascension 51: Snake Plant Malleable increased to %d (base: %d)",
-                    __instance.amount, __instance.amount
-                ));
+                        "Ascension 51: Snake Plant Malleable increased to %d (base: %d)",
+                        __instance.amount, __instance.amount));
             }
         }
     }
@@ -378,10 +346,7 @@ public class Level51 {
     /**
      * Looter (도적): Smoke Bomb block +4
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.exordium.Looter.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.exordium.Looter.class, method = "takeTurn")
     public static class LooterSmokeBombBlockIncrease {
         @SpirePostfixPatch
         public static void Postfix(com.megacrit.cardcrawl.monsters.exordium.Looter __instance) {
@@ -397,15 +362,15 @@ public class Level51 {
 
                 if (move == 2) { // ESCAPE (Smoke Bomb) move
                     // Increase escapeDef by 4
-                    java.lang.reflect.Field escapeDefField = com.megacrit.cardcrawl.monsters.exordium.Looter.class.getDeclaredField("escapeDef");
+                    java.lang.reflect.Field escapeDefField = com.megacrit.cardcrawl.monsters.exordium.Looter.class
+                            .getDeclaredField("escapeDef");
                     escapeDefField.setAccessible(true);
                     int currentEscapeDef = escapeDefField.getInt(__instance);
                     escapeDefField.setInt(__instance, currentEscapeDef + 4);
 
                     logger.info(String.format(
-                        "Ascension 51: Looter Smoke Bomb block increased by 4 to %d",
-                        currentEscapeDef + 4
-                    ));
+                            "Ascension 51: Looter Smoke Bomb block increased by 4 to %d",
+                            currentEscapeDef + 4));
                 }
             } catch (Exception e) {
                 logger.error("Failed to modify Looter Smoke Bomb block", e);
@@ -416,10 +381,7 @@ public class Level51 {
     /**
      * Mugger (강도): Smoke Bomb block +3
      */
-    @SpirePatch(
-        clz = Mugger.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = Mugger.class, method = "takeTurn")
     public static class MuggerSmokeBombBlockIncrease {
         @SpirePostfixPatch
         public static void Postfix(Mugger __instance) {
@@ -441,9 +403,8 @@ public class Level51 {
                     escapeDefField.setInt(__instance, currentEscapeDef + 3);
 
                     logger.info(String.format(
-                        "Ascension 51: Mugger Smoke Bomb block increased by 3 to %d",
-                        currentEscapeDef + 3
-                    ));
+                            "Ascension 51: Mugger Smoke Bomb block increased by 3 to %d",
+                            currentEscapeDef + 3));
                 }
             } catch (Exception e) {
                 logger.error("Failed to modify Mugger Smoke Bomb block", e);
@@ -454,10 +415,7 @@ public class Level51 {
     /**
      * Healer (신비주의자/Mystic): Heal pattern +5 heal amount
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.city.Healer.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.city.Healer.class, method = "takeTurn")
     public static class HealerHealAmountIncrease {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -475,15 +433,15 @@ public class Level51 {
 
                 if (move == 2) { // HEAL move
                     // Increase healAmt by 5 BEFORE takeTurn executes
-                    java.lang.reflect.Field healAmtField = com.megacrit.cardcrawl.monsters.city.Healer.class.getDeclaredField("healAmt");
+                    java.lang.reflect.Field healAmtField = com.megacrit.cardcrawl.monsters.city.Healer.class
+                            .getDeclaredField("healAmt");
                     healAmtField.setAccessible(true);
                     int currentHealAmt = healAmtField.getInt(__instance);
                     healAmtField.setInt(__instance, currentHealAmt + 5);
 
                     logger.info(String.format(
-                        "Ascension 51: Healer heal amount increased by 5 to %d",
-                        currentHealAmt + 5
-                    ));
+                            "Ascension 51: Healer heal amount increased by 5 to %d",
+                            currentHealAmt + 5));
                 }
             } catch (Exception e) {
                 logger.error("Failed to increase Healer heal amount", e);
@@ -500,7 +458,8 @@ public class Level51 {
             if (move != null && move == 2) { // HEAL move
                 try {
                     // Reset healAmt back to original after HEAL
-                    java.lang.reflect.Field healAmtField = com.megacrit.cardcrawl.monsters.city.Healer.class.getDeclaredField("healAmt");
+                    java.lang.reflect.Field healAmtField = com.megacrit.cardcrawl.monsters.city.Healer.class
+                            .getDeclaredField("healAmt");
                     healAmtField.setAccessible(true);
                     int currentHealAmt = healAmtField.getInt(__instance);
                     healAmtField.setInt(__instance, currentHealAmt - 5);
@@ -517,10 +476,7 @@ public class Level51 {
     /**
      * BanditBear (곰): Bear Hug dexterity reduction +1
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.city.BanditBear.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.city.BanditBear.class, method = "takeTurn")
     public static class BanditBearBearHugDebuffIncrease {
         @SpirePostfixPatch
         public static void Postfix(com.megacrit.cardcrawl.monsters.city.BanditBear __instance) {
@@ -537,13 +493,11 @@ public class Level51 {
                 if (move == 2) { // BEAR_HUG move
                     // Apply additional -1 Dexterity
                     AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                            AbstractDungeon.player,
-                            __instance,
-                            new com.megacrit.cardcrawl.powers.DexterityPower(AbstractDungeon.player, -1),
-                            -1
-                        )
-                    );
+                            new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
+                                    AbstractDungeon.player,
+                                    __instance,
+                                    new com.megacrit.cardcrawl.powers.DexterityPower(AbstractDungeon.player, -1),
+                                    -1));
 
                     logger.info("Ascension 51: BanditBear Bear Hug applied -1 additional Dexterity");
                 }
@@ -556,10 +510,7 @@ public class Level51 {
     /**
      * Spiker (반사기): Power pattern Thorns +1
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.beyond.Spiker.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.beyond.Spiker.class, method = "takeTurn")
     public static class SpikerThornsPowerIncrease {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -591,25 +542,29 @@ public class Level51 {
                 // Find and modify the last ApplyPowerAction with ThornsPower
                 try {
                     for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0; i--) {
-                        com.megacrit.cardcrawl.actions.AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
+                        com.megacrit.cardcrawl.actions.AbstractGameAction action = AbstractDungeon.actionManager.actions
+                                .get(i);
 
                         if (action instanceof com.megacrit.cardcrawl.actions.common.ApplyPowerAction) {
-                            java.lang.reflect.Field powerToApplyField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class.getDeclaredField("powerToApply");
+                            java.lang.reflect.Field powerToApplyField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class
+                                    .getDeclaredField("powerToApply");
                             powerToApplyField.setAccessible(true);
-                            com.megacrit.cardcrawl.powers.AbstractPower power = (com.megacrit.cardcrawl.powers.AbstractPower) powerToApplyField.get(action);
+                            com.megacrit.cardcrawl.powers.AbstractPower power = (com.megacrit.cardcrawl.powers.AbstractPower) powerToApplyField
+                                    .get(action);
 
-                            if (power instanceof com.megacrit.cardcrawl.powers.ThornsPower && power.owner == __instance) {
+                            if (power instanceof com.megacrit.cardcrawl.powers.ThornsPower
+                                    && power.owner == __instance) {
                                 power.amount += 1;
 
-                                java.lang.reflect.Field amountField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class.getDeclaredField("amount");
+                                java.lang.reflect.Field amountField = com.megacrit.cardcrawl.actions.common.ApplyPowerAction.class
+                                        .getDeclaredField("amount");
                                 amountField.setAccessible(true);
                                 int currentAmount = amountField.getInt(action);
                                 amountField.setInt(action, currentAmount + 1);
 
                                 logger.info(String.format(
-                                    "Ascension 51: Spiker Thorns increased by +1 (total: %d)",
-                                    power.amount
-                                ));
+                                        "Ascension 51: Spiker Thorns increased by +1 (total: %d)",
+                                        power.amount));
                                 break;
                             }
                         }
@@ -626,10 +581,7 @@ public class Level51 {
     /**
      * Darkling (어두미): Revive grants Strength +2
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.beyond.Darkling.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.beyond.Darkling.class, method = "takeTurn")
     public static class DarklingReviveStrengthGain {
         @SpirePostfixPatch
         public static void Postfix(com.megacrit.cardcrawl.monsters.beyond.Darkling __instance) {
@@ -646,13 +598,11 @@ public class Level51 {
                 if (move == 5) { // REINCARNATE move
                     // Apply +2 Strength on revive
                     AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                            __instance,
-                            __instance,
-                            new com.megacrit.cardcrawl.powers.StrengthPower(__instance, 2),
-                            2
-                        )
-                    );
+                            new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
+                                    __instance,
+                                    __instance,
+                                    new com.megacrit.cardcrawl.powers.StrengthPower(__instance, 2),
+                                    2));
 
                     logger.info("Ascension 51: Darkling gained +2 Strength on revive");
                 }
@@ -665,10 +615,7 @@ public class Level51 {
     /**
      * Maw (아귀): Roar pattern Weak and Frail +1
      */
-    @SpirePatch(
-        clz = com.megacrit.cardcrawl.monsters.beyond.Maw.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = com.megacrit.cardcrawl.monsters.beyond.Maw.class, method = "takeTurn")
     public static class MawRoarDebuffIncrease {
         @SpirePostfixPatch
         public static void Postfix(com.megacrit.cardcrawl.monsters.beyond.Maw __instance) {
@@ -685,21 +632,17 @@ public class Level51 {
                 if (move == 3) { // ROAR move
                     // Apply additional Weak +1 and Frail +1
                     AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                            AbstractDungeon.player,
-                            __instance,
-                            new com.megacrit.cardcrawl.powers.WeakPower(AbstractDungeon.player, 1, true),
-                            1
-                        )
-                    );
+                            new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
+                                    AbstractDungeon.player,
+                                    __instance,
+                                    new com.megacrit.cardcrawl.powers.WeakPower(AbstractDungeon.player, 1, true),
+                                    1));
                     AbstractDungeon.actionManager.addToBottom(
-                        new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
-                            AbstractDungeon.player,
-                            __instance,
-                            new com.megacrit.cardcrawl.powers.FrailPower(AbstractDungeon.player, 1, true),
-                            1
-                        )
-                    );
+                            new com.megacrit.cardcrawl.actions.common.ApplyPowerAction(
+                                    AbstractDungeon.player,
+                                    __instance,
+                                    new com.megacrit.cardcrawl.powers.FrailPower(AbstractDungeon.player, 1, true),
+                                    1));
 
                     logger.info("Ascension 51: Maw Roar applied +1 additional Weak and Frail");
                 }
@@ -713,10 +656,7 @@ public class Level51 {
      * Louse Normal: Grow pattern +1 additional Strength
      * 공벌레(일반): 힘 증가 패턴에서 추가적으로 힘을 1 증가
      */
-    @SpirePatch(
-        clz = LouseNormal.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = LouseNormal.class, method = "takeTurn")
     public static class LouseNormalGrowStrengthBonus {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -757,9 +697,8 @@ public class Level51 {
                             if (power instanceof StrengthPower && power.owner == __instance) {
                                 power.amount += 1;
                                 logger.info(String.format(
-                                    "Ascension 51: Louse Normal Grow pattern strength increased by +1 to %d",
-                                    power.amount
-                                ));
+                                        "Ascension 51: Louse Normal Grow pattern strength increased by +1 to %d",
+                                        power.amount));
                                 break;
                             }
                         }
@@ -777,10 +716,7 @@ public class Level51 {
      * Louse Defensive: Grow pattern +1 additional Strength
      * 공벌레(방어): 힘 증가 패턴에서 추가적으로 힘을 1 증가
      */
-    @SpirePatch(
-        clz = LouseDefensive.class,
-        method = "takeTurn"
-    )
+    @SpirePatch(clz = LouseDefensive.class, method = "takeTurn")
     public static class LouseDefensiveGrowStrengthBonus {
         private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
 
@@ -821,9 +757,8 @@ public class Level51 {
                             if (power instanceof StrengthPower && power.owner == __instance) {
                                 power.amount += 1;
                                 logger.info(String.format(
-                                    "Ascension 51: Louse Defensive Grow pattern strength increased by +1 to %d",
-                                    power.amount
-                                ));
+                                        "Ascension 51: Louse Defensive Grow pattern strength increased by +1 to %d",
+                                        power.amount));
                                 break;
                             }
                         }
@@ -840,11 +775,7 @@ public class Level51 {
     /**
      * GremlinTsundere (방패 그렘린): Block amount +3
      */
-    @SpirePatch(
-        clz = GremlinTsundere.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = GremlinTsundere.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class GremlinTsundereBlockPatch {
         @SpirePostfixPatch
         public static void Postfix(GremlinTsundere __instance, float x, float y) {
@@ -860,9 +791,8 @@ public class Level51 {
                 blockAmtField.setInt(__instance, currentBlockAmt + 3);
 
                 logger.info(String.format(
-                    "Ascension 51: GremlinTsundere blockAmt increased from %d to %d (+3)",
-                    currentBlockAmt, currentBlockAmt + 3
-                ));
+                        "Ascension 51: GremlinTsundere blockAmt increased from %d to %d (+3)",
+                        currentBlockAmt, currentBlockAmt + 3));
             } catch (Exception e) {
                 logger.error("Failed to modify GremlinTsundere blockAmt", e);
             }
@@ -872,11 +802,7 @@ public class Level51 {
     /**
      * GremlinThief (교활한 그렘린): Damage +2
      */
-    @SpirePatch(
-        clz = GremlinThief.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = GremlinThief.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class GremlinThiefDamagePatch51 {
         @SpirePostfixPatch
         public static void Postfix(GremlinThief __instance, float x, float y) {
@@ -898,9 +824,8 @@ public class Level51 {
                 }
 
                 logger.info(String.format(
-                    "Ascension 51: GremlinThief damage increased from %d to %d (+2)",
-                    currentDamage, currentDamage + 2
-                ));
+                        "Ascension 51: GremlinThief damage increased from %d to %d (+2)",
+                        currentDamage, currentDamage + 2));
             } catch (Exception e) {
                 logger.error("Failed to modify GremlinThief damage", e);
             }
@@ -910,11 +835,7 @@ public class Level51 {
     /**
      * GremlinWizard (마법사 그렘린): Damage +5
      */
-    @SpirePatch(
-        clz = GremlinWizard.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = GremlinWizard.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class GremlinWizardDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(GremlinWizard __instance, float x, float y) {
@@ -928,9 +849,8 @@ public class Level51 {
                 __instance.damage.get(0).base += 5;
 
                 logger.info(String.format(
-                    "Ascension 51: GremlinWizard damage increased from %d to %d (+5)",
-                    originalDamage, originalDamage + 5
-                ));
+                        "Ascension 51: GremlinWizard damage increased from %d to %d (+5)",
+                        originalDamage, originalDamage + 5));
             }
         }
     }
@@ -938,11 +858,7 @@ public class Level51 {
     /**
      * GremlinWarrior (화난 그렘린): HP +10
      */
-    @SpirePatch(
-        clz = GremlinWarrior.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = GremlinWarrior.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class GremlinWarriorHPPatch {
         @SpirePostfixPatch
         public static void Postfix(GremlinWarrior __instance, float x, float y) {
@@ -955,20 +871,15 @@ public class Level51 {
             __instance.currentHealth += 10;
 
             logger.info(String.format(
-                "Ascension 51: GremlinWarrior HP increased from %d to %d (+10)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: GremlinWarrior HP increased from %d to %d (+10)",
+                    originalHP, __instance.maxHealth));
         }
     }
 
     /**
      * GremlinFat (뚱뚱한 그렘린): HP +2
      */
-    @SpirePatch(
-        clz = GremlinFat.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = GremlinFat.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class GremlinFatHPPatch {
         @SpirePostfixPatch
         public static void Postfix(GremlinFat __instance, float x, float y) {
@@ -981,9 +892,8 @@ public class Level51 {
             __instance.currentHealth += 2;
 
             logger.info(String.format(
-                "Ascension 51: GremlinFat HP increased from %d to %d (+2)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: GremlinFat HP increased from %d to %d (+2)",
+                    originalHP, __instance.maxHealth));
         }
     }
 
@@ -991,10 +901,7 @@ public class Level51 {
      * JawWorm (턱벌레): First turn block +3
      * 첫턴에서 방어도를 3 얻은상태로 시작
      */
-    @SpirePatch(
-        clz = JawWorm.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = JawWorm.class, method = "usePreBattleAction")
     public static class JawWormFirstTurnBlock {
         @SpirePostfixPatch
         public static void Postfix(JawWorm __instance) {
@@ -1003,8 +910,7 @@ public class Level51 {
             }
 
             AbstractDungeon.actionManager.addToBottom(
-                new GainBlockAction(__instance, __instance, 3)
-            );
+                    new GainBlockAction(__instance, __instance, 3));
 
             logger.info("Ascension 51: JawWorm gained 3 block at battle start");
         }
@@ -1014,10 +920,7 @@ public class Level51 {
      * FungiBeast (동물하초): SporeCloud -1 and adds Frail on death
      * 포자 구름 수치 -1, 죽을 때 취약과 손상을 같이 부여
      */
-    @SpirePatch(
-        clz = SporeCloudPower.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
+    @SpirePatch(clz = SporeCloudPower.class, method = SpirePatch.CONSTRUCTOR)
     public static class FungiBeastSporeCloudReduction {
         @SpirePostfixPatch
         public static void Postfix(SporeCloudPower __instance, AbstractCreature owner, int amount) {
@@ -1030,9 +933,8 @@ public class Level51 {
                 __instance.amount = Math.max(1, __instance.amount - 1);
                 __instance.updateDescription();
                 logger.info(String.format(
-                    "Ascension 51: FungiBeast SporeCloud reduced from %d to %d",
-                    amount, __instance.amount
-                ));
+                        "Ascension 51: FungiBeast SporeCloud reduced from %d to %d",
+                        amount, __instance.amount));
             }
         }
     }
@@ -1040,10 +942,7 @@ public class Level51 {
     /**
      * FungiBeast: Add Frail debuff on death (in addition to Vulnerable)
      */
-    @SpirePatch(
-        clz = SporeCloudPower.class,
-        method = "onDeath"
-    )
+    @SpirePatch(clz = SporeCloudPower.class, method = "onDeath")
     public static class FungiBeastSporeCloudFrail {
         @SpirePostfixPatch
         public static void Postfix(SporeCloudPower __instance) {
@@ -1055,21 +954,17 @@ public class Level51 {
             if (__instance.owner instanceof com.megacrit.cardcrawl.monsters.exordium.FungiBeast) {
                 // Add Frail debuff (same amount as Vulnerable)
                 AbstractDungeon.actionManager.addToTop(
-                    new ApplyPowerAction(
-                        AbstractDungeon.player,
-                        null,
-                        new com.megacrit.cardcrawl.powers.FrailPower(
-                            AbstractDungeon.player,
-                            __instance.amount,
-                            true
-                        ),
-                        __instance.amount
-                    )
-                );
+                        new ApplyPowerAction(
+                                AbstractDungeon.player,
+                                null,
+                                new com.megacrit.cardcrawl.powers.FrailPower(
+                                        AbstractDungeon.player,
+                                        __instance.amount,
+                                        true),
+                                __instance.amount));
                 logger.info(String.format(
-                    "Ascension 51: FungiBeast death also applies %d Frail (in addition to Vulnerable)",
-                    __instance.amount
-                ));
+                        "Ascension 51: FungiBeast death also applies %d Frail (in addition to Vulnerable)",
+                        __instance.amount));
             }
         }
     }
@@ -1077,10 +972,7 @@ public class Level51 {
     /**
      * SporeCloudPower: Update description for Ascension 51+ (adds Frail info)
      */
-    @SpirePatch(
-        clz = SporeCloudPower.class,
-        method = "updateDescription"
-    )
+    @SpirePatch(clz = SporeCloudPower.class, method = "updateDescription")
     public static class SporeCloudPowerDescriptionPatch {
         @SpirePostfixPatch
         public static void Postfix(SporeCloudPower __instance) {
@@ -1103,10 +995,7 @@ public class Level51 {
     /**
      * ShelledParasite (갑각기생충): Plated Armor +2
      */
-    @SpirePatch(
-        clz = ShelledParasite.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = ShelledParasite.class, method = "usePreBattleAction")
     public static class ShelledParasitePlatedArmorIncrease {
         @SpirePostfixPatch
         public static void Postfix(ShelledParasite __instance) {
@@ -1115,9 +1004,8 @@ public class Level51 {
             }
 
             AbstractDungeon.actionManager.addToBottom(
-                new ApplyPowerAction(__instance, __instance,
-                    new PlatedArmorPower(__instance, 2), 2)
-            );
+                    new ApplyPowerAction(__instance, __instance,
+                            new PlatedArmorPower(__instance, 2), 2));
 
             logger.info("Ascension 51: ShelledParasite gained +2 Plated Armor");
         }
@@ -1126,11 +1014,7 @@ public class Level51 {
     /**
      * Chosen (선택받은 자): Damage +2
      */
-    @SpirePatch(
-        clz = Chosen.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = Chosen.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class ChosenDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(Chosen __instance) {
@@ -1150,11 +1034,7 @@ public class Level51 {
     /**
      * Centurion (백부장): HP +6
      */
-    @SpirePatch(
-        clz = Centurion.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = Centurion.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class CenturionHPPatch {
         @SpirePostfixPatch
         public static void Postfix(Centurion __instance) {
@@ -1167,20 +1047,15 @@ public class Level51 {
             __instance.currentHealth += 6;
 
             logger.info(String.format(
-                "Ascension 51: Centurion HP increased from %d to %d (+6)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: Centurion HP increased from %d to %d (+6)",
+                    originalHP, __instance.maxHealth));
         }
     }
 
     /**
      * Snecko (스네코): Damage +2
      */
-    @SpirePatch(
-        clz = Snecko.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = Snecko.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class SneckoDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(Snecko __instance) {
@@ -1200,10 +1075,7 @@ public class Level51 {
     /**
      * SphericGuardian (구체형 수호기): Block +15
      */
-    @SpirePatch(
-        clz = SphericGuardian.class,
-        method = "usePreBattleAction"
-    )
+    @SpirePatch(clz = SphericGuardian.class, method = "usePreBattleAction")
     public static class SphericGuardianBlockIncrease {
         @SpirePostfixPatch
         public static void Postfix(SphericGuardian __instance) {
@@ -1212,8 +1084,7 @@ public class Level51 {
             }
 
             AbstractDungeon.actionManager.addToBottom(
-                new GainBlockAction(__instance, __instance, 15)
-            );
+                    new GainBlockAction(__instance, __instance, 15));
 
             logger.info("Ascension 51: SphericGuardian gained +15 block at battle start");
         }
@@ -1222,11 +1093,7 @@ public class Level51 {
     /**
      * BanditPointy (촉새): Damage +1
      */
-    @SpirePatch(
-        clz = BanditPointy.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = BanditPointy.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class BanditPointyDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(BanditPointy __instance) {
@@ -1246,11 +1113,7 @@ public class Level51 {
     /**
      * BanditLeader (로미오): HP +5
      */
-    @SpirePatch(
-        clz = BanditLeader.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = BanditLeader.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class BanditLeaderHPPatch {
         @SpirePostfixPatch
         public static void Postfix(BanditLeader __instance) {
@@ -1263,20 +1126,15 @@ public class Level51 {
             __instance.currentHealth += 5;
 
             logger.info(String.format(
-                "Ascension 51: BanditLeader HP increased from %d to %d (+5)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: BanditLeader HP increased from %d to %d (+5)",
+                    originalHP, __instance.maxHealth));
         }
     }
 
     /**
      * Repulsor (현혹기): Damage +2
      */
-    @SpirePatch(
-        clz = Repulsor.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = Repulsor.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class RepulsorDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(Repulsor __instance) {
@@ -1296,11 +1154,7 @@ public class Level51 {
     /**
      * OrbWalker (구체 순찰기): HP +10
      */
-    @SpirePatch(
-        clz = OrbWalker.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {float.class, float.class}
-    )
+    @SpirePatch(clz = OrbWalker.class, method = SpirePatch.CONSTRUCTOR, paramtypez = { float.class, float.class })
     public static class OrbWalkerHPPatch {
         @SpirePostfixPatch
         public static void Postfix(OrbWalker __instance) {
@@ -1313,20 +1167,15 @@ public class Level51 {
             __instance.currentHealth += 10;
 
             logger.info(String.format(
-                "Ascension 51: OrbWalker HP increased from %d to %d (+10)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: OrbWalker HP increased from %d to %d (+10)",
+                    originalHP, __instance.maxHealth));
         }
     }
 
     /**
      * Transient (과도자): Damage +5
      */
-    @SpirePatch(
-        clz = Transient.class,
-        method = SpirePatch.CONSTRUCTOR,
-        paramtypez = {}
-    )
+    @SpirePatch(clz = Transient.class, method = SpirePatch.CONSTRUCTOR, paramtypez = {})
     public static class TransientDamagePatch {
         @SpirePostfixPatch
         public static void Postfix(Transient __instance) {
@@ -1346,10 +1195,7 @@ public class Level51 {
     /**
      * SpireGrowth (첨탑 암종): HP +15
      */
-    @SpirePatch(
-        clz = SpireGrowth.class,
-        method = SpirePatch.CONSTRUCTOR
-    )
+    @SpirePatch(clz = SpireGrowth.class, method = SpirePatch.CONSTRUCTOR)
     public static class SpireGrowthHPPatch {
         @SpirePostfixPatch
         public static void Postfix(SpireGrowth __instance) {
@@ -1362,9 +1208,8 @@ public class Level51 {
             __instance.currentHealth += 15;
 
             logger.info(String.format(
-                "Ascension 51: SpireGrowth HP increased from %d to %d (+15)",
-                originalHP, __instance.maxHealth
-            ));
+                    "Ascension 51: SpireGrowth HP increased from %d to %d (+15)",
+                    originalHP, __instance.maxHealth));
         }
     }
 }

@@ -64,6 +64,22 @@ public class Level58 {
                     }
                 }
 
+                // Special handling for GremlinThief: update thiefDamage field for SetMoveAction
+                if (__instance.id != null && __instance.id.equals("GremlinThief")) {
+                    try {
+                        Field thiefDamageField = __instance.getClass().getDeclaredField("thiefDamage");
+                        thiefDamageField.setAccessible(true);
+                        int currentThiefDamage = thiefDamageField.getInt(__instance);
+                        thiefDamageField.setInt(__instance, currentThiefDamage + damageIncrease);
+                        logger.info(String.format(
+                            "Ascension 58: GremlinThief thiefDamage field updated from %d to %d",
+                            currentThiefDamage, currentThiefDamage + damageIncrease
+                        ));
+                    } catch (Exception e) {
+                        logger.error("Failed to update GremlinThief thiefDamage field", e);
+                    }
+                }
+
                 logger.info(String.format(
                     "Ascension 58: Normal %s damage increased by %d [init prefix]",
                     __instance.name, damageIncrease

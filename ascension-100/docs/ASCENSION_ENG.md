@@ -892,7 +892,7 @@ If you enjoy suffering, feel free to challenge yourself, but it is recommended t
 - Orb Walker: Laser pattern shuffles 1 additional Burn into draw and discard piles
 - Darkling: Revives with Regen 2
 - The Maw: Drool pattern gains +3 additional Strength
-- Transient: Fading +1, gains Invincible 200
+- Transient: Fading +1
 - Spire Growth: HP +20
 - Writhing Mass: Malleable +5
 

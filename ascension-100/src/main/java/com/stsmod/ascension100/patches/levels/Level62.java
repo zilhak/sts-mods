@@ -90,6 +90,22 @@ public class Level62 {
                 }
             }
 
+            // Special handling for GremlinThief: update thiefDamage field for SetMoveAction
+            if (__instance.id != null && __instance.id.equals("GremlinThief")) {
+                try {
+                    Field thiefDamageField = __instance.getClass().getDeclaredField("thiefDamage");
+                    thiefDamageField.setAccessible(true);
+                    int currentThiefDamage = thiefDamageField.getInt(__instance);
+                    thiefDamageField.setInt(__instance, currentThiefDamage + damageIncrease);
+                    logger.info(String.format(
+                        "Ascension 62: GremlinThief thiefDamage field updated from %d to %d",
+                        currentThiefDamage, currentThiefDamage + damageIncrease
+                    ));
+                } catch (Exception e) {
+                    logger.error("Failed to update GremlinThief thiefDamage field", e);
+                }
+            }
+
             // Mark as patched
             patchedMonsters.add(__instance);
         }
