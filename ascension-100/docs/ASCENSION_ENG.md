@@ -898,7 +898,7 @@ If you enjoy suffering, feel free to challenge yourself, but it is recommended t
 
 **Elites**:
 - Gremlin Nob: Bellow pattern gains +2 additional Enrage
-- Lagavulin: Siphon Soul reduces Dexterity/Strength by additional 1, applies Focus -2
+- Lagavulin: Siphon Soul reduces Dexterity/Strength by additional 1, applies Focus -1
 - Sentry: Bolt pattern shuffles 1 additional Dazed
 - Book of Stabbing: Multi-Stab count +1
 - Gremlin Leader: Rally pattern Strength +4

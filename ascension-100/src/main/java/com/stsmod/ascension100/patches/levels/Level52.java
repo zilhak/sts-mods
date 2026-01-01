@@ -38,6 +38,11 @@ public class Level52 {
                 return;
             }
 
+            // Skip elite minions (they should not get normal enemy bonuses)
+            if (__instance.id != null && __instance.id.equals("Dagger")) {
+                return;
+            }
+
             // Skip Byrd (섀) - should not get basic damage increases
             if (__instance instanceof Byrd) {
                 return;

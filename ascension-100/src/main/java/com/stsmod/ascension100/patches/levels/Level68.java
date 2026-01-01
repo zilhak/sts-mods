@@ -46,8 +46,21 @@ public class Level68 {
                 return;
             }
 
-            // Skip byrd in Act 2 (handled by special Level 62 logic)
-            if (AbstractDungeon.actNum == 2 && __instance.id != null && __instance.id.equals("Byrd")) {
+            // Skip elite minions (they should not get normal enemy bonuses)
+            if (__instance.id != null && __instance.id.equals("Dagger")) {
+                logger.info("Ascension 68: Skipping Dagger (elite minion, not a normal enemy)");
+                return;
+            }
+
+            // Skip Byrd completely (handled by Level 62 Flight increase and Level 58 Headbutt increase)
+            if (__instance.id != null && __instance.id.equals("Byrd")) {
+                logger.info("Ascension 68: Skipping Byrd (handled by other levels)");
+                return;
+            }
+
+            // Alternative check using instanceof
+            if (__instance instanceof com.megacrit.cardcrawl.monsters.city.Byrd) {
+                logger.info("Ascension 68: Skipping Byrd via instanceof check");
                 return;
             }
 

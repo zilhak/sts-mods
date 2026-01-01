@@ -50,6 +50,11 @@ public class Level62 {
                 return;
             }
 
+            // Skip elite minions (they should not get normal enemy bonuses)
+            if (__instance.id != null && __instance.id.equals("Dagger")) {
+                return;
+            }
+
             // Check if already patched
             if (patchedMonsters.contains(__instance)) {
                 logger.warn(String.format(

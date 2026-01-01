@@ -37,8 +37,13 @@ public class Level58 {
                 return;
             }
 
-            // Only apply to NORMAL enemies, exclude Byrd
+            // Only apply to NORMAL enemies, exclude Byrd and elite minions
             if (__instance.type == AbstractMonster.EnemyType.NORMAL && !(__instance instanceof Byrd)) {
+                // Skip elite minions (they should not get normal enemy bonuses)
+                if (__instance.id != null && __instance.id.equals("Dagger")) {
+                    return;
+                }
+
                 int damageIncrease = 1;
 
                 for (DamageInfo damageInfo : __instance.damage) {
@@ -122,10 +127,10 @@ public class Level58 {
 
             try {
                 Byte move = lastMove.get();
-                if (move != null && move == 2) { // HEADBUTT move
-                    // Apply +2 damage to Headbutt pattern
-                    if (__instance.damage.size() > 0 && __instance.damage.get(0) != null) {
-                        __instance.damage.get(0).base += 2;
+                if (move != null && move == 5) { // HEADBUTT move (pattern 5)
+                    // Apply +2 damage to Headbutt pattern (damage index 2)
+                    if (__instance.damage.size() > 2 && __instance.damage.get(2) != null) {
+                        __instance.damage.get(2).base += 2;
                         logger.info("Ascension 58: Byrd Headbutt damage +2");
                     }
                 }

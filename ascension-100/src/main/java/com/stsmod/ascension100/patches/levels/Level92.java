@@ -1214,99 +1214,38 @@ public class Level92 {
 
     /**
      * Lagavulin's Soul Sap (DEBUFF) pattern has enhanced debuffs at A92+
-     * Base game: Dexterity -1/-2, Strength -1/-2 (A18+: -2/-2)
-     * A92+: Additional Dexterity -1, Strength -1, Focus -2
+     * Base game: Dexterity -2, Strength -2 (A18+)
+     * A92+: Additional -1 Str, -1 Dex, -1 Focus
      */
     @SpirePatch(
         clz = Lagavulin.class,
         method = "takeTurn"
     )
     public static class LagavulinEnhancedDebuff {
-        private static final ThreadLocal<Byte> lastMove = new ThreadLocal<>();
-
-        @SpirePrefixPatch
-        public static void Prefix(Lagavulin __instance) {
-            if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
-                return;
-            }
-
-            try {
-                Field nextMoveField = AbstractMonster.class.getDeclaredField("nextMove");
-                nextMoveField.setAccessible(true);
-                byte move = nextMoveField.getByte(__instance);
-                lastMove.set(move);
-            } catch (Exception e) {
-                logger.error("Failed to get Lagavulin move", e);
-            }
-        }
-
         @SpirePostfixPatch
         public static void Postfix(Lagavulin __instance) {
             if (!AbstractDungeon.isAscensionMode || AbstractDungeon.ascensionLevel < 92) {
                 return;
             }
 
-            Byte move = lastMove.get();
-            if (move != null && move == 1) { // DEBUFF move (Soul Sap) is case 1
-                // Find and modify the last ApplyPowerAction with DexterityPower and StrengthPower
-                try {
-                    boolean foundDex = false;
-                    boolean foundStr = false;
+            // Siphon Soul is move 1 (DEBUFF)
+            if (__instance.nextMove == 1) {
+                // Additional -1 Strength, -1 Dexterity, -1 Focus to player
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new StrengthPower(AbstractDungeon.player, -1), -1)
+                );
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new DexterityPower(AbstractDungeon.player, -1), -1)
+                );
+                AbstractDungeon.actionManager.addToBottom(
+                    new ApplyPowerAction(AbstractDungeon.player, __instance,
+                        new FocusPower(AbstractDungeon.player, -1), -1)
+                );
 
-                    for (int i = AbstractDungeon.actionManager.actions.size() - 1; i >= 0 && (!foundDex || !foundStr); i--) {
-                        AbstractGameAction action = AbstractDungeon.actionManager.actions.get(i);
-
-                        if (action instanceof ApplyPowerAction) {
-                            Field powerToApplyField = ApplyPowerAction.class.getDeclaredField("powerToApply");
-                            powerToApplyField.setAccessible(true);
-                            AbstractPower power = (AbstractPower) powerToApplyField.get(action);
-
-                            if (!foundDex && power instanceof DexterityPower && power.owner == AbstractDungeon.player) {
-                                power.amount -= 1; // Make it more negative
-
-                                Field amountField = ApplyPowerAction.class.getDeclaredField("amount");
-                                amountField.setAccessible(true);
-                                int currentAmount = amountField.getInt(action);
-                                amountField.setInt(action, currentAmount - 1);
-
-                                logger.info(String.format(
-                                    "Ascension 92: Lagavulin Dexterity debuff increased by -1 (total: %d)",
-                                    power.amount
-                                ));
-                                foundDex = true;
-                            } else if (!foundStr && power instanceof StrengthPower && power.owner == AbstractDungeon.player) {
-                                power.amount -= 1; // Make it more negative
-
-                                Field amountField = ApplyPowerAction.class.getDeclaredField("amount");
-                                amountField.setAccessible(true);
-                                int currentAmount = amountField.getInt(action);
-                                amountField.setInt(action, currentAmount - 1);
-
-                                logger.info(String.format(
-                                    "Ascension 92: Lagavulin Strength debuff increased by -1 (total: %d)",
-                                    power.amount
-                                ));
-                                foundStr = true;
-                            }
-                        }
-                    }
-
-                    // Apply Focus -2 to player
-                    AbstractDungeon.actionManager.addToBottom(
-                        new ApplyPowerAction(
-                            (AbstractCreature)AbstractDungeon.player,
-                            (AbstractCreature)__instance,
-                            new FocusPower((AbstractCreature)AbstractDungeon.player, -2),
-                            -2
-                        )
-                    );
-                    logger.info("Ascension 92: Lagavulin applied Focus -2 to player");
-                } catch (Exception e) {
-                    logger.error("Failed to modify Lagavulin debuff amount", e);
-                }
+                logger.info("Ascension 92: Lagavulin Siphon Soul enhanced - Additional Str/Dex/Focus -1");
             }
-
-            lastMove.remove();
         }
     }
 
